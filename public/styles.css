@@ -1,0 +1,87 @@
+*{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0px;
+    padding: 0px
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    min-width: 100vw;
+    min-height: 100vh;
+    background-color: aquamarine;
+}
+
+section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+}
+
+h1{
+    text-align: center;
+}
+
+#details{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    justify-items: center;
+    background-color: blueviolet;
+    padding: 10px;
+    margin: 10px;
+}
+
+#signature{
+    width: 200px;
+    height: 100px;
+    background-color: aliceblue;
+    border: seagreen dotted 3px;
+    border-radius: 20px;
+    padding: 10px;
+    margin: 10px;
+    align-self: center;
+    max-width: 450px;
+    width: calc(90% - 10px)
+}
+
+#submit{
+    border-radius: 10px;
+    max-width: 200px;
+    padding: 10px;
+    margin: 10px;
+    font-size: 30px;
+    align-self: center;
+}
+
+img{
+    object-fit: cover
+}
+
+#logo{
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 50%;
+    align-self: center;
+    margin: 20px;
+}
+
+.text-field{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    margin: 20px;
+    padding: 10px;
+}
+
+.text-field > input{
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+    margin: 20px;
+}
+

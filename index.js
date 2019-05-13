@@ -12,52 +12,30 @@ const db = require('./utils/db.js')
 app.engine('handlebars', hb())
 app.set('view engine', 'handlebars')
 
-app.use(express.static('public'))
+app.use(express.static(`${__dirname}/public`))
 
 app.use(function (req, res, next) {
-    console.log(req.url)
-    if (req.çurl.endsWith('/')) {
-        res.status = 302
-        res.redirect('/petition')
-    } else {
-        next()
-    }
+    next()
 })
 
 app.get('/petition', (req, res) => {
-    console.log('trying to render')
     res.render('petition', {
         layout: 'main'
     })
 })
 
-app.get('/petition/', (req, res) => {
-    console.log('trying to render in here')
-    res.render('petition', {
-        layout: 'main'
+app.get('/petition/signed', (req, res) => {
+    res.render('signers', {
+        layout: 'main',
+        people: [ 'janice', 'dave' ]
     })
 })
 
-// app.get('/petition/:name', (req, res) => {
-//     switch (name) {
-//         case 'css' :
-//             res.end(res.sendfile('public/styles.css'));
-//             break;
-//         case 'script.js' :
-//             res.end(res.sendfile('public/styles.css'));
-//             break;
-//         default:
-//             break;
-//     }
-// })
-
-app.post('/petition', (req, res) => {
-
+app.get('/petition/signers', (req, res) => {
+    res.render('thank-you', {
+        layout: 'main'
+    })
 })
-
-app.get('/petition/signed')
-
-app.get('/petition/signers')
 
 app.listen(8080, () => {
     console.log('Listening on port 8080')

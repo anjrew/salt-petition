@@ -85,3 +85,12 @@ img{
     margin: 20px;
 }
 
+#signers{
+    margin: 30px
+}
+
+li{
+    align-items: center;
+    list-style-position: inside;
+}
+

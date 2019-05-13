@@ -25,6 +25,13 @@ h1{
     text-align: center;
 }
 
+form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+}
+
 #details{
     display: flex;
     flex-direction: row;
@@ -45,7 +52,8 @@ h1{
     margin: 10px;
     align-self: center;
     max-width: 450px;
-    width: calc(90% - 10px)
+    width: calc(90% - 10px);
+    align-self: center;
 }
 
 #submit{

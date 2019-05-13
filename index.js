@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const hb = require('express-handlebars')
+const bodyParser = require('body-parser')
 
 // const pg = require('pg');
 
@@ -12,6 +13,12 @@ const db = require('./utils/db.js')
 app.engine('handlebars', hb())
 app.set('view engine', 'handlebars')
 
+// Very important to get the POST reests of forms
+app.use(bodyParser.json()) // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
+    extended: true
+}))
+
 app.use(express.static(`${__dirname}/public`))
 
 app.use(function (req, res, next) {
@@ -22,6 +29,10 @@ app.get('/petition', (req, res) => {
     res.render('petition', {
         layout: 'main'
     })
+})
+
+app.post('/petition', (req, res) => {
+    console.log(req.body)
 })
 
 app.get('/petition/signed', (req, res) => {

@@ -24,10 +24,6 @@ app.engine('handlebars', hb())
 // sets rendering
 app.set('view engine', 'handlebars')
 app.use(cookieParser())
-app.use(cookieSession({
-    secret: `I see dead people.`,
-    maxAge: 1000 * 60 * 60 * 24 * 14
-}))
 
 // Very important to get the POST reests of forms
 app.use(bodyParser.json()) // to support JSON-encoded bodies
@@ -35,30 +31,52 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }))
 
+app.use(cookieSession({
+    secret: `I'm always angry.`,
+    maxAge: 1000 * 60 * 60 * 24 * 14
+}))
+
 //  MAIN FUNCTIONS
 app.use(express.static(`${__dirname}/public`))
 
-app.use(function (req, res, next) {
-
-    console.log(`REQUEST IS : ${req.url}`)
-    if (req.cookies.hasSigned && req.url !== '/petition/signers') {
-        res.redirect('/petition/signers')
+app.use(function (req, res, next) {  
+    if (req.session.id && req.url !== '/petition/signed' && req.url !== '/logout') {
+        if (req.url === '/petition/signers') {
+            next()
+        } else {
+            res.redirect('/petition/signed')
+        }
     } else {
         next()
     }
 })
 
+app.get('/logout', (req, res) => {
+    req.session = null
+    res.redirect('/petition')
+})
+
 app.get('/petition/signed', (req, res) => {
-    res.cookie('hasSigned', true, { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
-    res.render('thank-you', {
-        layout: 'main'
+    var signatureId = req.session.id
+
+    db.getSigners().then((signers) => {
+        var signersCount = signers.rows.length
+        res.render('thank-you', {
+            layout: 'main',
+            signersCount: `See the other ${signersCount > 1 ? signersCount : ''} ${signersCount > 1 ? 'signers' : 'signer'}`,
+            logout: true,
+            signatureId: signatureId
+        })
     })
 })
 
 app.get('/petition/signers', (req, res) => {
-    res.render('signers', {
-        layout: 'main',
-        people: ['janice', 'dave']
+    db.getSigners().then((signers) => {
+        res.render('signers', {
+            layout: 'main',
+            people: signers.rows,
+            logout: true
+        })
     })
 })
 
@@ -79,10 +97,10 @@ app.post('/petition', (req, res) => {
         }
     }
 
-    db.addSignature(req.body.firstname, req.body.lastname, req.body.signature).then((id) => {
+    db.addSignature(req.body.firstname, req.body.lastname, req.body.signature).then((result) => {
         // req.session is an object which was added by the cookieSession middleware above.
         // add a property to our session cookie called cook;
-        req.session.id = id
+        req.session.id = result.rows[0].id
         res.redirect('/petition/signed')
     }).catch((e) => {
         res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
@@ -102,8 +120,8 @@ app.get('/error', (req, res) => {
 })
 
 app.get('*', (req, res) => {
-    res.render('petition', {
-        layout: 'error',
+    res.render('error', {
+        layout: 'main',
         error: 'No page found',
         type: 'no matich url',
         message: 'The url is badly formatted.'

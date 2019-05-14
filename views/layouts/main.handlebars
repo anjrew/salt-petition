@@ -6,7 +6,9 @@
     <title>Andrew Johnson</title>
 </head>
 <body>
-
+    {{#if logout}}
+        {{>log-out}}
+    {{/if}}
     {{!-- Main render --}}
     <h1>{{{ body }}}</h1>
 

@@ -11,12 +11,11 @@ const cookieParser = require('cookie-parser')
 // const client = new pg.Client('postgres://spicedling:password@localhost:5432/cities')
 /// encrypts cookies
 const cookieSession = require('cookie-session')
-
+console.log(__dirname);
 // MODULES
-const db = require('./utils/db.js')
+const db = require(`${__dirname}/utils/db.js`)
 
 // SETUP
-
 app.engine('handlebars', hb())
 // sets rendering
 app.set('view engine', 'handlebars')
@@ -54,9 +53,9 @@ app.post('/petition', (req, res) => {
     for (var propt in req.body) {
         console.log(propt + ': ' + req.body[propt])
         if (!req.body[propt]) {
-            res.cookie('error_title', 'Error', { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
-            res.cookie('error_type', 'missing_details', { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
-            res.cookie('error_message', `You did not fill in the ${propt} field`)
+            res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
+            res.cookie('error_type', 'missing_details', { maxAge: 1000, httpOnly: true })
+            res.cookie('error_message', `You did not fill in the ${propt} field`, { maxAge: 1000, httpOnly: true })
             // Sends the response and ends this fuction
             res.redirect('/error')
         }
@@ -66,12 +65,12 @@ app.post('/petition', (req, res) => {
         // req.session is an object which was added by the cookieSession middleware above.
         // add a property to our session cookie called cook;
         req.session.id = id
-        res.cookie('hasSigned', true, { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
+        res.cookie('hasSigned', true, { maxAge: 1000, httpOnly: true })
         res.redirect('/petition/signed')
     }).catch((e) => {
-        res.cookie('error_title', 'Error', { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
-        res.cookie('error_type', 'data_base_error', { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
-        res.cookie('error_message', 'Could not add signature to the database')
+        res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
+        res.cookie('error_type', 'data_base_error', { maxAge: 1000, httpOnly: true })
+        res.cookie(`error_message`, ` 'Database error: ${e}`, { maxAge: 1000, httpOnly: true })
         res.redirect('/error')
     })
 })

@@ -1,14 +1,14 @@
 // spicedPg setup
 
 const spicedPg = require('spiced-pg')
-const db = spicedPg(`postgres:postgres:postgres@localhost:5432/signatures`) 
+const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`); 
 // Database quieries
 // Vunerable to SQL injection
 
 module.exports.addSignature = function (first, last, signatureUrl) {
     return db.query(`
         INSERT INTO signatures(first, last, signature) 
-        VALUES ($1, $2, $3);
+        VALUES ($1, $2, $3)
         RETURNING id;
         `,
     [first, last, signatureUrl]

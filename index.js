@@ -39,7 +39,7 @@ app.use(cookieSession({
 //  MAIN FUNCTIONS
 app.use(express.static(`${__dirname}/public`))
 
-app.use(function (req, res, next) {  
+app.use(function (req, res, next) {
     if (req.session.id && req.url !== '/petition/signed' && req.url !== '/logout') {
         if (req.url === '/petition/signers') {
             next()
@@ -65,7 +65,7 @@ app.get('/petition/signed', (req, res) => {
             layout: 'main',
             signersCount: `See the other ${signersCount > 1 ? signersCount : ''} ${signersCount > 1 ? 'signers' : 'signer'}`,
             logout: true,
-            signatureId: signatureId
+            signatureId: signers.rows[signatureId - 1].signature
         })
     })
 })

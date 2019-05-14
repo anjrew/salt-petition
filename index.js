@@ -32,7 +32,23 @@ app.get('/petition', (req, res) => {
 })
 
 app.post('/petition', (req, res) => {
-    console.log(req.body)
+    for (var propt in req.body) {
+        console.log(propt + ': ' + req.body[propt])
+        if (req.body[propt]) {
+
+        } else {
+            submissionError = propt
+            res.redirect('/error')
+        }
+    }
+})
+
+let submissionError = ''
+app.get('/error', (req, res) => {
+    res.render('error', {
+        layout: 'main',
+        error: submissionError
+    })
 })
 
 app.get('/petition/signed', (req, res) => {

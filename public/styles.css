@@ -51,15 +51,11 @@ form{
 }
 
 #signature{
-    width: 200px;
-    height: 100px;
     background-color: aliceblue;
     border: seagreen dotted 3px;
     border-radius: 20px;
     margin: 10px;
     align-self: center;
-    max-width: 450px;
-    width: calc(90% - 10px);
     align-self: center;
 }
 

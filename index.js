@@ -17,6 +17,7 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
+const { Textfield } = require('./scripts/widget_data.js/index.js');
 
 // SETUP
 app.engine('handlebars', hb())
@@ -65,7 +66,8 @@ app.get('/petition/signed', (req, res) => {
             layout: 'main',
             signersCount: `See the other ${signersCount > 1 ? signersCount : ''} ${signersCount > 1 ? 'signers' : 'signer'}`,
             logout: true,
-            signatureId: signers.rows[signatureId - 1].signature
+            signatureId: signers.rows[signatureId - 1].signature,
+            name: signers.rows[signatureId - 1].name
         })
     })
 })

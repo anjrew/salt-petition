@@ -64,6 +64,10 @@ form{
     align-self: center;
 }
 
+#data{
+    display: none
+}
+
 img{
     object-fit: cover
 }

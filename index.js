@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser')
 const pg = require('pg')
 const client = new pg.Client('postgres://spicedling:password@localhost:5432/cities')
 const db = require('./utils/db.js')
+const cookieSession = require('cookie-session');
+
 // const pg = require('pg');
 
 // Setup
@@ -13,6 +15,10 @@ const db = require('./utils/db.js')
 app.engine('handlebars', hb())
 app.set('view engine', 'handlebars')
 app.use(cookieParser())
+app.use(cookieSession({
+    secret: `I'm always angry.`,
+    maxAge: 1000 * 60 * 60 * 24 * 14
+}))
 
 // Very important to get the POST reests of forms
 app.use(bodyParser.json()) // to support JSON-encoded bodies
@@ -20,7 +26,9 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }))
 
-// Main functions
+
+
+//  Main functions
 
 app.use(express.static(`${__dirname}/public`))
 
@@ -41,12 +49,12 @@ app.get('/petition', (req, res) => {
 app.post('/petition', (req, res) => {
     for (var propt in req.body) {
         console.log(propt + ': ' + req.body[propt])
-        if (!req.body[propt]) {
+        if (!req.body[propt]) { 
             submissionError = propt
             res.redirect('/error')
         }
     }
-    res.cookie('hasSigned', true, { maxAge: 900000, httpOnly: true })
+    res.cookie('hasSigned', true, { maxAge: 1000 * 60 * 60 * 24 * 14, httpOnly: true })
     res.redirect('/petition/signed')
 })
 

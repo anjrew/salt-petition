@@ -47,6 +47,18 @@ class FormField extends Widget {
     }
 }
 
+class Footer extends Widget {
+    constructor (text, link, linkText) {
+        super()
+        this.text = text
+        this.link = link
+        this.linkText = linkText
+        if (!(text && link && linkText)) {
+            throw new Error('Not all fields complete in Textfield init')
+        }
+    }
+}
+
 class Form extends Widget {
     constructor (formField, submitLabel) {
         super()
@@ -69,6 +81,7 @@ module.exports.Textfield = Textfield
 module.exports.Button = Button
 module.exports.FormField = FormField
 module.exports.Form = Form
+module.exports.Footer = Footer
 
 /**
  * A constructor for the data for a Button

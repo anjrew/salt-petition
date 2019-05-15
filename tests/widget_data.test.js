@@ -37,4 +37,3 @@ test('Test Textfield: placeholder', () => {5
 // test('If there are no matching countries, an empty array is returned',() => {
 //     expect(countries.find('asdljhvbajhkvbs')).toEqual([]);
 // });
-

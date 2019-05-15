@@ -3,17 +3,17 @@
     <h1>{{title}}</h1>
 
     {{>logo}}
+
     <form method="post">
 
-        {{#if error}}
-            {{>error_message}}
-        {{/if}}
+        {{#if error}} {{>error_message}} {{/if}}
 
         {{>fieldset}}
 
         {{>submit-button}}
 
         {{>footer}}
+        
     </form>
 
 </section>

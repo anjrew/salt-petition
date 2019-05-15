@@ -15,7 +15,6 @@ setupApp()
 
 // MIDDLEWARE
 app.use(function (req, res, next) {
-    console.log(req.url);
     const userId = req.session.userId
     const signatureId = req.session.signatureId
     const loggedIn = req.session.loggedIn
@@ -37,9 +36,15 @@ app.use(function (req, res, next) {
             }
         }
     } else {
-        res.redirect('/register')
+        if (url !== '/register') {
+            res.redirect('/register')
+        } else {
+            next()
+        }
     }
 })
+
+// REQUESTS
 
 app.get('/register', (req, res) => { renderPage(req, res, new SignUpPage()) })
 
@@ -70,16 +75,15 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
     var email = req.body.emailaddress
     var password = req.body.password
-    db.getHashedPWord(email).then((hashedP) => {
-        return encryption.checkPassword(password, hashedP)
+    db.getHashedPWord(email).then((result) => {
+        return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
+        req.session.loggedIn = true
+        res.redirect('/petition')
         res.redirect(`/petition/signed`)
     }).catch((e) => {
         renderPage(req, res, new LoginPage(`Error trying to login: ${e}`))
     })
-
-    req.session.loggedIn = true
-    res.redirect('/petition')
 })
 
 app.get('/logout', (req, res) => {

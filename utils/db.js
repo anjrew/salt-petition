@@ -3,8 +3,9 @@
 const spicedPg = require('spiced-pg')
 const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`)
 // Database quieries
-// Vunerable to SQL injection
+// Vunerable to SQL injection without "$" thing
 
+// SIGNATURE QUERYS
 module.exports.addSignature = function (first, last, signatureUrl) {
     return db.query(`
         INSERT INTO signatures(first, last, signature) 
@@ -21,6 +22,18 @@ module.exports.getSigners = function () {
 
 module.exports.getAmountOfSigners = function () {
     return db.query('SELECT COUNT(id) FROM signatures;')
+}
+
+// USER QUERIES
+
+module.exports.addUser = function (first, last, email, password) {
+    return db.query(`
+        INSERT INTO signatures(first, last, email, password) 
+        VALUES ($1, $2, $3, $4)
+        RETURNING id;
+        `,
+    [first, last, email, password]
+    )
 }
 
 // function addCity(city, country) {

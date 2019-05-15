@@ -18,7 +18,7 @@ const cookieSession = require('cookie-session')
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
 const { Widget, Textfield, Button, FormField, Form } = require('./scripts/widget_data.js')
-const { Page } = require('./scripts/page_data.js')
+const { Page, SignUpPage } = require('./scripts/page_data.js')
 
 // SETUP
 app.engine('handlebars', hb())
@@ -53,30 +53,24 @@ app.use(function (req, res, next) {
     }
 })
 
-// app.get('/registration', (req, res) => {
-//     res.render('form', {
-//         layout: 'main',
-//         textfields: [
-//             { label: 'First Name', inputType: 'text', databaseId: 'firstname', placeholder: '' },
-//             { label: 'Last Name', inputType: 'text', databaseId: 'lastname', placeholder: '' },
-//             { label: 'Email addess', inputType: 'text', databaseId: 'emailaddress', placeholder: '' },
-//             { label: 'Password', inputType: 'text', databaseId: 'password', placeholder: '' }
-//         ]
-//     })
-// })
+app.get('/register', (req, res) => { renderPage(req, res, new SignUpPage()) })
 
-app.get('/registration', (req, res) => {
+app.post('/register', (req, res) => {
 
-    var registrationForm = new Page('form', {
-        title: 'Lets sign you up!',
-        fieldset: new FormField([
-            new Textfield('First name', 'text', 'firstname', ''),
-            new Textfield('Last name', 'text', 'lastname', ''),
-            new Textfield('Email address', 'text', 'emailaddress', ''),
-            new Textfield('Password', 'password', 'password', '')
-        ])
+    for (var propt in req.body) {
+        if (!req.body[propt]) {
+            renderPage(req, res, new SignUpPage(`You did not fill in the ${propt} field`))
+        }
+    }
+
+    db.addUser(req.body.firstname, req.body.lastname, req.body.email, req.body.password).then((result) => {
+        // req.session is an object which was added by the cookieSession middleware above.
+        // add a property to our session cookie called cook;
+        req.session.userId = result.rows[0].id
+        res.redirect('/petition')
+    }).catch((e) => {
+        renderPage(req, res, new SignUpPage('Error'))
     })
-    renderPage(req, res, registrationForm)
 })
 
 app.get('/logout', (req, res) => {
@@ -167,5 +161,3 @@ function renderPage (req, res, page) {
     }
     res.render(page.name, page.data)
 }
-
-

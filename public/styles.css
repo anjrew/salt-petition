@@ -22,6 +22,11 @@ section{
     width: 100%;
 }
 
+fieldset{
+    max-width: 350px;
+    align-self: center
+}
+
 button{
     border-radius: 10px;
     padding: 10px;

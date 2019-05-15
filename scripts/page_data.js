@@ -1,18 +1,40 @@
 'use strict'
+const { Textfield, Button, FormField, Form } = require('./widget_data.js')
 
-class Page {
-    /**
+/**
      * @param {String} name - The name of the page
      * @param {Widget} data - The widget data for the page
      */
+
+class Page {
     constructor (name, data) {
         this.name = name
         this.data = data
         this.data.layout = 'main'
+        // for (const key in data) {
+        //     this.data[key] = data[key]
+        // }
+    };
+}
+
+class SignUpPage extends Page {
+    constructor (err) {
+        super('form',
+            {
+                title: 'Lets sign you up!',
+                fieldset: new FormField([
+                    new Textfield('First name', 'text', 'firstname', ''),
+                    new Textfield('Last name', 'text', 'lastname', ''),
+                    new Textfield('Email address', 'text', 'emailaddress', ''),
+                    new Textfield('Password', 'password', 'password', '')
+                ]),
+                error: err
+            })
     };
 }
 
 module.exports.Page = Page
+module.exports.SignUpPage = SignUpPage
 
 // class SignUp {
 //     constructor () {

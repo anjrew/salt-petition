@@ -11,9 +11,6 @@ class Page {
         this.name = name
         this.data = data
         this.data.layout = 'main'
-        // for (const key in data) {
-        //     this.data[key] = data[key]
-        // }
     };
 }
 
@@ -33,8 +30,23 @@ class SignUpPage extends Page {
     };
 }
 
+class LoginPage extends Page {
+    constructor (err) {
+        super('form',
+            {
+                title: 'Lets sign you up!',
+                fieldset: new FormField([
+                    new Textfield('Email address', 'text', 'emailaddress', ''),
+                    new Textfield('Password', 'password', 'password', '')
+                ]),
+                error: err
+            })
+    };
+}
+
 module.exports.Page = Page
 module.exports.SignUpPage = SignUpPage
+module.exports.LoginPage = LoginPage
 
 // class SignUp {
 //     constructor () {

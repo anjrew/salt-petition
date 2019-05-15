@@ -40,7 +40,7 @@ class FormField extends Widget {
             throw new Error('Fields is not an array')
         }
         for (let index = 0; index < textfields.length; index++) {
-            if (!(textfields[index] instanceof module.exports.Textfield)) {
+            if (!(textfields[index] instanceof Textfield)) {
                 throw new Error('Not all fields are of type TextField')
             }
         }
@@ -55,7 +55,7 @@ class Form extends Widget {
         if (!(formField && submitLabel)) {
             throw new Error('Not all fields complete in Form init')
         }
-        if (!(formField instanceof module.exports.FormField)) {
+        if (!(formField instanceof FormField)) {
             throw new Error('Not all fields are of type field')
         }
         if (!(typeof submitLabel !== 'string')) {

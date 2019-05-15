@@ -18,7 +18,7 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
-const { Page, SignUpPage } = require('./scripts/page_data.js')
+const { Page, SignUpPage, LoginPage } = require('./scripts/page_data.js')
 
 // SETUP
 app.engine('handlebars', hb())
@@ -44,13 +44,20 @@ app.use(express.static(`${__dirname}/public`))
 app.use(function (req, res, next) {
     const userId = req.session.userId
     const signatureId = req.session.signatureId
+    const loggedIn = req.session.loggedIn
     const url = req.url
     if (userId) {
         if (url === '/register') {
             res.redirect('/petition')
         } else {
-            if (signatureId) {
-                res.redirect('/petition/signed')
+            if (loggedIn) {
+                if (signatureId) {
+                    res.redirect('/petition/signed')
+                } else {
+                    next()
+                }
+            } else if (url !== '/login') {
+                res.redirect('/login')
             } else {
                 next()
             }
@@ -61,6 +68,8 @@ app.use(function (req, res, next) {
 })
 
 app.get('/register', (req, res) => { renderPage(req, res, new SignUpPage()) })
+
+app.get('/register', (req, res) => { renderPage(req, res, new LoginPage()) })
 
 app.post('/register', (req, res) => {
     for (var propt in req.body) {
@@ -82,8 +91,27 @@ app.post('/register', (req, res) => {
     })
 })
 
+app.get('/login', (req, res) => {
+    renderPage(req, res, new LoginPage())
+})
+
+app.post('/login', (req, res) => {
+    var email = req.body.emailaddress
+    var password = req.body.password
+    db.getHashedPWord(email).then((hashedP) => {
+        return encryption.checkPassword(password, hashedP)
+    }).then((doesMatch) => {
+        res.redirect(`/petition/signed`)
+    }).catch((e) => {
+        renderPage(req, res, new LoginPage(`Error trying to login: ${e}`))
+    })
+
+    req.session.loggedIn = true
+    res.redirect('/petition')
+})
+
 app.get('/logout', (req, res) => {
-    req.session = null
+    req.session.loggedIn = null
     res.redirect('/petition')
 })
 

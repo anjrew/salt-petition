@@ -36,6 +36,14 @@ module.exports.addUser = function (first, last, email, password) {
     )
 }
 
+module.exports.getHashedPWord = function (email) {
+    return db.query(`
+        SELECT password FROM users WHERE $1 = email; 
+        `,
+    [email]
+    )
+}
+
 // function addCity(city, country) {
 //     db.query(`
 //         INSERT INTO cities(city, country)

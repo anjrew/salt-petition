@@ -17,7 +17,7 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
-const { Textfield } = require('./scripts/widget_data.js/index.js');
+const { Textfield , Button} = require('./scripts/widget_data.js/index.js');
 
 // SETUP
 app.engine('handlebars', hb())

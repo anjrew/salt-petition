@@ -20,7 +20,7 @@ test('Test Textfield: databaseId', () => {
     expect(new Textfield('Name', 'text', 'first', 'jan').databaseId).toEqual('first')
 })
 
-test('Test Textfield: placeholder', () => {
+test('Test Textfield: placeholder', () => {5
     expect(new Textfield('Name', 'text', 'first', 'jan').placeholder).toEqual('jan')
 })
 

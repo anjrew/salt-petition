@@ -9,7 +9,13 @@
     {{#if logout}}
         {{>log-out}}
     {{/if}}
+    
     {{!-- Main render --}}
     <h1>{{{ body }}}</h1>
+    
+    {{#unless error}}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script src="/script.js"></script>
+    {{/unless}}
 </body>
 </html>

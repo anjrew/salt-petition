@@ -17,7 +17,8 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
-const { Textfield , Button} = require('./scripts/widget_data.js/index.js');
+const { Widget, Textfield, Button, FormField, Form } = require('./scripts/widget_data.js')
+const { Page } = require('./scripts/page_data.js')
 
 // SETUP
 app.engine('handlebars', hb())
@@ -50,6 +51,32 @@ app.use(function (req, res, next) {
     } else {
         next()
     }
+})
+
+// app.get('/registration', (req, res) => {
+//     res.render('form', {
+//         layout: 'main',
+//         textfields: [
+//             { label: 'First Name', inputType: 'text', databaseId: 'firstname', placeholder: '' },
+//             { label: 'Last Name', inputType: 'text', databaseId: 'lastname', placeholder: '' },
+//             { label: 'Email addess', inputType: 'text', databaseId: 'emailaddress', placeholder: '' },
+//             { label: 'Password', inputType: 'text', databaseId: 'password', placeholder: '' }
+//         ]
+//     })
+// })
+
+app.get('/registration', (req, res) => {
+
+    var registrationForm = new Page('form', {
+        title: 'Lets sign you up!',
+        fieldset: new FormField([
+            new Textfield('First name', 'text', 'firstname', ''),
+            new Textfield('Last name', 'text', 'lastname', ''),
+            new Textfield('Email address', 'text', 'emailaddress', ''),
+            new Textfield('Password', 'password', 'password', '')
+        ])
+    })
+    renderPage(req, res, registrationForm)
 })
 
 app.get('/logout', (req, res) => {
@@ -133,3 +160,12 @@ app.get('*', (req, res) => {
 app.listen(8080, () => {
     console.log('Listening on port 8080')
 })
+
+function renderPage (req, res, page) {
+    if (!(page instanceof Page)) {
+        throw new Error('Not all fields are of type TextField')
+    }
+    res.render(page.name, page.data)
+}
+
+

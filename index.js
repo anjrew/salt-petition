@@ -1,47 +1,21 @@
+// IMPORTS
 const express = require('express')
 const app = express()
-// IMPORTS
 const encryption = require('./utils/encryption')
 const hb = require('express-handlebars')
-
-// Makes the body of requests avaliable as an object
 const bodyParser = require('body-parser')
-
-// Makes the  cookies of the reqest avaliable to read as 'cookies' and abke to set cookies
 const cookieParser = require('cookie-parser')
-
-// The database app
-// const pg = require('pg')
-// const client = new pg.Client('postgres://spicedling:password@localhost:5432/cities')
-/// encrypts cookies
 const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
 const { Page, SignUpPage, LoginPage } = require('./scripts/page_data.js')
 
-// SETUP
-app.engine('handlebars', hb())
+setupApp()
 
-// sets rendering
-app.set('view engine', 'handlebars')
-app.use(cookieParser())
-
-// Very important to get the POST reests of forms
-app.use(bodyParser.json()) // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
-    extended: true
-}))
-
-app.use(cookieSession({
-    secret: `I'm always angry.`,
-    maxAge: 1000 * 60 * 60 * 24 * 14
-}))
-
-//  MAIN FUNCTIONS
-app.use(express.static(`${__dirname}/public`))
-
+// MIDDLEWARE
 app.use(function (req, res, next) {
+    console.log(req.url);
     const userId = req.session.userId
     const signatureId = req.session.signatureId
     const loggedIn = req.session.loggedIn
@@ -68,8 +42,6 @@ app.use(function (req, res, next) {
 })
 
 app.get('/register', (req, res) => { renderPage(req, res, new SignUpPage()) })
-
-app.get('/register', (req, res) => { renderPage(req, res, new LoginPage()) })
 
 app.post('/register', (req, res) => {
     for (var propt in req.body) {
@@ -191,6 +163,26 @@ app.get('*', (req, res) => {
 app.listen(8080, () => {
     console.log('Listening on port 8080')
 })
+
+function setupApp () {
+    app.engine('handlebars', hb())
+
+    // sets rendering
+    app.set('view engine', 'handlebars')
+    app.use(cookieParser())
+
+    // Very important to get the POST reests of forms
+    app.use(bodyParser.json()) // to support JSON-encoded bodies
+    app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
+        extended: true
+    }))
+
+    app.use(cookieSession({
+        secret: `I'm always angry.`,
+        maxAge: 1000 * 60 * 60 * 24 * 14
+    }))
+    app.use(express.static(`${__dirname}/public`))
+}
 
 function renderPage (req, res, page) {
     if (!(page instanceof Page)) {

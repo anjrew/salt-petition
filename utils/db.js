@@ -28,7 +28,7 @@ module.exports.getAmountOfSigners = function () {
 
 module.exports.addUser = function (first, last, email, password) {
     return db.query(`
-        INSERT INTO signatures(first, last, email, password) 
+        INSERT INTO users(first, last, email, password) 
         VALUES ($1, $2, $3, $4)
         RETURNING id;
         `,

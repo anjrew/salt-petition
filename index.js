@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 // IMPORTS
+const encryption = require('./utils/encryption')
 const hb = require('express-handlebars')
 
 // Makes the body of requests avaliable as an object
@@ -17,7 +18,6 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
-const { Widget, Textfield, Button, FormField, Form } = require('./scripts/widget_data.js')
 const { Page, SignUpPage } = require('./scripts/page_data.js')
 
 // SETUP
@@ -42,34 +42,43 @@ app.use(cookieSession({
 app.use(express.static(`${__dirname}/public`))
 
 app.use(function (req, res, next) {
-    if (req.session.id && req.url !== '/petition/signed' && req.url !== '/logout') {
-        if (req.url === '/petition/signers') {
-            next()
+    const userId = req.session.userId
+    const signatureId = req.session.signatureId
+    const url = req.url
+    if (userId) {
+        if (url === '/register') {
+            res.redirect('/petition')
         } else {
-            res.redirect('/petition/signed')
+            if (signatureId) {
+                res.redirect('/petition/signed')
+            } else {
+                next()
+            }
         }
     } else {
-        next()
+        res.redirect('/register')
     }
 })
 
 app.get('/register', (req, res) => { renderPage(req, res, new SignUpPage()) })
 
 app.post('/register', (req, res) => {
-
     for (var propt in req.body) {
         if (!req.body[propt]) {
             renderPage(req, res, new SignUpPage(`You did not fill in the ${propt} field`))
+            return
         }
     }
 
-    db.addUser(req.body.firstname, req.body.lastname, req.body.email, req.body.password).then((result) => {
+    encryption.hashPassword(req.body.password).then((hashedP) => {
+        return db.addUser(req.body.firstname, req.body.lastname, req.body.emailaddress, hashedP)
+    }).then((result) => {
         // req.session is an object which was added by the cookieSession middleware above.
         // add a property to our session cookie called cook;
         req.session.userId = result.rows[0].id
         res.redirect('/petition')
     }).catch((e) => {
-        renderPage(req, res, new SignUpPage('Error'))
+        renderPage(req, res, new SignUpPage(`Database Error: ${e}`))
     })
 })
 
@@ -79,7 +88,7 @@ app.get('/logout', (req, res) => {
 })
 
 app.get('/petition/signed', (req, res) => {
-    var signatureId = req.session.id
+    var signatureId = req.session.signatureId
 
     db.getSigners().then((signers) => {
         var signersCount = signers.rows.length
@@ -123,7 +132,7 @@ app.post('/petition', (req, res) => {
     db.addSignature(req.body.firstname, req.body.lastname, req.body.signature).then((result) => {
         // req.session is an object which was added by the cookieSession middleware above.
         // add a property to our session cookie called cook;
-        req.session.id = result.rows[0].id
+        req.session.signatureId = result.rows[0].id
         res.redirect('/petition/signed')
     }).catch((e) => {
         res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })

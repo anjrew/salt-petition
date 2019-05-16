@@ -1,5 +1,5 @@
-const db = require('../utils/db');
+const db = require('../utils/db')
 
-test('TestName',() => {
-    expect(db.test()).toEqual(true);
-});
+test('TestName', () => {
+    expect(db.test()).toEqual(true)
+})

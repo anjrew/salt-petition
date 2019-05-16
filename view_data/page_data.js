@@ -1,6 +1,7 @@
 'use strict'
 const { Textfield, Button, FormField, Form, Footer } = require('./widget_data.js')
-const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNUP: 'sign-up', SIGNERS: 'signers', THANKYOU: 'thank-you' })
+const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNUP: 'sign-up', SIGNERS: 'signers', SIGNED: '/signed' })
+const Routes = Object.freeze({ SIGNED: '/signed', PETITION: 'petition', REGISTER: '/register', SIGNERS: 'signers', LOGIN: 'log-in' })
 
 /**
  * @param {String} name - The name of the page
@@ -70,7 +71,8 @@ class SignPetitonPage extends Page {
     constructor (err) {
         super('petition',
             {
-                error: err
+                error: err,
+                signature: true
             })
     };
 }
@@ -83,12 +85,32 @@ class ProfilePage extends Page {
     constructor (err) {
         super(PageType.FORM, {
             error: err,
-            title: 'Pleasew tell us a little more about yourself',
+            title: 'Please tell us a little more about yourself',
             fieldset: new FormField([
                 new Textfield('Age', 'text', 'age', ''),
                 new Textfield('City', 'text', 'city', ''),
                 new Textfield('Homepage', 'text', 'url', '')
-            ])
+            ]),
+            buttonName: 'Continue'
+        })
+    }
+}
+class ThankyouPage extends Page {
+    /**
+    * @constructor
+    * @param {string} - The name of the person who just signed
+    * @param {number} - The total number of signers
+    */
+    constructor (name, signerAmount) {
+        if (!name && !signerAmount) {
+            throw Error('Arguments are missing for Thankyou page')
+        }
+        if (typeof signerAmount !== 'number') {
+            throw Error('Signer amount is not a number')
+        }
+        super(PageType.THANKYOU, {
+            name: name,
+            signerAmount: signerAmount
         })
     }
 }
@@ -98,6 +120,8 @@ module.exports.Page = Page
 module.exports.SignUpPage = SignUpPage
 module.exports.LoginPage = LoginPage
 module.exports.ProfilePage = ProfilePage
+module.exports.ThankyouPage = ThankyouPage
+module.exports.Routes = Routes
 
 // class SignUp {
 //     constructor () {

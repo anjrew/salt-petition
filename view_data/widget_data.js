@@ -60,10 +60,17 @@ class Footer extends Widget {
 }
 
 class Form extends Widget {
-    constructor (formField, submitLabel) {
+/**
+* @constructor
+* @param {FormField} formField
+* @param {string} submitLabel - A string param.
+* @param {boolean} [signature=false] - An optional param with a default value
+*/
+    constructor (formField, submitLabel, signature = false) {
         super()
         this.formField = formField
         this.submitLabel = submitLabel
+        this.signature = signature
         if (!(formField && submitLabel)) {
             throw new Error('Not all fields complete in Form init')
         }

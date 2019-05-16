@@ -5,7 +5,10 @@ test('Test Textfield: When passed to correct arguments it passes test', () => {
 })
 
 test('Test Textfield: When not all parameters are given an error is thrown', () => {
-    expect(new Textfield('Name', 'text')).toThrow(new Error('Not all fields complete in Textfield init'))
+    function renderTest () {
+        return new Textfield('Name', 'text')
+    }
+    expect(renderTest).toThrow()
 })
 
 test('Test Textfield: label', () => {

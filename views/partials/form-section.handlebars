@@ -1,0 +1,15 @@
+<form method="post">
+
+        {{#if error}} {{>error_message}} {{/if}}
+
+        {{#if fieldset}} {{>fieldset}} {{/if}}
+
+        {{#if signature}} {{>signature}} {{/if}}
+
+        {{>submit-button}}
+
+        {{>footer}}
+        
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        
+</form>

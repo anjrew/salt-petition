@@ -10,12 +10,11 @@ const cookieSession = require('cookie-session')
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
 const pages = require('./view_data/page_data.js')
+const Routes = require('./view_data/page_data').Routes
 
 setupApp()
 
 // SECURTIY
-const csurf = require('csurf')
-app.use(csurf())
 app.use((req, res, next) => {
     res.locals.csrfToken = req.csrfToken()
     res.setHeader('X-FRAME-OPTIONS', 'DENY')
@@ -31,20 +30,25 @@ app.use((req, res, next) => {
     if (userId) {
         if (url === '/profile') {
             next()
-        }
-        if (url === '/register') {
-            res.redirect('/petition')
         } else {
-            if (loggedIn) {
-                if (signatureId) {
-                    res.redirect('/petition/signed')
+            if (url === '/register') {
+                res.redirect('/petition')
+            } else {
+                if (loggedIn) {
+                    if (signatureId) {
+                        if (url !== Routes.SIGNED) {
+                            res.redirect(Routes.SIGNED)
+                        } else {
+                            next()
+                        }
+                    } else {
+                        next()
+                    }
+                } else if (url !== '/login') {
+                    res.redirect('/login')
                 } else {
                     next()
                 }
-            } else if (url !== '/login') {
-                res.redirect('/login')
-            } else {
-                next()
             }
         }
     } else {
@@ -57,6 +61,19 @@ app.use((req, res, next) => {
 })
 
 // REQUESTS
+app.get('/:name', (req, res, next) => {
+    const routeName = `/${req.params.name}`
+    const userId = req.session.userId
+    switch (routeName) {
+        case Routes.SIGNED:
+            db.
+            renderPage(req, res, new pages.ThankyouPage())
+            break
+
+        default: next()
+            break
+    }
+})
 
 app.get('/register', (req, res) => { renderPage(req, res, new pages.SignUpPage()) })
 
@@ -83,8 +100,20 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-    const userId = req.session.userId
     renderPage(req, res, new pages.ProfilePage())
+})
+app.post('/profile', (req, res) => {
+    const userId = req.session.userId
+    db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
+        console.log(result)
+        res.redirect(`/petition`)
+    }).catch((e) => {
+        if (e.code === '22P02') {
+            renderPage(req, res, new pages.ProfilePage(`Please enter a number for your age`))
+        } else {
+            renderPage(req, res, new pages.ProfilePage(`Error: ${e}`))
+        }
+    })
 })
 
 app.get('/login', (req, res) => {
@@ -110,7 +139,7 @@ app.get('/logout', (req, res) => {
 })
 
 app.get('/petition/signed', (req, res) => {
-    var signatureId = req.session.signatureId
+    const signatureId = req.session.signatureId
 
     db.getSigners().then((signers) => {
         var signersCount = signers.rows.length
@@ -142,15 +171,11 @@ app.get('/petition/signers', (req, res) => {
 app.get('/petition', (req, res) => { renderPage(req, res, new pages.SignPetitonPage()) })
 
 app.post('/petition', (req, res) => {
-    for (var propt in req.body) {
-        if (!req.body[propt]) {
-            renderPage(req, res, new pages.SignPetitonPage(`You did not fill in the ${propt} field`))
-        }
+    if (!req.body.signature) {
+        renderPage(req, res, new pages.SignPetitonPage(`You did not fill in the signature`))
     }
 
     db.addSignature(req.session.userId, req.body.signature).then((result) => {
-        // req.session is an object which was added by the cookieSession middleware above.
-        // add a property to our session cookie called cook;
         req.session.signatureId = result.rows[0].id
         res.redirect('/petition/signed')
     }).catch((e) => {
@@ -179,10 +204,6 @@ app.get('*', (req, res) => {
     })
 })
 
-app.listen(8080, () => {
-    console.log('Listening on port 8080')
-})
-
 function setupApp () {
     app.engine('handlebars', hb())
 
@@ -201,7 +222,14 @@ function setupApp () {
         maxAge: 1000 * 60 * 60 * 24 * 14
     }))
     app.use(express.static(`${__dirname}/public`))
+
+    const csurf = require('csurf')
+    app.use(csurf())
 }
+
+app.listen(8080, () => {
+    console.log('Listening on port 8080')
+})
 
 // Parameters may be declared in a variety of syntactic forms
 /**
@@ -212,6 +240,7 @@ function setupApp () {
 function renderPage (req, res, page) {
     if (!(page instanceof pages.Page)) {
         throw new Error(`Page argument is not of type "Page"`)
+    } else {
+        res.render(page.type, page.attributes)
     }
-    res.render(page.type, page.attributes)
 }

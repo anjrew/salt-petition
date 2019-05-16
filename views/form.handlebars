@@ -4,18 +4,6 @@
 
     {{>logo}}
 
-    <form method="post">
-
-        {{#if error}} {{>error_message}} {{/if}}
-
-        {{>fieldset}}
-
-        {{>submit-button}}
-
-        {{>footer}}
-        
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-        
-    </form>
+    {{>form-section}}
 
 </section>

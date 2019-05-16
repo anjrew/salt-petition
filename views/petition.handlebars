@@ -1,21 +1,14 @@
 <section>
-    {{>log-out}}
 
-    {{>slogan}}
+    {{>navigation-bar}}
+
+    <h2>Hey {{firstname}}. Please sign our petition below to stop this MADNESS</h2>
 
     {{>logo}}
 
     {{#if error}} {{>error_message}} {{/if}}
 
-    <form method="post">
-
-        {{>signature}} 
-
-        {{>submit-button}}
-        
-        <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-    </form>
+    {{>form-section}}
 
 </section>
  

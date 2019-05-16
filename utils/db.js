@@ -24,10 +24,25 @@ module.exports.addSignature = function (userId, signatureUrl) {
 }
 
 module.exports.getSigners = function () {
-    return db.query(`SELECT CONCAT(first, ' ', last) AS name, signature FROM signatures;`)
+    // return db.query(`SELECT CONCAT(first, ' ', last) AS name, signature FROM signatures;`)
+    return db.query(
+        `
+        SELECT user_id FROM signatures
+        JOIN user_profiles
+        ON signatures.user_id = user_profiles.user_id;
+        `
+    )
 }
 
-module.exports.getAmountOfSigners = function () {
+// CONCAT(user_profiles.first, ' ', user_profiles.last) AS name, 
+// user_profiles.age AS age,
+// user_profiles.city AS city,
+// user_profiles.url AS url
+// FROM user_profiles
+// JOIN songs
+// ON singers.id = songs.singer_id;
+
+module.exports = function getAmountOfSigners () {
     return db.query('SELECT COUNT(id) FROM signatures;')
 }
 
@@ -48,6 +63,16 @@ module.exports.getHashedPWord = function (email) {
         SELECT password FROM users WHERE $1 = email; 
         `,
     [email]
+    )
+}
+
+module.exports.addUserProfile = function (age, city, url, userId) {
+    return db.query(`
+        INSERT INTO user_profiles(age, city, url, user_id) 
+        VALUES ($1, $2, $3, $4)
+        RETURNING id;
+        `,
+    [age, city, url, userId]
     )
 }
 

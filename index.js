@@ -60,30 +60,75 @@ app.use((req, res, next) => {
     }
 })
 
-// REQUESTS
-app.get('/:name', (req, res, next) => {
+// GET REQUESTS
+app.get('/:name/:city', (req, res, next) => {
+
     const routeName = `/${req.params.name}`
     const userId = req.session.userId
+
     switch (routeName) {
+
         case Routes.SIGNED:
             const userName = db.getProfileData(userId)
             const signers = db.getSigners()
+            const signatureId = req.session.signatureId
             Promise.all([userName, signers]).then((results) => {
-                renderPage(req, res, new pages.ThankyouPage(results[0], results[1]))
+                renderPage(res, new pages.ThankyouPage(results[0], results[1]))
             }).catch((e) => { console.log(e) })
             break
 
-        default: next()
+        case Routes.REGISTER:
+            renderPage(res, new pages.SignUpPage())
             break
+
+        case Routes.PROFILE:
+            renderPage(res, new pages.ProfilePage())
+            break
+
+        case Routes.LOGIN:
+            renderPage(res, new pages.LoginPage())
+            break
+
+        case Routes.LOGOUT:
+            req.session.loggedIn = null
+            res.redirect('/petition')
+            break
+
+        case Routes.PETITION:
+            renderPage(res, new pages.SignPetitonPage())
+            break
+
+        case Routes.SIGNERS:
+            const city = req.params.city
+            if (city) {
+                db.getSigners(city).then((signers) => {
+                    renderPage(res, new pages.SignersPage(signers.rows))
+                }).catch((e) => {
+                    console.log(e)
+                    next()
+                })
+            } else {
+                db.getSigners().then((signers) => {
+                    renderPage(res, new pages.SignersPage(signers.rows))
+                }).catch((e) => {
+                    console.log(e)
+                    next()
+                })
+            }
+            break
+
+        default: next(); break
     }
 })
 
-app.get('/register', (req, res) => { renderPage(req, res, new pages.SignUpPage()) })
+// POST REQUESTS
+
+
 
 app.post('/register', (req, res) => {
     for (var propt in req.body) {
         if (!req.body[propt]) {
-            renderPage(req, res, new pages.SignUpPage(`You did not fill in the ${propt} field`))
+            renderPage(res, new pages.SignUpPage(`You did not fill in the ${propt} field`))
             return
         }
     }
@@ -95,16 +140,13 @@ app.post('/register', (req, res) => {
         res.redirect('/profile')
     }).catch((e) => {
         if (e.code === `23505`) {
-            renderPage(req, res, new pages.SignUpPage(`We already have a user registed to that email`))
+            renderPage(res, new pages.SignUpPage(`We already have a user registed to that email`))
         } else {
-            renderPage(req, res, new pages.SignUpPage(`Database Error: ${e}`))
+            renderPage(res, new pages.SignUpPage(`Database Error: ${e}`))
         }
     })
 })
 
-app.get('/profile', (req, res) => {
-    renderPage(req, res, new pages.ProfilePage())
-})
 app.post('/profile', (req, res) => {
     const userId = req.session.userId
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
@@ -112,70 +154,29 @@ app.post('/profile', (req, res) => {
         res.redirect(`/petition`)
     }).catch((e) => {
         if (e.code === '22P02') {
-            renderPage(req, res, new pages.ProfilePage(`Please enter a number for your age`))
+            renderPage(res, new pages.ProfilePage(`Please enter a number for your age`))
         } else {
-            renderPage(req, res, new pages.ProfilePage(`Error: ${e}`))
+            renderPage(res, new pages.ProfilePage(`Error: ${e}`))
         }
     })
 })
 
-app.get('/login', (req, res) => {
-    renderPage(req, res, new pages.LoginPage())
-})
-
 app.post('/login', (req, res) => {
-    var email = req.body.emailaddress
-    var password = req.body.password
+    const email = req.body.emailaddress
+    const password = req.body.password
     db.getHashedPWord(email).then((result) => {
         return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
         req.session.loggedIn = true
         res.redirect('/petition')
     }).catch((e) => {
-        renderPage(req, res, new pages.LoginPage(`Error trying to login: ${e}`))
+        renderPage(res, new pages.LoginPage(`Error trying to login: ${e}`))
     })
 })
-
-app.get('/logout', (req, res) => {
-    req.session.loggedIn = null
-    res.redirect('/petition')
-})
-
-app.get('/petition/signed', (req, res) => {
-    const signatureId = req.session.signatureId
-
-    db.getSigners().then((signers) => {
-        var signersCount = signers.rows.length
-        res.render('thank-you', {
-            layout: 'main',
-            signersCount: `See the other ${signersCount > 1 ? signersCount : ''} ${signersCount > 1 ? 'signers' : 'signer'}`,
-            logout: true,
-            signatureId: signers.rows[signatureId - 1].signature,
-            name: signers.rows[signatureId - 1].name
-        })
-    })
-})
-
-app.get('/signers/city', (req, res) => {
-    const city = req.params.city
-    db.getSingersByCity(city).then()
-})
-
-app.get('/petition/signers', (req, res) => {
-    db.getSigners().then((signers) => {
-        res.render('signers', {
-            layout: 'main',
-            people: signers.rows,
-            logout: true
-        })
-    })
-})
-
-app.get('/petition', (req, res) => { renderPage(req, res, new pages.SignPetitonPage()) })
 
 app.post('/petition', (req, res) => {
     if (!req.body.signature) {
-        renderPage(req, res, new pages.SignPetitonPage(`You did not fill in the signature`))
+        renderPage(res, new pages.SignPetitonPage(`You did not fill in the signature`))
     }
 
     db.addSignature(req.session.userId, req.body.signature).then((result) => {
@@ -240,10 +241,36 @@ app.listen(8080, () => {
  * @param {Object} res - The http response object.
  * @param {Page} page - A instance of a Page class or child.
  */
-function renderPage (req, res, page) {
+function renderPage (res, page) {
     if (!(page instanceof pages.Page)) {
         throw new Error(`Page argument is not of type "Page"`)
     } else {
         res.render(page.type, page.attributes)
     }
 }
+
+// db.getSigners().then((signers) => {
+//     var signersCount = signers.rows.length
+//     res.render('thank-you', {
+//         layout: 'main',
+//         signersCount: `See the other ${signersCount > 1 ? signersCount : ''} ${signersCount > 1 ? 'signers' : 'signer'}`,
+//         logout: true,
+//         signatureId: signers.rows[signatureId - 1].signature,
+//         name: signers.rows[signatureId - 1].name
+//     })
+// })
+
+// app.post('/:name/:city', (req, res) => {
+//     const routeName = `/${req.params.name}`
+//     const userId = req.session.userId
+//     var email = req.body.emailaddress
+//     var password = req.body.password
+//     switch (name) {
+//         case Routes.REGISTER:
+            
+//             break;
+    
+//         default:
+//             break;
+//     }
+// })

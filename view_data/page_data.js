@@ -1,8 +1,8 @@
 'use strict'
 const { Textfield, Button, FormField, Form, Footer } = require('./widget_data.js')
-const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNUP: 'sign-up', SIGNERS: 'signers', SIGNED: '/signed' })
-const Routes = Object.freeze({ SIGNED: '/signed', PETITION: 'petition', REGISTER: '/register', SIGNERS: 'signers', LOGIN: 'log-in' })
-
+const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
+const Routes = Object.freeze({ SIGNED: '/signed', PETITION: '/petition', REGISTER: '/register', SIGNERS: '/signers', LOGIN: '/login', LOGOUT: '/logout', PROFILE: '/profile', CITY: '/city' })
+const LAYOUT = 'layout'
 /**
  * @param {String} name - The name of the page
  * @param {Widget} data - The widget data for the page
@@ -19,20 +19,9 @@ class Page {
     }
 }
 
-// class PageAttributes {
-//     constructor () {
-//         this.name = name
-//         this.data = data
-//         this.data.layout = 'main'
-//         if (!this.name && !this.data) {
-//             throw Error('Arguments are missing')
-//         }
-//     }
-// }
-
 class SignUpPage extends Page {
     constructor (err) {
-        super('form',
+        super(PageType.FORM,
             {
                 title: 'Lets sign you up!',
                 fieldset: new FormField([
@@ -52,7 +41,7 @@ class LoginPage extends Page {
     * @param {any} err - An Erro to show the user.
     */
     constructor (err) {
-        super('form', {
+        super(PageType.FORM, {
             title: 'Lets Login',
             fieldset: new FormField([
                 new Textfield('Email address', 'text', 'emailaddress', ''),
@@ -69,7 +58,7 @@ class LoginPage extends Page {
 
 class SignPetitonPage extends Page {
     constructor (err) {
-        super('petition',
+        super(PageType.PETITION,
             {
                 error: err,
                 signature: true
@@ -101,27 +90,45 @@ class ThankyouPage extends Page {
     * @param {string} - The name of the person who just signed
     * @param {number} - The total number of signers
     */
-    constructor (name, signerAmount) {
-        if (!name && !signerAmount) {
+    constructor (signedName, signerCount) {
+        if (!signedName && !signerCount) {
             throw Error('Arguments are missing for Thankyou page')
         }
-        if (typeof signerAmount !== 'number') {
-            throw Error('Signer amount is not a number')
-        }
-        super(PageType.THANKYOU, {
-            name: name,
-            signerAmount: signerAmount
+        super(PageType.SIGNED, {
+            name: signedName,
+            signerAmount: signerCount
         })
     }
 }
 
-module.exports.SignPetitonPage = SignPetitonPage
-module.exports.Page = Page
-module.exports.SignUpPage = SignUpPage
-module.exports.LoginPage = LoginPage
-module.exports.ProfilePage = ProfilePage
-module.exports.ThankyouPage = ThankyouPage
-module.exports.Routes = Routes
+class SignersPage extends Page {
+    /**
+    * @constructor
+    * @param {Array[signers]} - And array of signer data
+    */
+    constructor (signersArr) {
+        if (!signersArr) {
+            throw Error('Signers Argument is missing')
+        }
+        if (!Array.isArray(signersArr)) {
+            throw Error('Signer amount is not a number')
+        }
+        super(PageType.SIGNERS, {
+            signers: signersArr,
+            logout: true
+        })
+    }
+}
+
+exports.SignPetitonPage = SignPetitonPage
+exports.Page = Page
+exports.SignUpPage = SignUpPage
+exports.LoginPage = LoginPage
+exports.ProfilePage = ProfilePage
+exports.ThankyouPage = ThankyouPage
+exports.Routes = Routes
+exports.SignersPage = SignersPage
+exports.LAYOUT = LAYOUT
 
 // class SignUp {
 //     constructor () {
@@ -150,5 +157,16 @@ module.exports.Routes = Routes
 // class Sign {
 //     constructor () {
 //         this.layout = 'main'
+//     }
+// }
+
+// class PageAttributes {
+//     constructor () {
+//         this.name = name
+//         this.data = data
+//         this.data.layout = 'main'
+//         if (!this.name && !this.data) {
+//             throw Error('Arguments are missing')
+//         }
 //     }
 // }

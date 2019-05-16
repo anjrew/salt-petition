@@ -93,6 +93,8 @@ module.exports.getProfileData = function (userId) {
     )
 }
 
+// exports.getSignersByCity
+
 // exports.getUsersByCity = function (city){
 //      // return db.query(`
 //     //     SELECT password FROM users WHERE $1 = email; 

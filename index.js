@@ -13,13 +13,25 @@ const pages = require('./view_data/page_data.js')
 
 setupApp()
 
-// MIDDLEWARE
-app.use(function (req, res, next) {
+// SECURTIY
+const csurf = require('csurf')
+app.use(csurf())
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken()
+    res.setHeader('X-FRAME-OPTIONS', 'DENY')
+    next()
+})
+
+// REDIRECTS
+app.use((req, res, next) => {
     const userId = req.session.userId
     const signatureId = req.session.signatureId
     const loggedIn = req.session.loggedIn
     const url = req.url
     if (userId) {
+        if (url === '/profile') {
+            next()
+        }
         if (url === '/register') {
             res.redirect('/petition')
         } else {
@@ -59,14 +71,12 @@ app.post('/register', (req, res) => {
     encryption.hashPassword(req.body.password).then((hashedP) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.emailaddress, hashedP)
     }).then((result) => {
-        // req.session is an object which was added by the cookieSession middleware above.
-        // add a property to our session cookie called cook;
         req.session.userId = result.rows[0].id
         res.redirect('/profile')
     }).catch((e) => {
         if (e.code === `23505`) {
             renderPage(req, res, new pages.SignUpPage(`We already have a user registed to that email`))
-        }else {
+        } else {
             renderPage(req, res, new pages.SignUpPage(`Database Error: ${e}`))
         }
     })
@@ -203,5 +213,5 @@ function renderPage (req, res, page) {
     if (!(page instanceof pages.Page)) {
         throw new Error(`Page argument is not of type "Page"`)
     }
-    res.render(page.name, page.data)
+    res.render(page.type, page.attributes)
 }

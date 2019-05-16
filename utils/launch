@@ -1,0 +1,4 @@
+npm test -t tests/db.test.js
+npm test -t tests/index.test.js
+npm test -t widget_data.test.js
+nodemon --inspect index.js

@@ -16,7 +16,7 @@ module.exports.test = function () {
 module.exports.addSignature = function (userId, signatureUrl) {
     return db.query(`
         INSERT INTO signatures(user_id, signature) 
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2)
         RETURNING id;
         `,
     [userId, signatureUrl]

@@ -6,7 +6,7 @@ const indexJs = require('../index.js')
 test('Takes a page as an argument and does not throw error', () => {
 
     function renderTest () {
-        indexJs.renderPage({}, {}, new pages.Page())
+        return indexJs.renderPage({}, {}, new pages.Page())
     }
     expect(renderTest).toThrowError(`Page argument is not of type "Page"`)
 })

@@ -4,7 +4,7 @@ test('Test Textfield: When passed to correct arguments it passes test', () => {
     expect(new Textfield('Name', 'text', 'first', 'jan')).toEqual(new Textfield('Name', 'text', 'first', 'jan'))
 })
 
-test('Test Textfield:When not all parameters are given an error is thrown', () => {
+test('Test Textfield: When not all parameters are given an error is thrown', () => {
     expect(new Textfield('Name', 'text')).toThrow(new Error('Not all fields complete in Textfield init'))
 })
 

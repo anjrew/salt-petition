@@ -3,20 +3,31 @@ const { Textfield, Button, FormField, Form, Footer } = require('./widget_data.js
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNUP: 'sign-up', SIGNERS: 'signers', THANKYOU: 'thank-you' })
 
 /**
-     * @param {String} name - The name of the page
-     * @param {Widget} data - The widget data for the page
-     */
+ * @param {String} name - The name of the page
+ * @param {Widget} data - The widget data for the page
+ */
 
 class Page {
-    constructor (name, data) {
-        this.name = name
-        this.data = data
-        this.data.layout = 'main'
-        if (!this.name && !this.data) {
+    constructor (type, attributes) {
+        this.type = type
+        this.attributes = attributes
+        this.attributes.layout = 'main'
+        if (!this.type && !this.attributes) {
             throw Error('Arguments are missing')
         }
     }
 }
+
+// class PageAttributes {
+//     constructor () {
+//         this.name = name
+//         this.data = data
+//         this.data.layout = 'main'
+//         if (!this.name && !this.data) {
+//             throw Error('Arguments are missing')
+//         }
+//     }
+// }
 
 class SignUpPage extends Page {
     constructor (err) {
@@ -72,7 +83,7 @@ class ProfilePage extends Page {
     constructor (err) {
         super(PageType.FORM, {
             error: err,
-            title: 'PLeasew tell us a little more about yourself',
+            title: 'Pleasew tell us a little more about yourself',
             fieldset: new FormField([
                 new Textfield('Age', 'text', 'age', ''),
                 new Textfield('City', 'text', 'city', ''),

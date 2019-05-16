@@ -1,25 +1,18 @@
 <section>
 
-    <h1>Sign the petition to execute people who don't ask you if you would like a <em> straw </em>and give you one
-        anyway and fuck the enviroment!</h1>
+    {{>slogan}}
 
-{{>logo}}
-    <form action="" method="post">
+    {{>logo}}
 
-        <section id="details">
-            <div class="text-field">
-                <p>First name</p>
-                <input type="text" name="firstname" placeholder="jim">
-            </div>
-            <div class="text-field">
-                <p>Last name</p>
-                <input type="text" name="lastname" placeholder="johns">
-            </div>
-        </section>
+    {{#if error}} {{>error_message}} {{/if}}
 
-        <canvas id="signature" width="400" height="100" style="border:1px dottedß #000000;"></canvas>
-        <input id="submit" type="submit" value="Submit" action="/petition" method="post">
+    <form method="post">
+
+        {{>signature}} 
+
+        {{>submit-button}}
+        
     </form>
-</section>
 
+</section>
  

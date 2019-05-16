@@ -14,7 +14,7 @@ class Page {
         if (!this.name && !this.data) {
             throw Error('Arguments are missing')
         }
-    }; 
+    } 
 }
 
 class SignUpPage extends Page {
@@ -34,6 +34,10 @@ class SignUpPage extends Page {
 }
 
 class LoginPage extends Page {
+    /**
+    * @constructor
+    * @param {any} err - An Erro to show the user.
+    */
     constructor (err) {
         super('form',
             {
@@ -53,13 +57,8 @@ class LoginPage extends Page {
 
 class SignPetitonPage extends Page {
     constructor (err) {
-        super('form',
+        super('petition',
             {
-                title: 'Time to sign the Petition!',
-                fieldset: new FormField([
-                    new Textfield('Email address', 'text', 'emailaddress', ''),
-                    new Textfield('Password', 'password', 'password', '')
-                ]),
                 error: err
             })
     };

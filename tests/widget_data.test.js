@@ -1,4 +1,4 @@
-const { Textfield, Button } = require('../scripts/widget_data.js')
+const { Textfield, Button } = require('../view_data/widget_data.js')
 
 test('Test Textfield: When passed to correct arguments it passes test', () => {
     expect(new Textfield('Name', 'text', 'first', 'jan')).toEqual(new Textfield('Name', 'text', 'first', 'jan'))

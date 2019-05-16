@@ -9,7 +9,7 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
-const { Page, SignUpPage, LoginPage } = require('./scripts/page_data.js')
+const { Page, SignUpPage, LoginPage, SignPetitonPage } = require('./view_data/page_data.js')
 
 setupApp()
 
@@ -116,20 +116,12 @@ app.get('/petition/signers', (req, res) => {
     })
 })
 
-app.get('/petition', (req, res) => {
-    res.render('petition', {
-        layout: 'main'
-    })
-})
+app.get('/petition', (req, res) => { renderPage(req, res, new SignPetitonPage()) })
 
 app.post('/petition', (req, res) => {
     for (var propt in req.body) {
         if (!req.body[propt]) {
-            res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
-            res.cookie('error_type', 'missing_details', { maxAge: 1000, httpOnly: true })
-            res.cookie('error_message', `You did not fill in the ${propt} field`, { maxAge: 1000, httpOnly: true })
-            // Sends the response and ends this fuction
-            res.redirect('/error')
+            renderPage(req, res, new SignPetitonPage(`You did not fill in the ${propt} field`))
         }
     }
 
@@ -162,6 +154,7 @@ app.get('*', (req, res) => {
         type: 'no matich url',
         message: 'The url is badly formatted.'
     })
+    
 })
 
 app.listen(8080, () => {
@@ -188,6 +181,12 @@ function setupApp () {
     app.use(express.static(`${__dirname}/public`))
 }
 
+// Parameters may be declared in a variety of syntactic forms
+/**
+ * @param {Object}  req - The http request object.
+ * @param {Object} res - The http response object.
+ * @param {Page} page - A instance of a Page class or child.
+ */
 function renderPage (req, res, page) {
     if (!(page instanceof Page)) {
         throw new Error('Not all fields are of type TextField')

@@ -28,11 +28,11 @@ app.use((req, res, next) => {
     const loggedIn = req.session.loggedIn
     const url = req.url
     if (userId) {
-        if (url === '/profile') {
+        if (url === Routes.PROFILE) {
             next()
         } else {
-            if (url === '/register') {
-                res.redirect('/petition')
+            if (url === Routes.REGISTER) {
+                res.redirect(Routes.PETITION)
             } else {
                 if (loggedIn) {
                     if (signatureId) {
@@ -44,16 +44,16 @@ app.use((req, res, next) => {
                     } else {
                         next()
                     }
-                } else if (url !== '/login') {
-                    res.redirect('/login')
+                } else if (url !== Routes.LOGIN) {
+                    res.redirect(Routes.LOGIN)
                 } else {
                     next()
                 }
             }
         }
     } else {
-        if (url !== '/register') {
-            res.redirect('/register')
+        if (url !== Routes.REGISTER) {
+            res.redirect(Routes.REGISTER)
         } else {
             next()
         }
@@ -61,71 +61,51 @@ app.use((req, res, next) => {
 })
 
 // GET REQUESTS
-app.get('/:name/:city', (req, res, next) => {
-
-    const routeName = `/${req.params.name}`
-    const userId = req.session.userId
-
-    switch (routeName) {
-
-        case Routes.SIGNED:
-            const userName = db.getProfileData(userId)
-            const signers = db.getSigners()
-            const signatureId = req.session.signatureId
-            Promise.all([userName, signers]).then((results) => {
-                renderPage(res, new pages.ThankyouPage(results[0], results[1]))
-            }).catch((e) => { console.log(e) })
-            break
-
-        case Routes.REGISTER:
-            renderPage(res, new pages.SignUpPage())
-            break
-
-        case Routes.PROFILE:
-            renderPage(res, new pages.ProfilePage())
-            break
-
-        case Routes.LOGIN:
-            renderPage(res, new pages.LoginPage())
-            break
-
-        case Routes.LOGOUT:
-            req.session.loggedIn = null
-            res.redirect('/petition')
-            break
-
-        case Routes.PETITION:
-            renderPage(res, new pages.SignPetitonPage())
-            break
-
-        case Routes.SIGNERS:
-            const city = req.params.city
-            if (city) {
-                db.getSigners(city).then((signers) => {
-                    renderPage(res, new pages.SignersPage(signers.rows))
-                }).catch((e) => {
-                    console.log(e)
-                    next()
-                })
-            } else {
-                db.getSigners().then((signers) => {
-                    renderPage(res, new pages.SignersPage(signers.rows))
-                }).catch((e) => {
-                    console.log(e)
-                    next()
-                })
-            }
-            break
-
-        default: next(); break
+app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
+    const city = req.params.city
+    if (city) {
+        db.getSigners(city).then((signers) => {
+            renderPage(res, new pages.SignersPage(signers.rows))
+        }).catch((e) => {
+            console.log(e)
+            next()
+        })
+    } else {
+        db.getSigners().then((signers) => {
+            renderPage(res, new pages.SignersPage(signers.rows))
+        }).catch((e) => {
+            console.log(e)
+            next()
+        })
     }
 })
 
+app.get(Routes.REGISTER, (req, res) => { renderPage(res, new pages.SignUpPage()) })
+
+app.get(Routes.PROFILE, (req, res) => { renderPage(res, new pages.ProfilePage()) })
+
+app.get(Routes.LOGIN, (req, res) => { renderPage(res, new pages.LoginPage()) })
+
+app.get(Routes.PETITION, (req, res) => { renderPage(res, new pages.SignPetitonPage()) })
+
+app.get(Routes.SIGNED, (req, res, next) => {
+    const userName = db.getProfileData(req.session.userId)
+    const signers = db.getSigners()
+    const signatureId = req.session.signatureId
+    Promise.all([userName]).then((results) => {
+        renderPage(res, new pages.ThankyouPage(results[0], results[1]))
+    }).catch((e) => {
+        console.log(e)
+    })
+})
+
+app.get(Routes.LOGOUT, (req, res) => {
+    req.session.loggedIn = null
+    res.redirect(Routes.PETITION)
+})
+
 // POST REQUESTS
-
-
-
-app.post('/register', (req, res) => {
+app.post(Routes.REGISTER, (req, res) => {
     for (var propt in req.body) {
         if (!req.body[propt]) {
             renderPage(res, new pages.SignUpPage(`You did not fill in the ${propt} field`))
@@ -137,7 +117,7 @@ app.post('/register', (req, res) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.emailaddress, hashedP)
     }).then((result) => {
         req.session.userId = result.rows[0].id
-        res.redirect('/profile')
+        res.redirect(Routes.PROFILE)
     }).catch((e) => {
         if (e.code === `23505`) {
             renderPage(res, new pages.SignUpPage(`We already have a user registed to that email`))
@@ -147,11 +127,11 @@ app.post('/register', (req, res) => {
     })
 })
 
-app.post('/profile', (req, res) => {
+app.post(Routes.PROFILE, (req, res) => {
     const userId = req.session.userId
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
-        res.redirect(`/petition`)
+        res.redirect(Routes.PETITION)
     }).catch((e) => {
         if (e.code === '22P02') {
             renderPage(res, new pages.ProfilePage(`Please enter a number for your age`))
@@ -161,27 +141,28 @@ app.post('/profile', (req, res) => {
     })
 })
 
-app.post('/login', (req, res) => {
+app.post(Routes.LOGIN, (req, res) => {
     const email = req.body.emailaddress
     const password = req.body.password
     db.getHashedPWord(email).then((result) => {
         return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
         req.session.loggedIn = true
-        res.redirect('/petition')
+        res.redirect(Routes.PETITION)
     }).catch((e) => {
         renderPage(res, new pages.LoginPage(`Error trying to login: ${e}`))
     })
 })
 
-app.post('/petition', (req, res) => {
+app.post(Routes.PETITION, (req, res) => {
     if (!req.body.signature) {
         renderPage(res, new pages.SignPetitonPage(`You did not fill in the signature`))
     }
 
     db.addSignature(req.session.userId, req.body.signature).then((result) => {
         req.session.signatureId = result.rows[0].id
-        res.redirect('/petition/signed')
+        res.redirect(Routes.SIGNED
+        )
     }).catch((e) => {
         res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
         res.cookie('error_type', 'data_base_error', { maxAge: 1000, httpOnly: true })
@@ -267,9 +248,9 @@ function renderPage (res, page) {
 //     var password = req.body.password
 //     switch (name) {
 //         case Routes.REGISTER:
-            
+
 //             break;
-    
+
 //         default:
 //             break;
 //     }

@@ -15,14 +15,17 @@ exports.addSignature = function (userId, signatureUrl) {
     )
 }
 
-exports.getSigners = function () {
+exports.getSigners = function (userId) {
     // return db.query(`SELECT CONCAT(first, ' ', last) AS name, signature FROM signatures;`)
     return db.query(
         `
-        SELECT user_id FROM signatures
+        SELECT users.first, user_profiles.city, user_profiles.age, user_profiles.url
+        FROM users
+        WHERE users.id != $1
         JOIN user_profiles
         ON signatures.user_id = user_profiles.user_id;
-        `
+        `,
+        [userId]
     )
 }
 

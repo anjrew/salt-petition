@@ -5,14 +5,21 @@ const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`)
 // Database quieries
 // Vunerable to SQL injection without "$" thing
 
+/**
+    * This is just a default test function
+    */
+module.exports.test = function () {
+    return true
+}
+
 // SIGNATURE QUERYS
-module.exports.addSignature = function (first, last, signatureUrl) {
+module.exports.addSignature = function (userId, signatureUrl) {
     return db.query(`
-        INSERT INTO signatures(first, last, signature) 
+        INSERT INTO signatures(user_id, signature) 
         VALUES ($1, $2, $3)
         RETURNING id;
         `,
-    [first, last, signatureUrl]
+    [userId, signatureUrl]
     )
 }
 
@@ -43,6 +50,24 @@ module.exports.getHashedPWord = function (email) {
     [email]
     )
 }
+
+module.exports.getNameAndSignature = function (email) {
+    // return db.query(`
+    //     SELECT password FROM users WHERE $1 = email; 
+    //     `,
+    // [email]
+    // )
+}
+
+module.exports.getSingersByCity = function (){
+     // return db.query(`
+    //     SELECT password FROM users WHERE $1 = email; 
+    //     `,
+    // [email]
+    // )
+    // WHERE LOWER(city) = LOWER($1)
+}
+
 
 // function addCity(city, country) {
 //     db.query(`

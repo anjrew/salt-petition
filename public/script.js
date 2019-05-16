@@ -4,7 +4,7 @@
     var context = signature.getContext('2d')
     context.strokeStyle = '#900'
     context.lineWidth = 2
-
+ 
     $(signature).mousedown(function (event) {
         context.beginPath()
         context.moveTo(event.offsetX, event.offsetY)
@@ -16,4 +16,6 @@
             $('#data').val(data)
         })
     }).on('mouseup mouseleave', function (event) { $(signature).off('mousemove mouseleave') })
+
 })()
+

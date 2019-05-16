@@ -9,7 +9,7 @@ const cookieSession = require('cookie-session')
 
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
-const { Page, SignUpPage, LoginPage, SignPetitonPage } = require('./view_data/page_data.js')
+const pages = require('./view_data/page_data.js')
 
 setupApp()
 
@@ -46,12 +46,12 @@ app.use(function (req, res, next) {
 
 // REQUESTS
 
-app.get('/register', (req, res) => { renderPage(req, res, new SignUpPage()) })
+app.get('/register', (req, res) => { renderPage(req, res, new pages.SignUpPage()) })
 
 app.post('/register', (req, res) => {
     for (var propt in req.body) {
         if (!req.body[propt]) {
-            renderPage(req, res, new SignUpPage(`You did not fill in the ${propt} field`))
+            renderPage(req, res, new pages.SignUpPage(`You did not fill in the ${propt} field`))
             return
         }
     }
@@ -62,14 +62,23 @@ app.post('/register', (req, res) => {
         // req.session is an object which was added by the cookieSession middleware above.
         // add a property to our session cookie called cook;
         req.session.userId = result.rows[0].id
-        res.redirect('/petition')
+        res.redirect('/profile')
     }).catch((e) => {
-        renderPage(req, res, new SignUpPage(`Database Error: ${e}`))
+        if (e.code === `23505`) {
+            renderPage(req, res, new pages.SignUpPage(`We already have a user registed to that email`))
+        }else {
+            renderPage(req, res, new pages.SignUpPage(`Database Error: ${e}`))
+        }
     })
 })
 
+app.get('/profile', (req, res) => {
+    const userId = req.session.userId
+    renderPage(req, res, new pages.ProfilePage())
+})
+
 app.get('/login', (req, res) => {
-    renderPage(req, res, new LoginPage())
+    renderPage(req, res, new pages.LoginPage())
 })
 
 app.post('/login', (req, res) => {
@@ -80,9 +89,8 @@ app.post('/login', (req, res) => {
     }).then((doesMatch) => {
         req.session.loggedIn = true
         res.redirect('/petition')
-        res.redirect(`/petition/signed`)
     }).catch((e) => {
-        renderPage(req, res, new LoginPage(`Error trying to login: ${e}`))
+        renderPage(req, res, new pages.LoginPage(`Error trying to login: ${e}`))
     })
 })
 
@@ -106,6 +114,11 @@ app.get('/petition/signed', (req, res) => {
     })
 })
 
+app.get('/signers/city', (req, res) => {
+    const city = req.params.city
+    db.getSingersByCity(city).then()
+})
+
 app.get('/petition/signers', (req, res) => {
     db.getSigners().then((signers) => {
         res.render('signers', {
@@ -116,16 +129,16 @@ app.get('/petition/signers', (req, res) => {
     })
 })
 
-app.get('/petition', (req, res) => { renderPage(req, res, new SignPetitonPage()) })
+app.get('/petition', (req, res) => { renderPage(req, res, new pages.SignPetitonPage()) })
 
 app.post('/petition', (req, res) => {
     for (var propt in req.body) {
         if (!req.body[propt]) {
-            renderPage(req, res, new SignPetitonPage(`You did not fill in the ${propt} field`))
+            renderPage(req, res, new pages.SignPetitonPage(`You did not fill in the ${propt} field`))
         }
     }
 
-    db.addSignature(req.body.firstname, req.body.lastname, req.body.signature).then((result) => {
+    db.addSignature(req.session.userId, req.body.signature).then((result) => {
         // req.session is an object which was added by the cookieSession middleware above.
         // add a property to our session cookie called cook;
         req.session.signatureId = result.rows[0].id
@@ -154,7 +167,6 @@ app.get('*', (req, res) => {
         type: 'no matich url',
         message: 'The url is badly formatted.'
     })
-    
 })
 
 app.listen(8080, () => {
@@ -188,8 +200,8 @@ function setupApp () {
  * @param {Page} page - A instance of a Page class or child.
  */
 function renderPage (req, res, page) {
-    if (!(page instanceof Page)) {
-        throw new Error('Not all fields are of type TextField')
+    if (!(page instanceof pages.Page)) {
+        throw new Error(`Page argument is not of type "Page"`)
     }
     res.render(page.name, page.data)
 }

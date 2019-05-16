@@ -1,3 +1,5 @@
+DROP TABLE if EXISTS user_profiles;
+
 CREATE TABLE user_profiles(
     id SERIAL PRIMARY key,
     city VARCHAR(255),

@@ -66,8 +66,11 @@ app.get('/:name', (req, res, next) => {
     const userId = req.session.userId
     switch (routeName) {
         case Routes.SIGNED:
-            db.
-            renderPage(req, res, new pages.ThankyouPage())
+            const userName = db.getProfileData(userId)
+            const signers = db.getSigners()
+            Promise.all([userName, signers]).then((results) => {
+                renderPage(req, res, new pages.ThankyouPage(results[0], results[1]))
+            }).catch((e) => { console.log(e) })
             break
 
         default: next()

@@ -1,19 +1,11 @@
-// spicedPg setup
-
 const spicedPg = require('spiced-pg')
 const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`)
-// Database quieries
-// Vunerable to SQL injection without "$" thing
 
-/**
-    * This is just a default test function
-    */
-module.exports.test = function () {
+exports.test = function () {
     return true
 }
 
-// SIGNATURE QUERYS
-module.exports.addSignature = function (userId, signatureUrl) {
+exports.addSignature = function (userId, signatureUrl) {
     return db.query(`
         INSERT INTO signatures(user_id, signature) 
         VALUES ($1, $2)
@@ -23,7 +15,7 @@ module.exports.addSignature = function (userId, signatureUrl) {
     )
 }
 
-module.exports.getSigners = function () {
+exports.getSigners = function () {
     // return db.query(`SELECT CONCAT(first, ' ', last) AS name, signature FROM signatures;`)
     return db.query(
         `
@@ -34,7 +26,7 @@ module.exports.getSigners = function () {
     )
 }
 
-// CONCAT(user_profiles.first, ' ', user_profiles.last) AS name, 
+// CONCAT(user_profiles.first, ' ', user_profiles.last) AS name
 // user_profiles.age AS age,
 // user_profiles.city AS city,
 // user_profiles.url AS url
@@ -42,13 +34,13 @@ module.exports.getSigners = function () {
 // JOIN songs
 // ON singers.id = songs.singer_id;
 
-module.exports = function getAmountOfSigners () {
+exports = function getAmountOfSigners () {
     return db.query('SELECT COUNT(id) FROM signatures;')
 }
 
 // USER QUERIES
 
-module.exports.addUser = function (first, last, email, password) {
+exports.addUser = function (first, last, email, password) {
     return db.query(`
         INSERT INTO users(first, last, email, password) 
         VALUES ($1, $2, $3, $4)
@@ -58,7 +50,7 @@ module.exports.addUser = function (first, last, email, password) {
     )
 }
 
-module.exports.getHashedPWord = function (email) {
+exports.getHashedPWord = function (email) {
     return db.query(`
         SELECT password FROM users WHERE $1 = email; 
         `,
@@ -66,7 +58,10 @@ module.exports.getHashedPWord = function (email) {
     )
 }
 
-module.exports.addUserProfile = function (age, city, url, userId) {
+exports.addUserProfile = function (age, city, url, userId) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        throw new Error('Not a valid Url')
+    }
     return db.query(`
         INSERT INTO user_profiles(age, city, url, user_id) 
         VALUES ($1, $2, $3, $4)
@@ -76,38 +71,33 @@ module.exports.addUserProfile = function (age, city, url, userId) {
     )
 }
 
-module.exports.getNameAndSignature = function (email) {
-    // return db.query(`
-    //     SELECT password FROM users WHERE $1 = email; 
-    //     `,
-    // [email]
-    // )
+exports.getSigId = function (userId) {
+    return db.query(`SELECT id FROM signatures WHERE user_id =$1`, [userId])
 }
 
-module.exports.getSingersByCity = function (){
-     // return db.query(`
-    //     SELECT password FROM users WHERE $1 = email; 
-    //     `,
-    // [email]
-    // )
-    // WHERE LOWER(city) = LOWER($1)
+exports.getNameAndSignature = function (userId) {
+    return db.query(`
+        SELECT first FROM users 
+        WHERE $1 = userId; 
+ 
+        `,
+    [userId]
+    )
 }
 
+module.exports.getProfileData = function (userId) {
+    return db.query(`
+    SELECT * FROM user_profiles WHERE user_id =$1;
+        `,
+    [userId]
+    )
+}
 
-// function addCity(city, country) {
-//     db.query(`
-//         INSERT INTO cities(city, country)
-//         VALUES (${city}, ${country} )`
-//     )
-// }
-
-// // With new syntax it will use it as a string and not a command
-
-// function addCity(city, country) {
-//     return db.query(`
-//         INSERT INTO cities(city, country)
-//         VALUES ($1, $2 );
-//         `,
-//         [city, country]
-//     )
+// exports.getUsersByCity = function (city){
+//      // return db.query(`
+//     //     SELECT password FROM users WHERE $1 = email; 
+//     //     `,
+//     // [email]
+//     // )
+//     // WHERE LOWER(city) = LOWER($1)
 // }

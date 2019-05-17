@@ -89,6 +89,12 @@ form{
 
 #signature-img{
     width:400; height:100;
+    background-color: aliceblue;
+    border: seagreen dotted 3px;
+    border-radius: 20px;
+    margin: 10px;
+    align-self: center;
+    align-self: center;
 }
 
 #submit{

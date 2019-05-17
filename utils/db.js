@@ -1,11 +1,11 @@
 const spicedPg = require('spiced-pg')
 const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`)
 
-exports.test = function () {
+module.exports.test = function () {
     return true
 }
 
-exports.addSignature = function (userId, signatureUrl) {
+module.exports.addSignature = function (userId, signatureUrl) {
     return db.query(`
         INSERT INTO signatures(user_id, signature) 
         VALUES ($1, $2)
@@ -15,19 +15,35 @@ exports.addSignature = function (userId, signatureUrl) {
     )
 }
 
-exports.getSigners = function (userId) {
+module.exports.getSignedInfo = function (userId) {
+    return db.query(`
+        INSERT INTO signatures(user_id, signature) 
+        VALUES ($1, $2)
+        RETURNING id;
+        `,
+    [userId, signatureUrl]
+    )
+}
+
+
+// TODO
+module.exports.getSigners = function (userId) {
     // return db.query(`SELECT CONCAT(first, ' ', last) AS name, signature FROM signatures;`)
     return db.query(
         `
-        SELECT users.first, user_profiles.city, user_profiles.age, user_profiles.url
+        SELECT CONCAT(users.first, ' ', users.last) As name,  user_profiles.city, user_profiles.age, user_profiles.url
         FROM users
-        WHERE users.id != $1
         JOIN user_profiles
-        ON signatures.user_id = user_profiles.user_id;
+        ON users.id = user_profiles.user_id
+        WHERE users.id != $1;
         `,
         [userId]
     )
 }
+
+// module.exports.signersCount = function signersCount () {
+//     return db.query(`SELECT COUNT(*) FROM signatures;`)
+// }
 
 // CONCAT(user_profiles.first, ' ', user_profiles.last) AS name
 // user_profiles.age AS age,
@@ -37,13 +53,13 @@ exports.getSigners = function (userId) {
 // JOIN songs
 // ON singers.id = songs.singer_id;
 
-exports = function getAmountOfSigners () {
+module.exports.signersCount = function getAmountOfSigners () {
     return db.query('SELECT COUNT(id) FROM signatures;')
 }
 
 // USER QUERIES
 
-exports.addUser = function (first, last, email, password) {
+module.exports.addUser = function (first, last, email, password) {
     return db.query(`
         INSERT INTO users(first, last, email, password) 
         VALUES ($1, $2, $3, $4)
@@ -53,7 +69,7 @@ exports.addUser = function (first, last, email, password) {
     )
 }
 
-exports.getHashedPWord = function (email) {
+module.exports.getHashedPWord = function (email) {
     return db.query(`
         SELECT password FROM users WHERE $1 = email; 
         `,
@@ -61,28 +77,35 @@ exports.getHashedPWord = function (email) {
     )
 }
 
-exports.addUserProfile = function (age, city, url, userId) {
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        throw new Error('Not a valid Url')
-    }
-    return db.query(`
-        INSERT INTO user_profiles(age, city, url, user_id) 
-        VALUES ($1, $2, $3, $4)
-        RETURNING id;
-        `,
-    [age, city, url, userId]
-    )
+module.exports.addUserProfile = function (age, city, url, userId) {
+    return new Promise((resolve, reject) => {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            reject(new Error('Not a valid Url'))
+        } else {
+            resolve(
+                db.query(`
+                INSERT INTO user_profiles(age, city, url, user_id) 
+                VALUES ($1, $2, $3, $4)
+                RETURNING id;
+                `,
+                [age, city, url, userId]
+                )
+            )
+        }
+    })
 }
 
-exports.getSigId = function (userId) {
+module.exports.getSigId = function (userId) {
     return db.query(`SELECT id FROM signatures WHERE user_id =$1`, [userId])
 }
 
-exports.getNameAndSignature = function (userId) {
+module.exports.getNameAndSignature = function (userId) {
     return db.query(`
-        SELECT first FROM users 
-        WHERE $1 = userId; 
- 
+        SELECT first, signature
+        FROM users 
+        JOIN signatures
+        ON signatures.user_id = users.id
+        WHERE $1 = users.Id; 
         `,
     [userId]
     )
@@ -96,11 +119,11 @@ module.exports.getProfileData = function (userId) {
     )
 }
 
-// exports.getSignersByCity
+// module.exports.getSignersByCity
 
-// exports.getUsersByCity = function (city){
+// module.exports.getUsersByCity = function (city){
 //      // return db.query(`
-//     //     SELECT password FROM users WHERE $1 = email; 
+//     //     SELECT password FROM users WHERE $1 = email;
 //     //     `,
 //     // [email]
 //     // )

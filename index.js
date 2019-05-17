@@ -36,10 +36,14 @@ app.use((req, res, next) => {
             } else {
                 if (loggedIn) {
                     if (signatureId) {
-                        if (url !== Routes.SIGNED) {
-                            res.redirect(Routes.SIGNED)
-                        } else {
+                        if (url === Routes.SIGNERS) {
                             next()
+                        } else {
+                            if (url !== Routes.SIGNED) {
+                                res.redirect(Routes.SIGNED)
+                            } else {
+                                next()
+                            }
                         }
                     } else {
                         next()
@@ -61,23 +65,24 @@ app.use((req, res, next) => {
 })
 
 // GET REQUESTS
+
+app.get(Routes.SIGNERS, (req, res, next) => {
+    db.getSigners().then((signers) => {
+        renderPage(res, new pages.SignersPage(signers.rows))
+    }).catch((e) => {
+        console.log(e)
+        next()
+    })
+})
+
 app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
     const city = req.params.city
-    if (city) {
-        db.getSigners(city).then((signers) => {
-            renderPage(res, new pages.SignersPage(signers.rows))
-        }).catch((e) => {
-            console.log(e)
-            next()
-        })
-    } else {
-        db.getSigners().then((signers) => {
-            renderPage(res, new pages.SignersPage(signers.rows))
-        }).catch((e) => {
-            console.log(e)
-            next()
-        })
-    }
+    db.getSigners(city).then((signers) => {
+        renderPage(res, new pages.SignersPage(signers.rows))
+    }).catch((e) => {
+        console.log(e)
+        next()
+    })
 })
 
 app.get(Routes.REGISTER, (req, res) => { renderPage(res, new pages.SignUpPage()) })
@@ -88,12 +93,17 @@ app.get(Routes.LOGIN, (req, res) => { renderPage(res, new pages.LoginPage()) })
 
 app.get(Routes.PETITION, (req, res) => { renderPage(res, new pages.SignPetitonPage()) })
 
+app.get(Routes.SIGNERS, (req, res) => { renderPage(res, new pages.SignersPage()) })
+
 app.get(Routes.SIGNED, (req, res, next) => {
-    const userName = db.getProfileData(req.session.userId)
-    const signers = db.getSigners()
-    const signatureId = req.session.signatureId
-    Promise.all([userName]).then((results) => {
-        renderPage(res, new pages.ThankyouPage(results[0], results[1]))
+    const userName = db.getNameAndSignature(req.session.userId)
+    const signers = db.signersCount()
+
+    Promise.all([userName, signers]).then((results) => {
+        const name = results[0].rows[0].first
+        const signature = results[0].rows[0].signature
+        const signersCount = results[1].rows[0].count
+        renderPage(res, new pages.ThankyouPage(name, signature, signersCount))
     }).catch((e) => {
         console.log(e)
     })
@@ -106,11 +116,13 @@ app.get(Routes.LOGOUT, (req, res) => {
 
 // POST REQUESTS
 app.post(Routes.REGISTER, (req, res) => {
+    var test = 0; var error = ''
     for (var propt in req.body) {
-        if (!req.body[propt]) {
-            renderPage(res, new pages.SignUpPage(`You did not fill in the ${propt} field`))
-            return
-        }
+        if (!req.body[propt]) { test++ }
+    }
+
+    if (test !== 4) {
+        return renderPage(res, new pages.SignUpPage(`You did not fill in the ${error} field`))
     }
 
     encryption.hashPassword(req.body.password).then((hashedP) => {
@@ -122,7 +134,7 @@ app.post(Routes.REGISTER, (req, res) => {
         if (e.code === `23505`) {
             renderPage(res, new pages.SignUpPage(`We already have a user registed to that email`))
         } else {
-            renderPage(res, new pages.SignUpPage(`Database Error: ${e}`))
+            renderPage(res, new pages.SignUpPage(`Database ${e}`))
         }
     })
 })
@@ -136,7 +148,7 @@ app.post(Routes.PROFILE, (req, res) => {
         if (e.code === '22P02') {
             renderPage(res, new pages.ProfilePage(`Please enter a number for your age`))
         } else {
-            renderPage(res, new pages.ProfilePage(`Error: ${e}`))
+            renderPage(res, new pages.ProfilePage(`${e}`))
         }
     })
 })

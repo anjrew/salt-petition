@@ -1,13 +1,17 @@
 <section>
 
+{{>nav-bar}}
+
 <h1> <em>Great work!</em> The less people like that the better :&#41;</h1>
 
 {{>logo}}
 
 <a href="/petition/signers">
 
-<img id="signature-img" src={{"signatureId"}} >
+<img id="signature-img" src={{"signature"}} >
 
-<a href="/petition/signers"><button>{{signersCount}}</button></a>
+{{#if signersCount}} <h3> <a href="/petition/signers">Click here</a> to see the other {{signersCount}} Signers</h3>{{/if}}
+
+
 
 </section>

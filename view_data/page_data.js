@@ -1,7 +1,7 @@
 'use strict'
 const { Textfield, Button, FormField, Form, Footer } = require('./widget_data.js')
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
-const Routes = Object.freeze({ SIGNED: '/signed', PETITION: '/petition', REGISTER: '/register', SIGNERS: '/signers', LOGIN: '/login', LOGOUT: '/logout', PROFILE: '/profile', CITY: '/city' })
+const Routes = Object.freeze({ SIGNED: '/petition/signed', PETITION: '/petition', REGISTER: '/register', SIGNERS: '/petition/signers', LOGIN: '/login', LOGOUT: '/logout', PROFILE: '/profile', CITY: '/city' })
 const LAYOUT = 'layout'
 /**
  * @param {String} name - The name of the page
@@ -88,15 +88,17 @@ class ThankyouPage extends Page {
     /**
     * @constructor
     * @param {string} - The name of the person who just signed
+    * @param {number} - Text data for the image
     * @param {number} - The total number of signers
     */
-    constructor (signedName, signerCount) {
-        if (!signedName && !signerCount) {
+    constructor (userName, signedName, signers) {
+        if (!userName && !signedName && !signers) {
             throw Error('Arguments are missing for Thankyou page')
         }
         super(PageType.SIGNED, {
-            name: signedName,
-            signerAmount: signerCount
+            name: userName,
+            signature: signedName,
+            signersCount: signers
         })
     }
 }

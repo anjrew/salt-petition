@@ -1,0 +1,4 @@
+psql salt-petition -f sql/create_signatures_table.sql
+psql salt-petition -f sql/create_user_profile_table.sql
+psql salt-petition -f sql/create_users_table.sql
+

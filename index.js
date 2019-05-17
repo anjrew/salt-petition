@@ -28,59 +28,6 @@ app.use((req, res, next) => {
     next()
 })
 
-// REDIRECTS
-app.use((req, res, next) => {
-    const userId = req.session[Cookies.USERID]
-    const signatureId = req.session[Cookies.SIGNATUREID]
-    const loggedIn = req.session[Cookies.LOGGEDIN]
-    const method = req.method
-    const route = req.url
-
-    if (route === Routes.LOGIN && method === 'GET') {
-        next()
-    } else {
-        if (userId) {
-            if (route === Routes.PROFILE) {
-                next()
-            } else {
-                if (route === Routes.REGISTER) {
-                    res.redirect(Routes.PETITION)
-                } else {
-                    if (loggedIn) {
-                        if (route === Routes.LOGOUT) {
-                            next()
-                        } else {
-                            if (signatureId) {
-                                if (route === Routes.SIGNERS) {
-                                    next()
-                                } else {
-                                    if (route !== Routes.SIGNED) {
-                                        res.redirect(Routes.SIGNED)
-                                    } else {
-                                        next()
-                                    }
-                                }
-                            } else {
-                                next()
-                            }
-                        }
-                    } else if (route !== Routes.LOGIN) {
-                        res.redirect(Routes.LOGIN)
-                    } else {
-                        next()
-                    }
-                }
-            }
-        } else {
-            if (route !== Routes.REGISTER && route !== Routes.LOGIN) {
-                res.redirect(Routes.REGISTER)
-            } else {
-                next()
-            }
-        }
-    }
-})
-
 // GET REQUESTS
 
 app.get(Routes.SIGNERS, (req, res, next) => {
@@ -102,13 +49,37 @@ app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
     })
 })
 
-app.get(Routes.REGISTER, (req, res) => { renderPage(res, new Pages.SignUpPage()) })
+app.get(Routes.REGISTER, (req, res, next) => { 
+    const userId = req.session[Cookies.USERID]
+    if (userId) {
+        next()
+    } else {
+        renderPage(res, new Pages.SignUpPage()) 
+    }
+})
 
 app.get(Routes.PROFILE, (req, res) => { renderPage(res, new Pages.ProfilePage()) })
 
-app.get(Routes.LOGIN, (req, res) => { renderPage(res, new Pages.LoginPage()) })
+app.get(Routes.LOGIN, (req, res, next) => { 
+    const userId = req.session[Cookies.USERID]
+    const loggedIn = req.session[Cookies.LOGGEDIN]
+    if (userId && loggedIn) {
+        next()
+    } else {
+        renderPage(res, new Pages.LoginPage()) 
+    }
+})
 
-app.get(Routes.PETITION, (req, res) => { renderPage(res, new Pages.SignPetitonPage()) })
+app.get(Routes.PETITION, (req, res, next) => { 
+    const userId = req.session[Cookies.USERID]
+    const signatureId = req.session[Cookies.SIGNATUREID]
+    const loggedIn = req.session[Cookies.LOGGEDIN]
+    if (userId && signatureId && loggedIn) {
+        next()
+    } else {
+        renderPage(res, new Pages.SignPetitonPage())
+    }
+})
 
 app.get(Routes.SIGNERS, (req, res) => { renderPage(res, new Pages.SignersPage()) })
 
@@ -151,10 +122,6 @@ app.get(Routes.LOGOUT, (req, res) => {
 
 // POST REQUESTS
 app.post(Routes.REGISTER, (req, res) => {
-    var test = 0; var error = ''
-    for (var propt in req.body) {
-        if (!req.body[propt]) { test++; error = propt }
-    }
 
     if (!req.body.firstname && !req.body.lastname && !req.body.emailaddress && !req.body.password) {
         return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
@@ -194,8 +161,12 @@ app.post(Routes.LOGIN, (req, res) => {
     db.getHashedPWord(email).then((result) => {
         return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
-        req.session[Cookies.LOGGEDIN] = true
-        res.redirect(Routes.PETITION)
+        if (doesMatch) {
+            req.session[Cookies.LOGGEDIN] = true
+            res.redirect(Routes.PETITION)
+        } else {
+            renderPage(res, new Pages.LoginPage(`Credentials did not match`))
+        }
     }).catch((e) => {
         renderPage(res, new Pages.LoginPage(`Error trying to login: ${e}`))
     })

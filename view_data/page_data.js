@@ -3,12 +3,12 @@ const { Textfield, Button, FormField, Form, Footer } = require('./widget_data.js
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
 const Routes = Object.freeze({ SIGNED: '/petition/signed', PETITION: '/petition', REGISTER: '/register', SIGNERS: '/petition/signers', LOGIN: '/login', LOGOUT: '/logout', PROFILE: '/profile', CITY: '/city' })
 const LAYOUT = 'layout'
-/**
- * @param {String} name - The name of the page
- * @param {Widget} data - The widget data for the page
- */
 
 class Page {
+    /**
+    * @param {PageType} name - The name of the page
+    * @param {PageAttributes} data - The widget data for the page
+    */
     constructor (type, attributes) {
         this.type = type
         this.attributes = attributes
@@ -84,7 +84,8 @@ class ProfilePage extends Page {
         })
     }
 }
-class ThankyouPage extends Page {
+
+class SignedPage extends Page {
     /**
     * @constructor
     * @param {string} - The name of the person who just signed
@@ -127,7 +128,7 @@ exports.Page = Page
 exports.SignUpPage = SignUpPage
 exports.LoginPage = LoginPage
 exports.ProfilePage = ProfilePage
-exports.ThankyouPage = ThankyouPage
+exports.SignedPage = SignedPage
 exports.Routes = Routes
 exports.SignersPage = SignersPage
 exports.LAYOUT = LAYOUT

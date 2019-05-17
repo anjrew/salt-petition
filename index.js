@@ -103,7 +103,7 @@ app.get(Routes.SIGNED, (req, res, next) => {
         const name = results[0].rows[0].first
         const signature = results[0].rows[0].signature
         const signersCount = results[1].rows[0].count
-        renderPage(res, new pages.ThankyouPage(name, signature, signersCount))
+        renderPage(res, new pages.SignedPage(name, signature, signersCount))
     }).catch((e) => {
         console.log(e)
     })

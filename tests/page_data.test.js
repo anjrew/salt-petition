@@ -1,11 +1,11 @@
-const pages = require('../view_data/page_data');
+const pages = require('../view_data/page_data')
 
-test('Test ThankyouPage constructor', () => {
-    expect(new pages.ThankyouPage('Name', 32).attributes.name).toBe('Name')
+test('Test SignedPage constructor', () => {
+    expect(new pages.SignedPage('Name', 32).attributes.name).toBe('Name')
 })
 
-test('Test ThankyouPage constructor throw', () => {
-    function renderTest () { return new pages.ThankyouPage() }
+test('Test SignedPage constructor throw', () => {
+    function renderTest () { return new pages.SignedPage() }
     expect(renderTest).toThrow()
 })
 

@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 
 // MODULES
-const db = require(`${__dirname}/utils/db.js`)
+const db = require(`./utils/db.js`)
 const Pages = require('./view_data/page_data.js')
 const Routes = require('./view_data/page_data').Routes
 
@@ -25,6 +25,11 @@ setupApp()
 app.use((req, res, next) => {
     res.locals.csrfToken = req.csrfToken()
     res.setHeader('X-FRAME-OPTIONS', 'DENY')
+    next()
+})
+
+app.use((req, res, next) => {
+    console.log(`Recieve ${req.method} to ${req.url}`)
     next()
 })
 
@@ -49,18 +54,18 @@ app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
     })
 })
 
-app.get(Routes.REGISTER, (req, res, next) => { 
+app.get(Routes.REGISTER, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
     if (userId) {
         res.redirect(Routes.LOGIN)
     } else {
-        renderPage(res, new Pages.SignUpPage()) 
+        renderPage(res, new Pages.SignUpPage())
     }
 })
 
 app.get(Routes.PROFILE, (req, res) => { renderPage(res, new Pages.ProfilePage()) })
 
-app.get(Routes.LOGIN, (req, res, next) => { 
+app.get(Routes.LOGIN, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
     const loggedIn = req.session[Cookies.LOGGEDIN]
     if (userId && loggedIn) {
@@ -70,14 +75,20 @@ app.get(Routes.LOGIN, (req, res, next) => {
     }
 })
 
-app.get(Routes.PETITION, (req, res, next) => { 
+app.get(Routes.PETITION, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
     const signatureId = req.session[Cookies.SIGNATUREID]
     const loggedIn = req.session[Cookies.LOGGEDIN]
     if (userId && signatureId && loggedIn) {
         res.redirect(Routes.SIGNED)
     } else {
-        renderPage(res, new Pages.SignPetitonPage())
+        db.getName(userId).then((result) => {
+            const firstname = result.rows[0].first
+            renderPage(res, new Pages.SignPetitonPage(firstname))
+        }).catch((e) => {
+            console.log(e)
+            next()
+        })
     }
 })
 
@@ -122,7 +133,6 @@ app.get(Routes.LOGOUT, (req, res) => {
 
 // POST REQUESTS
 app.post(Routes.REGISTER, (req, res) => {
-
     if (!req.body.firstname && !req.body.lastname && !req.body.emailaddress && !req.body.password) {
         return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
     }
@@ -207,7 +217,7 @@ app.get('*', (req, res) => {
     })
 })
 
-function setupApp () {
+function setupApp() {
     app.engine('handlebars', hb())
 
     // sets rendering
@@ -240,7 +250,7 @@ app.listen(process.env.PORT || 8080, () => {
  * @param {Object} res - The http response object.
  * @param {Page} page - A instance of a Page class or child.
  */
-function renderPage (res, page) {
+function renderPage(res, page) {
     if (!(page instanceof Pages.Page)) {
         throw new Error(`Page argument is not of type "Page"`)
     } else {

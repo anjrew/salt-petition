@@ -8,7 +8,7 @@ const TableId = Object.freeze({
     SIGNATURE: 'signature',
     EMAIL: 'email',
     FIRSTNAME: 'first',
-    LASTNAME: 'last',
+    TableId: 'last',
     CITY: 'city',
     AGE: 'age',
     URL: 'url'
@@ -95,8 +95,8 @@ module.exports.getHashedPWord = function (email) {
 
 module.exports.addUserProfile = function (age, city, url, userId) {
     return new Promise((resolve, reject) => {
-        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.')) {
-            reject(new Error('Not a valid Url'))
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.') && !url === '') {
+            reject(new Error('Not a valid Url. Leave blank if you like :)'))
         } else {
             if (url.startsWith('www.')) {
                 url = 'https://'.concat(url)
@@ -124,6 +124,16 @@ module.exports.getNameAndSignature = function (userId) {
         FROM users 
         JOIN signatures
         ON signatures.user_id = users.id
+        WHERE $1 = users.Id; 
+        `,
+    [userId]
+    )
+}
+
+module.exports.getName = function (userId) {
+    return db.query(`
+        SELECT first
+        FROM users 
         WHERE $1 = users.Id; 
         `,
     [userId]

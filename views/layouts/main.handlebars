@@ -2,20 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <title>Andrew Johnson</title>
 </head>
 <body>
-    {{#if logout}}
-        {{>log-out}}
+     <video autoplay loop>
+         <source src="video.mp4" type="video/mp4">
+     </video>
+
+    {{#if loggedIn}}
+        {{>nav-bar}}
     {{/if}}
     
     {{!-- Main render --}}
-    <h1>{{{ body }}}</h1>
+
+    <div id="main">{{{ body }}}</div>
     
     {{#unless error}}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         <script src="/script.js"></script>
     {{/unless}}
-</body>
+
+    </body>
 </html>

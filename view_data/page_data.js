@@ -35,7 +35,8 @@ class SignUpPage extends Page {
     constructor (err) {
         super(PageType.FORM,
             {
-                title: 'Lets sign you up!',
+                title: 'Make lava lamps exempt from VAT!',
+                subtitle: 'Sign up below to make a change...',
                 fieldset: new FormField([
                     new Textfield('First name', 'text', 'firstname', ''),
                     new Textfield('Last name', 'text', 'lastname', ''),
@@ -43,7 +44,7 @@ class SignUpPage extends Page {
                     new Textfield('Password', 'password', 'password', '')
                 ]),
                 footer: new Footer(
-                    'If you are already a member, please log in',
+                    'If you are already a member, please ',
                     Routes.LOGIN,
                     'Log in!'),
                 error: err
@@ -58,13 +59,13 @@ class LoginPage extends Page {
     */
     constructor (err) {
         super(PageType.FORM, {
-            title: 'Lets Login',
+            title: 'Let\'s Login',
             fieldset: new FormField([
                 new Textfield('Email address', 'email', 'emailaddress', ''),
                 new Textfield('Password', 'password', 'password', '')
             ]),
             footer: new Footer(
-                'If you don\'t have an account yet please register',
+                'If you don\'t have an account yet please ',
                 Routes.REGISTER,
                 'Register'),
             error: err
@@ -73,11 +74,13 @@ class LoginPage extends Page {
 }
 
 class SignPetitonPage extends Page {
-    constructor (err) {
+    constructor (firstnameIn, err) {
         super(PageType.PETITION,
             {
                 error: err,
-                signature: true
+                signature: true,
+                firstname: firstnameIn,
+                loggedIn: true
             })
     };
 }
@@ -89,6 +92,7 @@ class ProfilePage extends Page {
     */
     constructor (err) {
         super(PageType.FORM, {
+            loggedIn: true,
             error: err,
             title: 'Please tell us a little more about yourself',
             fieldset: new FormField([
@@ -116,6 +120,7 @@ class EditProfilePage extends Page {
     */
     constructor (detailsObj, err) {
         super(PageType.FORM, {
+            loggedIn: true,
             error: err,
             title: 'Please tell us a little more about yourself',
             fieldset: new FormField([
@@ -160,6 +165,7 @@ class SignedPage extends Page {
         }
 
         super(PageType.SIGNED, {
+            loggedIn: true,
             name: userName,
             signature: signedName,
             signersCount: signers,
@@ -181,8 +187,8 @@ class SignersPage extends Page {
             throw Error('Signer amount is not a number')
         }
         super(PageType.SIGNERS, {
+            loggedIn: true,
             signers: signersArr,
-            logout: true
         })
     }
 }

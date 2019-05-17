@@ -1,8 +1,10 @@
 *{
-    font-family: "Trebuchet MS", Helvetica, sans-serif	    ;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 100;
     margin: 0px;
     padding: 0px;
+    color: white;
+    align-self: center;
 }
 *:focus {
     outline: none;
@@ -15,7 +17,33 @@ body{
     justify-items: center;
     min-width: 100vw;
     min-height: 100vh;
-    background-color: aquamarine;
+}
+
+#main{
+    border-radius: 30px;
+    background-color: rgb(10,10,10,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    padding: 10px;
+    margin: 10px;
+    width: calc(100% - 40px);
+    max-width: 500px;
+    max-height: 100vh;
+    overflow: hidden;
+    align-self: center;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+nav > a > button {
+    font-size: 20px
 }
 
 section{
@@ -26,12 +54,16 @@ section{
     width: 100%;
 }
 
-fieldset{
-    border-radius: 20px;
-    max-width: 350px;
-    align-self: center;
-    box-shadow: 4px 6px 13px -8px rgba(0,0,0,0.75);
-
+video{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    object-fit: cover;
+    z-index: -99;
 }
 
 button{
@@ -42,6 +74,7 @@ button{
     align-self: center;
     font-size: 30px;
     transition: all 300ms;
+    color: black;
     box-shadow: 4px 6px 13px -8px rgba(0,0,0,0.75);
 }
 button:hover{
@@ -56,7 +89,20 @@ button:active{
 
 h1{
     text-align: center;
-    margin: 20px
+    margin: 20px;
+    font-size: 35px
+}
+
+h2{
+    text-align: center;
+    margin: 20px;
+    font-size: 25px
+}
+
+h3{
+    text-align: center;
+    margin: 15px;
+    font-size: 18px
 }
 
 form{
@@ -68,19 +114,22 @@ form{
 }
 
 #details{
+    border-radius: 20px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     justify-items: center;
-    background-color: blueviolet;
     padding: 10px;
     margin: 10px;
     width: calc(100% - 40px);
+    max-width: 600px;
+    max-height: 100vh;
+    align-self: center;
 }
 
 #signature{
     background-color: aliceblue;
-    border: seagreen dotted 3px;
+    border: white solid 3px;
     border-radius: 20px;
     margin: 10px;
     align-self: center;
@@ -90,10 +139,9 @@ form{
 #signature-img{
     width:400; height:100;
     background-color: aliceblue;
-    border: seagreen dotted 3px;
+    border: white solid 3px;
     border-radius: 20px;
     margin: 10px;
-    align-self: center;
     align-self: center;
 }
 
@@ -129,14 +177,17 @@ img{
     flex-direction: column;
     justify-content: center;
     justify-items: center;
-    padding: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .text-field > input{
-    border-radius: 10px;
-    font-size: 20px;
+    border-radius: 18px;
+    font-size: 15px;
     text-align: center;
-    padding: 10px;
+    padding: 5px;
+    color: black
 }
 .text-field > input:hover{
     transform: scale(1.05);

@@ -1,10 +1,13 @@
 (function () {
     'use strict'
     var signature = document.getElementById('signature')
-    var context = signature.getContext('2d')
-    context.strokeStyle = '#900'
-    context.lineWidth = 2
- 
+    var context; 
+    if (signature) {
+        context = signature.getContext('2d')
+        context.strokeStyle = '#900'
+        context.lineWidth = 2
+    }
+
     $(signature).mousedown(function (event) {
         context.beginPath()
         context.moveTo(event.offsetX, event.offsetY)

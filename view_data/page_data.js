@@ -63,6 +63,10 @@ class LoginPage extends Page {
                 new Textfield('Email address', 'email', 'emailaddress', ''),
                 new Textfield('Password', 'password', 'password', '')
             ]),
+            footer: new Footer(
+                'If you don\'t have an account yet please register',
+                Routes.REGISTER,
+                'Register'),
             error: err
         })
     };

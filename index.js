@@ -52,7 +52,7 @@ app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
 app.get(Routes.REGISTER, (req, res, next) => { 
     const userId = req.session[Cookies.USERID]
     if (userId) {
-        next()
+        res.redirect(Routes.LOGIN)
     } else {
         renderPage(res, new Pages.SignUpPage()) 
     }
@@ -64,9 +64,9 @@ app.get(Routes.LOGIN, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
     const loggedIn = req.session[Cookies.LOGGEDIN]
     if (userId && loggedIn) {
-        next()
+        res.redirect(Routes.PETITION)
     } else {
-        renderPage(res, new Pages.LoginPage()) 
+        renderPage(res, new Pages.LoginPage())
     }
 })
 
@@ -75,7 +75,7 @@ app.get(Routes.PETITION, (req, res, next) => {
     const signatureId = req.session[Cookies.SIGNATUREID]
     const loggedIn = req.session[Cookies.LOGGEDIN]
     if (userId && signatureId && loggedIn) {
-        next()
+        res.redirect(Routes.SIGNED)
     } else {
         renderPage(res, new Pages.SignPetitonPage())
     }

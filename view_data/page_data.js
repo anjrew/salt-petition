@@ -1,6 +1,8 @@
 'use strict'
 const { Textfield, Button, FormField, Form, Footer, Link } = require('./widget_data.js')
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
+const LAYOUT = 'layout'
+const { TableId } = require(`../utils/db`)
 const Routes = Object.freeze({
     SIGNED: '/petition/signed',
     PETITION: '/petition',
@@ -12,9 +14,6 @@ const Routes = Object.freeze({
     CITY: '/city',
     EDITPROFILE: '/edit-profile'
 })
-const LAYOUT = 'layout'
-const { TableId } = require(`${__dirname}/utils/db.js`)
-
 
 class Page {
     /**
@@ -150,7 +149,7 @@ class SignedPage extends Page {
             new Link('Delete your signature', Routes.SIGNED, true)
         ]
 
-        if (signers === 1) {
+        if (signers === '1' || signers === 1) {
             linksIn.unshift(new Link('See the other signer', Routes.SIGNERS))
         } else if (signers > 1) {
             linksIn.unshift(new Link(`See the other ${signers} singers`, Routes.SIGNERS))

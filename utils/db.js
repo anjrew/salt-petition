@@ -1,5 +1,8 @@
 const spicedPg = require('spiced-pg')
-const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`)
+
+// process.env.NODE_ENV === "production" ? secrets = process.env : secrets = require('./secrets');
+const dbUrl = process.env.DATABASE_URL || `postgres:postgres:postgres@localhost:5432/salt-petition`;
+const db = spicedPg(dbUrl)
 const TableId = Object.freeze({
     USERID: 'user_id',
     SIGNATURE: 'signature',
@@ -126,7 +129,11 @@ module.exports.getNameAndSignature = function (userId) {
 
 module.exports.getProfileData = function (userId) {
     return db.query(`
-    SELECT * FROM user_profiles WHERE user_id =$1;
+    SELECT * 
+    FROM user 
+    LEFT JOIN user_profiles
+    ON user.id = user_profiles.user_id
+    WHERE user.id.id =$1;
         `,
     [userId]
     )

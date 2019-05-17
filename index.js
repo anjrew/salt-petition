@@ -7,10 +7,19 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 
+
+
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
 const Pages = require('./view_data/page_data.js')
 const Routes = require('./view_data/page_data').Routes
+
+// VARIABLES
+const Cookies = Object.freeze({
+    LOGGEDIN: 'loggedIn',
+    USERID: 'userId',
+    SIGNATUREID: 'signatureId'
+})
 
 setupApp()
 
@@ -109,26 +118,25 @@ app.get(Routes.SIGNED, (req, res, next) => {
     })
 })
 
-app.get(Routes.EDITPROFILE, (req, res) =>{
-    Promise.all([
-
-
-    ]).then((result) => {
+app.get(Routes.EDITPROFILE, (req, res) => {
+    db.getProfileData(req.session.userId).then((result) => {
         var detailsObj = {
-            firstname
-            lastname
-            password
-            age
-            city
-            url
+            firstname: result,
+            lastname: result,
+            password: result,
+            age: result,
+            city: result,
+            url: result
         }
-        new Pages.EditProfilePage(detailsObj)
-    })    
+        renderPage(new Pages.EditProfilePage(detailsObj))
+    }).catch((e) => {
+        console.log(e)
+    })
 })
 
 app.get(Routes.LOGOUT, (req, res) => {
-    req.session.loggedIn = null
-    res.redirect(Routes.PETITION)
+    req.session.destroy()
+    res.redirect(Routes.LOGIN)
 })
 
 // POST REQUESTS
@@ -241,8 +249,8 @@ function setupApp () {
     app.use(csurf())
 }
 
-app.listen(8080, () => {
-    console.log('Listening on port 8080')
+app.listen(process.env.PORT || 8080, () => {
+    console.log(process.env.PORT ? `Online` : `Listening on port 8080`)
 })
 
 // Parameters may be declared in a variety of syntactic forms

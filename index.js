@@ -109,6 +109,23 @@ app.get(Routes.SIGNED, (req, res, next) => {
     })
 })
 
+app.get(Routes.EDITPROFILE, (req, res) =>{
+    Promise.all([
+
+
+    ]).then((result) => {
+        var detailsObj = {
+            firstname
+            lastname
+            password
+            age
+            city
+            url
+        }
+        new Pages.EditProfilePage(detailsObj)
+    })    
+})
+
 app.get(Routes.LOGOUT, (req, res) => {
     req.session.loggedIn = null
     res.redirect(Routes.PETITION)

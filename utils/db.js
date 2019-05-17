@@ -1,5 +1,20 @@
 const spicedPg = require('spiced-pg')
 const db = spicedPg(`postgres:postgres:postgres@localhost:5432/salt-petition`)
+const TableId = Object.freeze({
+    USERID: 'user_id',
+    SIGNATURE: 'signature',
+    EMAIL: 'first',
+    FIRSTNAME: 'first',
+    LASTNAME: 'last',
+    CITY: 'city',
+    AGE: 'age',
+    URL: 'url'
+})
+const RelationId = Object.freeze({
+    SIGNATURES: 'signatures',
+    USERS: 'users',
+    USERPROFILES: 'user_profiles'
+})
 
 module.exports.test = function () {
     return true

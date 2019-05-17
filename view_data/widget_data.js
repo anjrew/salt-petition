@@ -1,4 +1,10 @@
 'use strict'
+const InputTypes = Object.freeze({
+    TEXT: 'text',
+    PASSWORD: 'email',
+    EMAIL: 'password'
+})
+
 class Widget {
     constructor () {
         this.type = 'WIDGET'
@@ -6,14 +12,23 @@ class Widget {
 }
 
 class Textfield extends Widget {
-    constructor (label, inputType, databaseId, placeholder) {
+    /**
+    * @constructor
+    * @param {string} label - The label of the textfield
+    * @param {string} inputType - A string representation of an input type.
+    * @param {string} databaseId - The database Id asscociated with this
+    * @param {string} placeholder - placeholder text.
+    * @param {string} value - An optional value that fills the textfield
+    */
+    constructor (label, inputType, databaseId, placeholder, value) {
         super()
         this.label = label
         this.inputType = inputType
         this.databaseId = databaseId
         this.placeholder = placeholder
+        this.value = value
         if (!(label && inputType && databaseId)) {
-            throw new Error('Not all fields complete in Textfield init')
+            throw new Error('Not all neccessary fields complete in Textfield init.')
         }
     }
 }

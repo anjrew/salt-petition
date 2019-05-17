@@ -13,6 +13,8 @@ const Routes = Object.freeze({
     EDITPROFILE: '/edit-profile'
 })
 const LAYOUT = 'layout'
+const { TableId } = require(`${__dirname}/utils/db.js`)
+
 
 class Page {
     /**
@@ -96,23 +98,31 @@ class ProfilePage extends Page {
     }
 }
 
-class UpdateProfilePage extends Page {
+class EditProfilePage extends Page {
     /**
     * @constructor
-    * @param {string} err - The error to render to screen in case of an Error.
+        @param {string} err - The error to render to screen in case of an Error.
+        @param {Object} detailsObj - An object with the details of the values to be filled into the page.
+        values The details object should be:
+    *        - firstname
+    *        - lastname
+    *        - password
+    *        - age
+    *        - city
+    *        - url
     */
-    constructor (err) {
+    constructor (detailsObj, err) {
         super(PageType.FORM, {
             error: err,
             title: 'Please tell us a little more about yourself',
             fieldset: new FormField([
-                new Textfield('First name', 'text', 'firstname', ''),
-                new Textfield('Last name', 'text', 'lastname', ''),
-                new Textfield('Email address', 'email', 'emailaddress', ''),
-                new Textfield('Password', 'password', 'password', ''),
-                new Textfield('Age', 'text', 'age', ''),
-                new Textfield('City', 'text', 'city', ''),
-                new Textfield('Homepage', 'text', 'url', '')
+                new Textfield('First name', 'text', 'firstname', '', detailsObj.firstname),
+                new Textfield('Last name', 'text', 'lastname', '', detailsObj.lastname),
+                new Textfield('Email address', 'email', 'emailaddress', '', detailsObj.emailAddress),
+                new Textfield('Password', 'password', 'password', '', detailsObj.password),
+                new Textfield('Age', 'text', 'age', '', detailsObj.age),
+                new Textfield('City', 'text', 'city', '', detailsObj.city),
+                new Textfield('Homepage', 'text', 'url', '', detailsObj.url)
             ]),
             buttonName: 'Continue'
         })
@@ -182,7 +192,7 @@ exports.ProfilePage = ProfilePage
 exports.SignedPage = SignedPage
 exports.Routes = Routes
 exports.SignersPage = SignersPage
-exports.UpdateProfilePage = UpdateProfilePage
+exports.EditProfilePage = EditProfilePage
 exports.LAYOUT = LAYOUT
 
 // class SignUp {

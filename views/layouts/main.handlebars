@@ -13,6 +13,8 @@
 
     {{#if loggedIn}}
         {{>nav-bar}}
+    {{else}}
+         <div class="balance"></div>
     {{/if}}
     
     {{!-- Main render --}}
@@ -24,5 +26,6 @@
         <script src="/script.js"></script>
     {{/unless}}
 
+        <div class="balance"></div>
     </body>
 </html>

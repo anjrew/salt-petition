@@ -122,7 +122,7 @@ class EditProfilePage extends Page {
         super(PageType.FORM, {
             loggedIn: true,
             error: err,
-            title: 'Please tell us a little more about yourself',
+            title: 'Tell the world a little more about yourself...',
             fieldset: new FormField([
                 new Textfield('First name', 'text', 'firstname', '', detailsObj.firstname),
                 new Textfield('Last name', 'text', 'lastname', '', detailsObj.lastname),
@@ -188,7 +188,7 @@ class SignersPage extends Page {
         }
         super(PageType.SIGNERS, {
             loggedIn: true,
-            signers: signersArr,
+            signers: signersArr
         })
     }
 }

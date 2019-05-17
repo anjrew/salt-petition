@@ -1,4 +1,4 @@
-DROP TABLE if EXISTS  users cascade;
+DROP TABLE if EXISTS  users CASCADE;
 CREATE TABLE users(
     id SERIAL PRIMARY KEY,
     first VARCHAR(255) NOT NULL,

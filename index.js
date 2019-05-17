@@ -32,9 +32,9 @@ app.use((req, res, next) => {
 
 // REDIRECTS
 app.use((req, res, next) => {
-    const userId = req.session.userId
-    const signatureId = req.session.signatureId
-    const loggedIn = req.session.loggedIn
+    const userId = req.session[Cookies.USERID]
+    const signatureId = req.session[Cookies.SIGNATUREID]
+    const loggedIn = req.session[Cookies.LOGGEDIN]
     const url = req.url
     if (userId) {
         if (url === Routes.PROFILE) {
@@ -106,7 +106,7 @@ app.get(Routes.SIGNERS, (req, res) => { renderPage(res, new Pages.SignersPage())
 
 app.get(Routes.SIGNED, (req, res, next) => {
     Promise.all([
-        db.getNameAndSignature(req.session.userId),
+        db.getNameAndSignature(req.session[Cookies.USERID]),
         db.signersCount()
     ]).then((results) => {
         const name = results[0].rows[0].first
@@ -119,7 +119,7 @@ app.get(Routes.SIGNED, (req, res, next) => {
 })
 
 app.get(Routes.EDITPROFILE, (req, res) => {
-    db.getProfileData(req.session.userId).then((result) => {
+    db.getProfileData(req.session[Cookies.USERID]).then((result) => {
         var detailsObj = {
             firstname: result,
             lastname: result,
@@ -135,7 +135,7 @@ app.get(Routes.EDITPROFILE, (req, res) => {
 })
 
 app.get(Routes.LOGOUT, (req, res) => {
-    req.session.destroy()
+    req.session = null
     res.redirect(Routes.LOGIN)
 })
 
@@ -153,7 +153,7 @@ app.post(Routes.REGISTER, (req, res) => {
     encryption.hashPassword(req.body.password).then((hashedP) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.emailaddress, hashedP)
     }).then((result) => {
-        req.session.userId = result.rows[0].id
+        req.session[Cookies.USERID] = result.rows[0].id
         res.redirect(Routes.PROFILE)
     }).catch((e) => {
         if (e.code === `23505`) {
@@ -165,7 +165,7 @@ app.post(Routes.REGISTER, (req, res) => {
 })
 
 app.post(Routes.PROFILE, (req, res) => {
-    const userId = req.session.userId
+    const userId = req.session[Cookies.USERID]
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
         res.redirect(Routes.PETITION)
@@ -184,7 +184,7 @@ app.post(Routes.LOGIN, (req, res) => {
     db.getHashedPWord(email).then((result) => {
         return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
-        req.session.loggedIn = true
+        req.session[Cookies.LOGGEDIN] = true
         res.redirect(Routes.PETITION)
     }).catch((e) => {
         renderPage(res, new Pages.LoginPage(`Error trying to login: ${e}`))
@@ -196,8 +196,8 @@ app.post(Routes.PETITION, (req, res) => {
         renderPage(res, new Pages.SignPetitonPage(`You did not fill in the signature`))
     }
 
-    db.addSignature(req.session.userId, req.body.signature).then((result) => {
-        req.session.signatureId = result.rows[0].id
+    db.addSignature(req.session[Cookies.USERID], req.body.signature).then((result) => {
+        req.session[Cookies.SIGNATUREID] = result.rows[0].id
         res.redirect(Routes.SIGNED
         )
     }).catch((e) => {

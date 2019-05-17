@@ -1,13 +1,24 @@
 'use strict'
-const { Textfield, Button, FormField, Form, Footer } = require('./widget_data.js')
+const { Textfield, Button, FormField, Form, Footer, Link } = require('./widget_data.js')
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
-const Routes = Object.freeze({ SIGNED: '/petition/signed', PETITION: '/petition', REGISTER: '/register', SIGNERS: '/petition/signers', LOGIN: '/login', LOGOUT: '/logout', PROFILE: '/profile', CITY: '/city' })
+const Routes = Object.freeze({
+    SIGNED: '/petition/signed',
+    PETITION: '/petition',
+    REGISTER: '/register',
+    SIGNERS: '/petition/signers',
+    LOGIN: '/login',
+    LOGOUT: '/logout',
+    PROFILE: '/profile',
+    CITY: '/city',
+    EDITPROFILE: '/edit-profile'
+})
 const LAYOUT = 'layout'
 
 class Page {
     /**
-    * @param {PageType} name - The name of the page
-    * @param {PageAttributes} data - The widget data for the page
+    * @param {PageType} name - The name of the page.
+    * @param {PageAttributes} data - The widget data for the page.
+    * @property {Object} attributes - An attributes object which has details that are passed to the handlebars script.
     */
     constructor (type, attributes) {
         this.type = type
@@ -27,7 +38,7 @@ class SignUpPage extends Page {
                 fieldset: new FormField([
                     new Textfield('First name', 'text', 'firstname', ''),
                     new Textfield('Last name', 'text', 'lastname', ''),
-                    new Textfield('Email address', 'text', 'emailaddress', ''),
+                    new Textfield('Email address', 'email', 'emailaddress', ''),
                     new Textfield('Password', 'password', 'password', '')
                 ]),
                 error: err
@@ -38,13 +49,13 @@ class SignUpPage extends Page {
 class LoginPage extends Page {
     /**
     * @constructor
-    * @param {any} err - An Erro to show the user.
+    * @param {any} err - An Error to show the user.
     */
     constructor (err) {
         super(PageType.FORM, {
             title: 'Lets Login',
             fieldset: new FormField([
-                new Textfield('Email address', 'text', 'emailaddress', ''),
+                new Textfield('Email address', 'email', 'emailaddress', ''),
                 new Textfield('Password', 'password', 'password', '')
             ]),
             footer: new Footer(
@@ -69,7 +80,7 @@ class SignPetitonPage extends Page {
 class ProfilePage extends Page {
     /**
     * @constructor
-    * @param {string} - The error to render to screen in case of an Error
+    * @param {string} err - The error to render to screen in case of an Error.
     */
     constructor (err) {
         super(PageType.FORM, {
@@ -85,21 +96,61 @@ class ProfilePage extends Page {
     }
 }
 
+class UpdateProfilePage extends Page {
+    /**
+    * @constructor
+    * @param {string} err - The error to render to screen in case of an Error.
+    */
+    constructor (err) {
+        super(PageType.FORM, {
+            error: err,
+            title: 'Please tell us a little more about yourself',
+            fieldset: new FormField([
+                new Textfield('First name', 'text', 'firstname', ''),
+                new Textfield('Last name', 'text', 'lastname', ''),
+                new Textfield('Email address', 'email', 'emailaddress', ''),
+                new Textfield('Password', 'password', 'password', ''),
+                new Textfield('Age', 'text', 'age', ''),
+                new Textfield('City', 'text', 'city', ''),
+                new Textfield('Homepage', 'text', 'url', '')
+            ]),
+            buttonName: 'Continue'
+        })
+    }
+}
+
 class SignedPage extends Page {
     /**
     * @constructor
-    * @param {string} - The name of the person who just signed
-    * @param {number} - Text data for the image
-    * @param {number} - The total number of signers
+    * @param {string} userName - The name of the person who just signed
+    * @param {number} signedName - Text data for the image
+    * @param {number} signers - The total number of signers
+    * @property {Array<Link>} links - An array of links to display below the signature pad
     */
     constructor (userName, signedName, signers) {
         if (!userName && !signedName && !signers) {
             throw Error('Arguments are missing for Thankyou page')
         }
+        if (isNaN(signers)) {
+            throw Error('Signers is not a number')
+        }
+
+        var linksIn = [
+            new Link('Edit your profile', Routes.EDITPROFILE),
+            new Link('Delete your signature', Routes.SIGNED, true)
+        ]
+
+        if (signers === 1) {
+            linksIn.unshift(new Link('See the other signer', Routes.SIGNERS))
+        } else if (signers > 1) {
+            linksIn.unshift(new Link(`See the other ${signers} singers`, Routes.SIGNERS))
+        }
+
         super(PageType.SIGNED, {
             name: userName,
             signature: signedName,
-            signersCount: signers
+            signersCount: signers,
+            links: linksIn
         })
     }
 }
@@ -131,6 +182,7 @@ exports.ProfilePage = ProfilePage
 exports.SignedPage = SignedPage
 exports.Routes = Routes
 exports.SignersPage = SignersPage
+exports.UpdateProfilePage = UpdateProfilePage
 exports.LAYOUT = LAYOUT
 
 // class SignUp {

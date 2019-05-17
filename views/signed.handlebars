@@ -12,6 +12,11 @@
 
 {{#if signersCount}} <h3> <a href="/petition/signers">Click here</a> to see the other {{signersCount}} Signers</h3>{{/if}}
 
+{{#if links}} 
+    {{#links}}
+        {{>link}}
+    {{/links}}
+{{/if}}
 
 
 </section>

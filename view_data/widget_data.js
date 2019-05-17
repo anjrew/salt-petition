@@ -59,6 +59,27 @@ class Footer extends Widget {
     }
 }
 
+class Link extends Widget {
+    /**
+    * @constructor
+    * @param {string} label - The label for the link
+    * @param {string} route - the route for the link.
+    * @param {boolean=} [post=false] - An option parameter to use post request for the link.
+    */
+    constructor (label, route, post = false) {
+        super()
+        this.label = label
+        this.route = route
+        this.post = post
+        if (!label || !route) {
+            throw new Error('Not all fields complete in Textfield init')
+        }
+        if (typeof label !== 'string' || typeof route !== 'string') {
+            throw new Error('Incorrect type assigned to label or route parameter')
+        }
+    }
+}
+
 class Form extends Widget {
 /**
 * @constructor
@@ -89,6 +110,7 @@ module.exports.Button = Button
 module.exports.FormField = FormField
 module.exports.Form = Form
 module.exports.Footer = Footer
+module.exports.Link = Link
 
 /**
  * A constructor for the data for a Button

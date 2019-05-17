@@ -21,14 +21,12 @@ module.exports.getSignedInfo = function (userId) {
         VALUES ($1, $2)
         RETURNING id;
         `,
-    [userId, signatureUrl]
+    [userId]
     )
 }
 
-
 // TODO
 module.exports.getSigners = function (userId) {
-    // return db.query(`SELECT CONCAT(first, ' ', last) AS name, signature FROM signatures;`)
     return db.query(
         `
         SELECT CONCAT(users.first, ' ', users.last) As name,  user_profiles.city, user_profiles.age, user_profiles.url

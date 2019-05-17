@@ -7,8 +7,6 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 
-
-
 // MODULES
 const db = require(`${__dirname}/utils/db.js`)
 const Pages = require('./view_data/page_data.js')
@@ -35,40 +33,50 @@ app.use((req, res, next) => {
     const userId = req.session[Cookies.USERID]
     const signatureId = req.session[Cookies.SIGNATUREID]
     const loggedIn = req.session[Cookies.LOGGEDIN]
-    const url = req.url
-    if (userId) {
-        if (url === Routes.PROFILE) {
-            next()
-        } else {
-            if (url === Routes.REGISTER) {
-                res.redirect(Routes.PETITION)
+    const method = req.method
+    const route = req.url
+
+    if (route === Routes.LOGIN && method === 'GET') {
+        next()
+    } else {
+        if (userId) {
+            if (route === Routes.PROFILE) {
+                next()
             } else {
-                if (loggedIn) {
-                    if (signatureId) {
-                        if (url === Routes.SIGNERS) {
+                if (route === Routes.REGISTER) {
+                    res.redirect(Routes.PETITION)
+                } else {
+                    if (loggedIn) {
+                        if (route === Routes.LOGOUT) {
                             next()
                         } else {
-                            if (url !== Routes.SIGNED) {
-                                res.redirect(Routes.SIGNED)
+                            if (signatureId) {
+                                if (route === Routes.SIGNERS) {
+                                    next()
+                                } else {
+                                    if (route !== Routes.SIGNED) {
+                                        res.redirect(Routes.SIGNED)
+                                    } else {
+                                        next()
+                                    }
+                                }
                             } else {
                                 next()
                             }
                         }
+                    } else if (route !== Routes.LOGIN) {
+                        res.redirect(Routes.LOGIN)
                     } else {
                         next()
                     }
-                } else if (url !== Routes.LOGIN) {
-                    res.redirect(Routes.LOGIN)
-                } else {
-                    next()
                 }
             }
-        }
-    } else {
-        if (url !== Routes.REGISTER) {
-            res.redirect(Routes.REGISTER)
         } else {
-            next()
+            if (route !== Routes.REGISTER && route !== Routes.LOGIN) {
+                res.redirect(Routes.REGISTER)
+            } else {
+                next()
+            }
         }
     }
 })
@@ -135,6 +143,8 @@ app.get(Routes.EDITPROFILE, (req, res) => {
 })
 
 app.get(Routes.LOGOUT, (req, res) => {
+    console.log('here')
+    req.session[Cookies.LOGGEDIN] = false
     req.session = null
     res.redirect(Routes.LOGIN)
 })
@@ -143,11 +153,11 @@ app.get(Routes.LOGOUT, (req, res) => {
 app.post(Routes.REGISTER, (req, res) => {
     var test = 0; var error = ''
     for (var propt in req.body) {
-        if (!req.body[propt]) { test++ }
+        if (!req.body[propt]) { test++; error = propt }
     }
 
-    if (test !== 4) {
-        return renderPage(res, new Pages.SignUpPage(`You did not fill in the ${error} field`))
+    if (!req.body.firstname && !req.body.lastname && !req.body.emailaddress && !req.body.password) {
+        return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
     }
 
     encryption.hashPassword(req.body.password).then((hashedP) => {

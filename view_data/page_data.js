@@ -42,6 +42,10 @@ class SignUpPage extends Page {
                     new Textfield('Email address', 'email', 'emailaddress', ''),
                     new Textfield('Password', 'password', 'password', '')
                 ]),
+                footer: new Footer(
+                    'If you are already a member, please log in',
+                    Routes.LOGIN,
+                    'Log in!'),
                 error: err
             })
     };
@@ -59,10 +63,6 @@ class LoginPage extends Page {
                 new Textfield('Email address', 'email', 'emailaddress', ''),
                 new Textfield('Password', 'password', 'password', '')
             ]),
-            footer: new Footer(
-                'If you are already a member, please log in',
-                '/register',
-                'Log in!'),
             error: err
         })
     };

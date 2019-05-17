@@ -1,12 +1,12 @@
 const spicedPg = require('spiced-pg')
 
 // process.env.NODE_ENV === "production" ? secrets = process.env : secrets = require('./secrets');
-const dbUrl = process.env.DATABASE_URL || `postgres:postgres:postgres@localhost:5432/salt-petition`;
+const dbUrl = process.env.DATABASE_URL || `postgres:postgres:postgres@localhost:5432/salt-petition`
 const db = spicedPg(dbUrl)
 const TableId = Object.freeze({
     USERID: 'user_id',
     SIGNATURE: 'signature',
-    EMAIL: 'first',
+    EMAIL: 'email',
     FIRSTNAME: 'first',
     LASTNAME: 'last',
     CITY: 'city',
@@ -95,9 +95,12 @@ module.exports.getHashedPWord = function (email) {
 
 module.exports.addUserProfile = function (age, city, url, userId) {
     return new Promise((resolve, reject) => {
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.')) {
             reject(new Error('Not a valid Url'))
         } else {
+            if (url.startsWith('www.')) {
+                url = 'https://'.concat(url)
+            }
             resolve(
                 db.query(`
                 INSERT INTO user_profiles(age, city, url, user_id) 

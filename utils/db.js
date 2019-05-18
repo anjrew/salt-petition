@@ -44,16 +44,36 @@ module.exports.getSignedInfo = function (userId) {
 }
 
 // TODO
-module.exports.getSigners = function (userId) {
+module.exports.getSigners1 = function (userId) {
     return db.query(
         `
-        SELECT CONCAT(users.first, ' ', users.last) As name,  user_profiles.city, user_profiles.age, user_profiles.url
-        FROM users
-        JOIN user_profiles
-        ON users.id = user_profiles.user_id
+        SELECT CONCAT(users.first, ' ', users.last) AS name,city,age,url
+        FROM signatures
+        JOIN users ON signatures.user_id=users.id
+        LEFT JOIN user_profiles ON users.id=user_profiles.user_id 
         WHERE users.id != $1;
         `,
         [userId]
+    )
+}
+
+module.exports.getSigners = function (userId) {
+    return db.query(
+        `SELECT first,last,age,city,url FROM signatures
+        CONCAT (first, " ", last) AS name
+        FROM signatures
+        JOIN users ON signatures.user_id=users.id
+        LEFT JOIN user_profiles ON users.id=user_profiles.user_id;`,
+        [userId]
+    )
+}
+
+module.exports.listSigners = function listSigners () {
+    return db.query(
+        `SELECT first,last,age,city,url FROM signatures
+        JOIN users ON signatures.user_id=users.id
+        LEFT JOIN user_profiles ON users.id=user_profiles.user_id;
+        `
     )
 }
 
@@ -140,15 +160,64 @@ module.exports.getName = function (userId) {
     )
 }
 
+// Not working
 module.exports.getProfileData = function (email) {
     return db.query(`
     SELECT * 
     FROM users 
     LEFT JOIN user_profiles
     ON users.id = user_profiles.user_id
+    LEFT JOIN signatures
+    ON user_profiles.user_id = signatures.user_id;
     WHERE users.email =$1;
         `,
     [email]
+    )
+}
+// Not working
+module.exports.getProfileDataById = function (id) {
+    return db.query(`
+    SELECT * 
+    FROM users 
+    LEFT JOIN user_profiles
+    ON users.id = user_profiles.user_id
+    LEFT JOIN signatures
+    ON user_profiles.user_id = signatures.user_id;
+    WHERE users.id =$1;
+        `,
+    [id]
+    )
+}
+
+// TODO why not working
+module.exports.getLoginData = function (email) {
+    return db.query(`
+    SELECT email,users.id, signature.id AS "sigId"
+    FROM users
+    LEFT JOIN signatures ON users.id=signatures.user_id
+    WHERE email =$1;
+    `,
+    [email]
+    )
+}
+
+module.exports.getUserProfile = function (email) {
+    return db.query(`
+    SELECT first,last,email,password,users.id, signatures.id AS "sigId" 
+    FROM users
+    LEFT JOIN signatures ON users.id=signatures.user_id
+    WHERE email =$1;`,
+    [email]
+    )
+}
+
+module.exports.getUserProfileById = function (id) {
+    return db.query(`
+    SELECT first,last,email,user_profiles.age,user_profiles.city
+    FROM users
+    LEFT JOIN user_profiles ON users.id=user_profiles.user_id
+    WHERE users.id =$1;`,
+    [id]
     )
 }
 

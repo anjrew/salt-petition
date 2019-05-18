@@ -1,17 +1,17 @@
 <section>
 
-{{>logo}}
-
-<h2> Shout out to the lava lamp crew!&#41;</h2>
-
+<h2> Shout out to the Lava Lamp crew!</h2>
+    {{#if error}}
+        {{>error}}
+    {{else}}
     <section id="signers">
         <ul>
             {{#signers}}
-                <li>{{name}}</li>
+                {{>signer-details}}
             {{/signers}}
         </ul>
     </section>
-
-    <a href="/thank-you"><button>Go to my pertition</button></a>
+    {{/if}}
+    <a href="/petition"><button>Go to my pertition</button></a>
 
 </section>

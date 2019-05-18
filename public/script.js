@@ -1,10 +1,9 @@
 (function () {
-    'use strict'
     var signature = document.getElementById('signature')
     var context; 
     if (signature) {
         context = signature.getContext('2d')
-        context.strokeStyle = '#900'
+        context.strokeStyle = 'white'
         context.lineWidth = 2
     }
 

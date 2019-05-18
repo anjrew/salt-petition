@@ -179,7 +179,7 @@ class SignersPage extends Page {
     * @constructor
     * @param {Array[signers]} - And array of signer data
     */
-    constructor (signersArr) {
+    constructor (signersArr, err) {
         if (!signersArr) {
             throw Error('Signers Argument is missing')
         }
@@ -187,6 +187,7 @@ class SignersPage extends Page {
             throw Error('Signer amount is not a number')
         }
         super(PageType.SIGNERS, {
+            error: err,
             loggedIn: true,
             signers: signersArr
         })

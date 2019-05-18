@@ -1,0 +1,17 @@
+<li>
+    {{#if url}}
+        {{>signers-link}}
+        {{else}}
+        <h3>{{name}}</h3>
+    {{/if}}
+
+    {{#if age}}
+       <h3>{{age}}</h3> 
+    {{/if}}
+
+    {{#if city}}
+        <a href='/signers/{{city}}'>{{city}}</a>
+    {{/if}}
+    
+    
+</li>

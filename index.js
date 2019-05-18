@@ -6,6 +6,7 @@ const hb = require('express-handlebars')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
+const csurf = require('csurf')
 
 // MODULES
 const db = require(`./utils/db.js`)
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 // GET REQUESTS
 
 app.get(Routes.SIGNERS, (req, res, next) => {
-    db.getSigners().then((signers) => {
+    db.listSigners().then((signers) => {
         renderPage(res, new Pages.SignersPage(signers.rows))
     }).catch((e) => {
         console.log(e)
@@ -54,39 +55,10 @@ app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
     })
 })
 
-app.get(Routes.REGISTER, (req, res, next) => {
-    const userId = req.session[Cookies.USERID]
-    if (userId) {
-        res.redirect(Routes.LOGIN)
-    } else {
-        renderPage(res, new Pages.SignUpPage())
-    }
-})
-
-app.get(Routes.PROFILE, (req, res) => { 
-    const userId = req.session[Cookies.USERID]
-    if (userId) {
-        res.redirect(Routes.PETITION)
-    } else {
-        renderPage(res, new Pages.ProfilePage())
-    }
-})
-
-app.get(Routes.LOGIN, (req, res, next) => {
-    const userId = req.session[Cookies.USERID]
-    const loggedIn = req.session[Cookies.LOGGEDIN]
-    if (userId && loggedIn) {
-        res.redirect(Routes.PETITION)
-    } else {
-        renderPage(res, new Pages.LoginPage())
-    }
-})
-
 app.get(Routes.PETITION, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
     const signatureId = req.session[Cookies.SIGNATUREID]
-    const loggedIn = req.session[Cookies.LOGGEDIN]
-    if (userId && signatureId && loggedIn) {
+    if (userId && signatureId) {
         res.redirect(Routes.SIGNED)
     } else {
         db.getName(userId).then((result) => {
@@ -96,6 +68,33 @@ app.get(Routes.PETITION, (req, res, next) => {
             console.log(e)
             next()
         })
+    }
+})
+
+app.get(Routes.LOGIN, (req, res, next) => {
+    const userId = req.session[Cookies.USERID]
+    if (userId) {
+        res.redirect(Routes.PETITION)
+    } else {
+        renderPage(res, new Pages.LoginPage())
+    }
+})
+
+app.get(Routes.REGISTER, (req, res, next) => {
+    const userId = req.session[Cookies.USERID]
+    if (userId) {
+        res.redirect(Routes.LOGIN)
+    } else {
+        renderPage(res, new Pages.SignUpPage())
+    }
+})
+
+app.get(Routes.PROFILE, (req, res) => {
+    const userId = req.session[Cookies.USERID]
+    if (userId) {
+        res.redirect(Routes.PETITION)
+    } else {
+        renderPage(res, new Pages.ProfilePage())
     }
 })
 
@@ -115,19 +114,21 @@ app.get(Routes.SIGNED, (req, res, next) => {
     })
 })
 
-app.get(Routes.EDITPROFILE, (req, res) => {
-    db.getProfileData(req.session[Cookies.USERID]).then((result) => {
-        var detailsObj = {
-            firstname: result,
-            lastname: result,
-            password: result,
-            age: result,
-            city: result,
-            url: result
+app.get(Routes.EDITPROFILE, (req, res, next) => {
+    db.getUserProfileById(req.session[Cookies.USERID]).then((result) => {
+        let detailsObj = {
+            firstname: result.rows[0].first,
+            lastname: result.rows[0].last,
+            email: result.rows[0].email,
+            age: result.rows[0].age,
+            city: result.rows[0].city,
+            url: result.rows[0].url
         }
-        renderPage(new Pages.EditProfilePage(detailsObj))
+        let pageData = new Pages.EditProfilePage(detailsObj)
+        renderPage(res, pageData)
     }).catch((e) => {
         console.log(e)
+        next()
     })
 })
 
@@ -139,13 +140,14 @@ app.get(Routes.LOGOUT, (req, res) => {
 
 // POST REQUESTS
 app.post(Routes.REGISTER, (req, res) => {
+    if (!req.body._csrf) { console.log('error no _csrf') }
     if (!req.body.firstname && !req.body.lastname && !req.body.emailaddress && !req.body.password) {
         return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
     }
     encryption.hashPassword(req.body.password).then((hashedP) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.emailaddress, hashedP)
     }).then((result) => {
-        db.getSigId()
+        req.session[Cookies.USERID] = result.rows[0].id
         res.redirect(Routes.PROFILE)
     }).catch((e) => {
         if (e.code === `23505`) {
@@ -177,10 +179,11 @@ app.post(Routes.LOGIN, (req, res) => {
         return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
         if (doesMatch) {
-            db.getProfileData(email).then((userProfile) => {
-                req.session[Cookies.USERID] = 2
+            db.getUserProfile(email).then((userProfile) => {
+                req.session[Cookies.USERID] = userProfile.rows[0].id
+                req.session[Cookies.SIGNATUREID] = userProfile.rows[0].sigId
                 res.redirect(Routes.PETITION)
-            })
+            }).catch((e) => { renderPage(res, new Pages.LoginPage(e)) })
         } else {
             renderPage(res, new Pages.LoginPage(`Credentials did not match`))
         }
@@ -224,7 +227,7 @@ app.get('*', (req, res) => {
     })
 })
 
-function setupApp() {
+function setupApp () {
     app.engine('handlebars', hb())
 
     // sets rendering
@@ -243,7 +246,6 @@ function setupApp() {
     }))
     app.use(express.static(`${__dirname}/public`))
 
-    const csurf = require('csurf')
     app.use(csurf())
 }
 
@@ -257,7 +259,7 @@ app.listen(process.env.PORT || 8080, () => {
  * @param {Object} res - The http response object.
  * @param {Page} page - A instance of a Page class or child.
  */
-function renderPage(res, page) {
+function renderPage (res, page) {
     if (!(page instanceof Pages.Page)) {
         throw new Error(`Page argument is not of type "Page"`)
     } else {

@@ -114,16 +114,13 @@ app.get(Routes.PROFILE, (req, res) => {
 app.get(Routes.SIGNERS, (req, res) => { renderPage(res, new Pages.SignersPage()) })
 
 app.get(Routes.SIGNED, (req, res, next) => {
-    Promise.all([
-        db.getNameAndSignature(req.session[Cookies.ID]),
-        db.signersCount()
-    ]).then((results) => {
-        if (results[0].rows[0] < 1) {
+    db.signersCount().then((results) => {
+        if (results.rows[0] < 1) {
             res.redirect(Routes.PETITION)
         } else {
-            const name = results[0].rows[0].first
-            const signature = results[0].rows[0].signature
-            const signersCount = results[1].rows[0].count
+            const name = req.session[Cookies.FIRSTNAME]
+            const signature = req.session[Cookies.SIGNATURE]
+            const signersCount = results.rows[0].count
             renderPage(res, new Pages.SignedPage(name, signature, signersCount))
         }
     }).catch((e) => {
@@ -155,6 +152,33 @@ app.get(Routes.LOGOUT, (req, res) => {
 })
 
 // POST REQUESTS
+app.post(Routes.EDITPROFILE, (req, res, next) => {
+    const userId = req.session[Cookies.ID]
+    const age = req.body.age
+    const city = req.body.city
+    const url = req.body.url
+    const first = req.body.firstname
+    const last = req.body.lastname
+    const email = req.body.email
+    const password = req.body.password
+
+    Promise.all([
+        db.updateProfile(userId, age, city, url),
+        encryption.hashPassword(password).then((hashedP) => {
+            return db.addUser(first, last, email, hashedP)
+        })
+    ]).then((result) => {
+        req.session[Cookies.LOGGEDIN] = true
+        res.redirect(Routes.PETITION)
+    }).catch((e) => {
+        if (e.code === '22P02') {
+            renderPage(res, new Pages.ProfilePage(`Please enter a number for your age`))
+        } else {
+            renderPage(res, new Pages.ProfilePage(`${e}`))
+        }
+    })
+})
+
 app.post(Routes.REGISTER, (req, res) => {
     if (!req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password) {
         return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
@@ -208,13 +232,15 @@ app.post(Routes.LOGIN, (req, res) => {
             req.session[Cookies.SIGNATURE] = userProfile.rows[0].sigId
             req.session[Cookies.URL] = userProfile.rows[0].url
             req.session[Cookies.LOGGEDIN] = true
-
             return db.getSigId(req.session[Cookies.ID])
         }).then((result) => {
-            let sig = result.rows[0].id
-            req.session[Cookies.SIGNATURE] = sig
+            if (result.rows[0]) {
+                let sig = result.rows[0].id
+                req.session[Cookies.SIGNATURE] = sig
+            }
             res.redirect(Routes.PETITION)
-        }).catch((e) => { renderPage(res, new Pages.LoginPage(e)) })
+            
+        }).catch((_e) => { renderPage(res, new Pages.LoginPage('Credentials don\'t match')) })
     } else {
         renderPage(res, new Pages.LoginPage('PLease fill in both fields'))
     }
@@ -223,18 +249,17 @@ app.post(Routes.LOGIN, (req, res) => {
 app.post(Routes.PETITION, (req, res) => {
     if (!req.body.signature) {
         renderPage(res, new Pages.SignPetitonPage(`You did not fill in the signature`))
+    } else {
+        db.addSignature(req.session[Cookies.ID], req.body.signature).then((result) => {
+            req.session[Cookies.SIGNATUREID] = result.rows[0].id
+            res.redirect(Routes.SIGNED)
+        }).catch((e) => {
+            res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
+            res.cookie('error_type', 'data_base_error', { maxAge: 1000, httpOnly: true })
+            res.cookie(`error_message`, ` 'Database error: ${e}`, { maxAge: 1000, httpOnly: true })
+            res.redirect('/error')
+        })
     }
-
-    db.addSignature(req.session[Cookies.ID], req.body.signature).then((result) => {
-        req.session[Cookies.SIGNATUREID] = result.rows[0].id
-        res.redirect(Routes.SIGNED
-        )
-    }).catch((e) => {
-        res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
-        res.cookie('error_type', 'data_base_error', { maxAge: 1000, httpOnly: true })
-        res.cookie(`error_message`, ` 'Database error: ${e}`, { maxAge: 1000, httpOnly: true })
-        res.redirect('/error')
-    })
 })
 
 app.get('/error', (req, res) => {

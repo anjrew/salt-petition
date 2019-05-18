@@ -140,10 +140,10 @@ module.exports.getSigId = function (userId) {
 
 module.exports.getNameAndSignature = function (userId) {
     return db.query(`
-        SELECT first, signature
+        SELECT users.first, signatures.signature
         FROM users 
         JOIN signatures
-        ON signatures.user_id = users.id
+        ON users.id = signatures.user_id 
         WHERE $1 = users.Id; 
         `,
     [userId]
@@ -229,7 +229,7 @@ module.exports.findUser = function findUser (email) {
 
 module.exports.getUserProfileById = function (id) {
     return db.query(`
-    SELECT first,last,email,user_profiles.age,user_profiles.city
+    SELECT first,last,email, user_profiles.age, user_profiles.city
     FROM users
     LEFT JOIN user_profiles ON users.id=user_profiles.user_id
     WHERE users.id =$1;`,
@@ -237,17 +237,16 @@ module.exports.getUserProfileById = function (id) {
     )
 }
 
-module.exports.getUserProfileById = function (id) {
+module.exports.updateProfile = function (userId, age, city, url) {
     return db.query(`
-    INSERT INTO user_profiles (name, age, oscars)
-    VALUES ('Penélope Cruz', 43, 1)
-    ON CONFLICT (name)
-    DO UPDATE SET age = 43, oscars = 1;
+    INSERT INTO user_profiles(user_id, age, city, url) 
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (user_id)
+    DO UPDATE SET age=$2, city=$3, url=$4;
     `,
-    [id]
+    [ userId, age, city, url ]
     )
 }
-
 
 // module.exports.getSignersByCity
 

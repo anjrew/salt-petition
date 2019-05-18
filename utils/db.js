@@ -140,15 +140,15 @@ module.exports.getName = function (userId) {
     )
 }
 
-module.exports.getProfileData = function (userId) {
+module.exports.getProfileData = function (email) {
     return db.query(`
     SELECT * 
-    FROM user 
+    FROM users 
     LEFT JOIN user_profiles
-    ON user.id = user_profiles.user_id
-    WHERE user.id.id =$1;
+    ON users.id = user_profiles.user_id
+    WHERE users.email =$1;
         `,
-    [userId]
+    [email]
     )
 }
 

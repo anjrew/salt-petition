@@ -35,7 +35,7 @@ class SignUpPage extends Page {
     constructor (err) {
         super(PageType.FORM,
             {
-                title: 'Make lava lamps exempt from VAT!',
+                title: 'Make LAVA LAMPS exempt from VAT!',
                 subtitle: 'Sign up below to make a change...',
                 fieldset: new FormField([
                     new Textfield('First name', 'text', 'firstname', ''),
@@ -65,7 +65,7 @@ class LoginPage extends Page {
                 new Textfield('Password', 'password', 'password', '')
             ]),
             footer: new Footer(
-                'If you don\'t have an account yet please ',
+                `If you don't have an account yet please `,
                 Routes.REGISTER,
                 'Register'),
             error: err

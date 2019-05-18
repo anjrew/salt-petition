@@ -33,8 +33,6 @@ body{
     align-items: center;
     padding: 10px;
     margin: 10px;
-    width: calc(100% - 40px);
-    max-width: 500px;
     max-height: 100vh;
     overflow: hidden;
     align-self: center;
@@ -52,7 +50,9 @@ nav > a > button {
     border-color: transparent;
     border-style: none;
     background-color: rgb(10,10,10,0.5);
-    font-size: 20px
+    box-shadow: none;
+    font-size: 20px;
+    box-shadow: none
 }
 
 section{
@@ -171,6 +171,16 @@ form{
 img{
     box-shadow: 4px 6px 13px -8px rgba(0,0,0,0.75);
     object-fit: cover
+}
+
+a{
+    transition: all 300ms;
+}
+a:hover{
+    transform: scale(1.05);
+}
+a:active{
+    transform: translateY(-3px);
 }
 
 #logo{

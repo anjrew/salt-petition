@@ -63,7 +63,14 @@ app.get(Routes.REGISTER, (req, res, next) => {
     }
 })
 
-app.get(Routes.PROFILE, (req, res) => { renderPage(res, new Pages.ProfilePage()) })
+app.get(Routes.PROFILE, (req, res) => { 
+    const userId = req.session[Cookies.USERID]
+    if (userId) {
+        res.redirect(Routes.PETITION)
+    } else {
+        renderPage(res, new Pages.ProfilePage())
+    }
+})
 
 app.get(Routes.LOGIN, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
@@ -125,7 +132,6 @@ app.get(Routes.EDITPROFILE, (req, res) => {
 })
 
 app.get(Routes.LOGOUT, (req, res) => {
-    console.log('here')
     req.session[Cookies.LOGGEDIN] = false
     req.session = null
     res.redirect(Routes.LOGIN)
@@ -136,11 +142,10 @@ app.post(Routes.REGISTER, (req, res) => {
     if (!req.body.firstname && !req.body.lastname && !req.body.emailaddress && !req.body.password) {
         return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
     }
-
     encryption.hashPassword(req.body.password).then((hashedP) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.emailaddress, hashedP)
     }).then((result) => {
-        req.session[Cookies.USERID] = result.rows[0].id
+        db.getSigId()
         res.redirect(Routes.PROFILE)
     }).catch((e) => {
         if (e.code === `23505`) {
@@ -172,13 +177,15 @@ app.post(Routes.LOGIN, (req, res) => {
         return encryption.checkPassword(password, result.rows[0].password)
     }).then((doesMatch) => {
         if (doesMatch) {
-            req.session[Cookies.LOGGEDIN] = true
-            res.redirect(Routes.PETITION)
+            db.getProfileData(email).then((userProfile) => {
+                req.session[Cookies.USERID] = 2
+                res.redirect(Routes.PETITION)
+            })
         } else {
             renderPage(res, new Pages.LoginPage(`Credentials did not match`))
         }
     }).catch((e) => {
-        renderPage(res, new Pages.LoginPage(`Error trying to login: ${e}`))
+        renderPage(res, new Pages.LoginPage(`Credentials did not match`))
     })
 })
 
@@ -211,7 +218,7 @@ app.get('/error', (req, res) => {
 app.get('*', (req, res) => {
     res.render('error', {
         layout: 'main',
-        error: 'No page found',
+        error: 'ERROR: No page found',
         type: 'no matich url',
         message: 'The url is badly formatted.'
     })

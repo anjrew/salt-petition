@@ -18,7 +18,7 @@ module.exports.hashPassword = function (plainTextPassword) {
 }
 
 // To be called in the POST login route
-module.exports.checkPassword = function (textEnteredInLoginForm, hashedPasswordFromDatabase) {
+module.exports.checkPassword = function checkPassword (textEnteredInLoginForm, hashedPasswordFromDatabase) {
     return new Promise(function (resolve, reject) {
         bcrypt.compare(textEnteredInLoginForm, hashedPasswordFromDatabase, function (err, doesMatch) {
             if (err) {

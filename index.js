@@ -222,6 +222,10 @@ app.post(Routes.PROFILE, (req, res) => {
 
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
+        req.session[Cookies.ID] = result.rows[0].id
+        req.session[Cookies.AGE] = result.rows[0].age
+        req.session[Cookies.CITY] = result.rows[0].city
+        req.session[Cookies.URL] = result.rows[0].url
         req.session[Cookies.LOGGEDIN] = true
         res.redirect(Routes.PETITION)
     }).catch((e) => {

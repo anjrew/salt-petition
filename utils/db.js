@@ -143,7 +143,7 @@ module.exports.addUserProfile = function (age, city, url, userId) {
                 db.query(`
                 INSERT INTO user_profiles(age, city, url, user_id) 
                 VALUES ($1, $2, $3, $4)
-                RETURNING id;
+                RETURNING id, age, city, url;
                 `,
                 [age, city, url, userId]
                 )

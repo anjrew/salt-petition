@@ -148,6 +148,20 @@ module.exports.getSignatureWithId = function (userId) {
     )
 }
 
+module.exports.UpdateUsers = function (first, last, password, email, userId) {
+    return db.query(`
+        UPDATE users
+        SET first = $1, last = $2, password = $3, email = $4
+        WHERE id = $5;
+        `,
+    [first, last, password, email, userId]
+    )
+}
+
+// UPDATE users
+// SET first = 'PLEASE', last = 'FUCKING', password = 'WORK', email = 'io@SpeechGrammarList.com'
+// WHERE id = 1;
+
 module.exports.getNameAndSignature = function (userId) {
     return db.query(`
         SELECT users.first, signatures.signature

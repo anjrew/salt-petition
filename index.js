@@ -157,16 +157,16 @@ app.get(Routes.LOGOUT, (req, res) => {
 // POST REQUESTS
 app.post(Routes.EDITPROFILE, (req, res, next) => {
     const userId = req.session[Cookies.ID]
-    const age = req.body.age
-    const city = req.body.city
-    const url = req.body.url
-    const first = req.body.firstname
-    const last = req.body.lastname
-    const email = req.body.email
+    const age = req.session[Cookies.AGE] = req.body.age
+    const city = req.session[Cookies.CITY] = req.body.city
+    const url = req.session[Cookies.URL] = req.body.url
+    const first = req.session[Cookies.FIRSTNAME] = req.body.firstname
+    const last = req.session[Cookies.LASTNAME] = req.body.lastname
+    const email = req.session[Cookies.EMAIL] = req.body.email
     const password = req.body.password
-
+    // to update Profile
     Promise.all([
-        db.updateProfile(userId, age, city, url),
+        db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }),
         encryption.hashPassword(password).then((hashedP) => {
             return db.addUser(first, last, email, hashedP)
         })

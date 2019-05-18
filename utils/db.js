@@ -8,7 +8,7 @@ const TableId = Object.freeze({
     SIGNATURE: 'signature',
     EMAIL: 'email',
     FIRSTNAME: 'first',
-    TableId: 'last',
+    LASTNAME: 'last',
     CITY: 'city',
     AGE: 'age',
     URL: 'url'
@@ -201,15 +201,31 @@ module.exports.getLoginData = function (email) {
     )
 }
 
+// NOT WORKING
 module.exports.getUserProfile = function (email) {
     return db.query(`
-    SELECT first,last,email,password,users.id, signatures.id AS "sigId" 
+    SELECT users.id, first,last,email,password, signatures.id AS "sigId", age, city, url
     FROM users
-    LEFT JOIN signatures ON users.id=signatures.user_id
+    LEFT JOIN user_profiles
+    ON users.id = user_profiles.user_id
+    LEFT JOIN signatures 
+    ON user_profiles.user_id=signatures.user_id
     WHERE email =$1;`,
     [email]
     )
 }
+
+module.exports.findUser = function findUser (email) {
+    return db.query(
+        `SELECT users.id, first,last,email,password,  age, city, url
+        FROM users
+        LEFT JOIN user_profiles
+        ON users.id = user_profiles.userid
+        WHERE email=$1;
+        `,
+        [email]
+    );
+};
 
 module.exports.getUserProfileById = function (id) {
     return db.query(`

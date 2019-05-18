@@ -40,7 +40,7 @@ class SignUpPage extends Page {
                 fieldset: new FormField([
                     new Textfield('First name', 'text', 'firstname', ''),
                     new Textfield('Last name', 'text', 'lastname', ''),
-                    new Textfield('Email address', 'email', 'emailaddress', ''),
+                    new Textfield('Email address', 'email', 'email', ''),
                     new Textfield('Password', 'password', 'password', '')
                 ]),
                 footer: new Footer(
@@ -61,7 +61,7 @@ class LoginPage extends Page {
         super(PageType.FORM, {
             title: 'Let\'s Login',
             fieldset: new FormField([
-                new Textfield('Email address', 'email', 'emailaddress', ''),
+                new Textfield('Email address', 'email', 'email', ''),
                 new Textfield('Password', 'password', 'password', '')
             ]),
             footer: new Footer(
@@ -126,8 +126,8 @@ class EditProfilePage extends Page {
             fieldset: new FormField([
                 new Textfield('First name', 'text', 'firstname', '', detailsObj.firstname),
                 new Textfield('Last name', 'text', 'lastname', '', detailsObj.lastname),
-                new Textfield('Email address', 'email', 'emailaddress', '', detailsObj.emailAddress),
-                new Textfield('Password', 'password', 'password', '', detailsObj.password),
+                new Textfield('Email address', 'email', 'email', '', detailsObj.email),
+                new Textfield('Password', 'password', 'password', '', ''),
                 new Textfield('Age', 'text', 'age', '', detailsObj.age),
                 new Textfield('City', 'text', 'city', '', detailsObj.city),
                 new Textfield('Homepage', 'text', 'url', '', detailsObj.url)

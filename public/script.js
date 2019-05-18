@@ -20,13 +20,12 @@
     }).on('mouseup mouseleave', function (event) { $(signature).off('mousemove mouseleave') })
 
     var allelements = $('*')
-    console.log(allelements)
 
     var heights = allelements.map(function () {
-        return $(this).height()
+        return $(this).outerHeight(true);
     }).get()
 
     var maxHeight = Math.max.apply(null, heights)
 
-    var videoHeight = $('video').outerHeight(maxHeight)
+    $('video').outerHeight(maxHeight)
 })()

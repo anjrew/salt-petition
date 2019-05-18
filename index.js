@@ -72,7 +72,7 @@ app.get(Routes.PETITION, (req, res, next) => {
 })
 
 app.get(Routes.LOGIN, (req, res, next) => {
-    const userId = req.session[Cookies.USERID]
+    const userId = req.session[Cookies.LOGGEDIN]
     if (userId) {
         res.redirect(Routes.PETITION)
     } else {
@@ -82,6 +82,7 @@ app.get(Routes.LOGIN, (req, res, next) => {
 
 app.get(Routes.REGISTER, (req, res, next) => {
     const userId = req.session[Cookies.USERID]
+    req.session = null
     if (userId) {
         res.redirect(Routes.LOGIN)
     } else {
@@ -92,9 +93,9 @@ app.get(Routes.REGISTER, (req, res, next) => {
 app.get(Routes.PROFILE, (req, res) => {
     const userId = req.session[Cookies.USERID]
     if (userId) {
-        res.redirect(Routes.PETITION)
-    } else {
         renderPage(res, new Pages.ProfilePage())
+    } else {
+        res.redirect(Routes.REGISTER)
     }
 })
 
@@ -162,6 +163,7 @@ app.post(Routes.PROFILE, (req, res) => {
     const userId = req.session[Cookies.USERID]
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
+        req.session[Cookies.LOGGEDIN] = true
         res.redirect(Routes.PETITION)
     }).catch((e) => {
         if (e.code === '22P02') {

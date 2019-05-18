@@ -52,14 +52,18 @@ app.get(Routes.SIGNERS, (req, res, next) => {
     })
 })
 
-app.get(`/${Routes.SIGNERS}/:city`, (req, res, next) => {
+app.get(`${Routes.SIGNERS}/:city`, (req, res, next) => {
     const city = req.params.city
-    db.getSigners(city).then((signers) => {
-        renderPage(res, new Pages.SignersPage(signers.rows))
-    }).catch((e) => {
-        console.log(e)
+    if (city) {
+        db.listSignersByCity(city).then((signers) => {
+            renderPage(res, new Pages.SignersPage(signers.rows))
+        }).catch((e) => {
+            console.log(e)
+            next()
+        })
+    } else {
         next()
-    })
+    }
 })
 
 app.get(Routes.PETITION, (req, res, next) => {
@@ -117,18 +121,25 @@ app.get(Routes.SIGNED, (req, res, next) => {
     let sigId = req.session[Cookies.SIGNATURE]
     let userID = req.session[Cookies.ID]
     db.getSignatureWithId(sigId).then((sigResult) => {
-        db.signersCount(userID).then((results) => {
-            if (results.rows[0] < 1) {
-                res.redirect(Routes.PETITION)
-            } else {
-                const name = req.session[Cookies.FIRSTNAME]
-                const signature = sigResult.rows[0].signature
-                const signersCount = results.rows[0].count
-                renderPage(res, new Pages.SignedPage(name, signature, signersCount))
-            }
-        })
+        const signature = sigResult.rows[0]
+        if (!signature) {
+            req.session[Cookies.SIGNATURE] = null
+            res.redirect(Routes.PETITION)
+        } else {
+            db.signersCount(userID).then((results) => {
+                if (results.rows[0] < 1) {
+                    res.redirect(Routes.PETITION)
+                } else {
+                    const name = req.session[Cookies.FIRSTNAME]
+                    const signature = sigResult.rows[0].signature
+                    const signersCount = results.rows[0].count
+                    renderPage(res, new Pages.SignedPage(name, signature, signersCount))
+                }
+            })
+        }
     }).catch((e) => {
         console.log(e)
+        next()
     })
 })
 

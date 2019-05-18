@@ -12,7 +12,8 @@ const Routes = Object.freeze({
     LOGOUT: '/logout',
     PROFILE: '/profile',
     CITY: '/city',
-    EDITPROFILE: '/edit-profile'
+    EDITPROFILE: '/edit-profile',
+    DELETESIG: '/delete-sig'
 })
 
 class Page {
@@ -133,7 +134,7 @@ class EditProfilePage extends Page {
                 new Textfield('City', 'text', 'city', '', detailsObj.city),
                 new Textfield('Homepage', 'text', 'url', '', detailsObj.url)
             ]),
-            buttonName: 'Continue',
+            buttonName: 'Update',
             editProfile: true
         })
     }
@@ -157,7 +158,7 @@ class SignedPage extends Page {
 
         var linksIn = [
             new Link('Edit your profile', Routes.EDITPROFILE),
-            new Link('Delete your signature', Routes.SIGNED, true)
+            new Link('Delete your signature', Routes.DELETESIG, true)
         ]
 
         if (signers === '1' || signers === 1) {

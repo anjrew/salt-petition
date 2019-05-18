@@ -79,6 +79,18 @@ module.exports.listSigners = function listSigners (userId) {
     )
 }
 
+module.exports.listSignersByCity = function listSignersByCity (city) {
+    return db.query(
+        `SELECT first,last,age,city,url 
+        FROM signatures
+        JOIN users ON signatures.user_id=users.id
+        LEFT JOIN user_profiles ON users.id=user_profiles.user_id
+        WHERE city =$1
+        `,
+        [ city ]
+    )
+}
+
 // module.exports.signersCount = function signersCount () {
 //     return db.query(`SELECT COUNT(*) FROM signatures;`)
 // }

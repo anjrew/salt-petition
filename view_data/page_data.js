@@ -65,7 +65,7 @@ class LoginPage extends Page {
                 new Textfield('Password', 'password', 'password', '')
             ]),
             footer: new Footer(
-                `If you don't have an account yet please Register`,
+                `If you don't have an account yet please `,
                 Routes.REGISTER,
                 'Register'),
             loginPage: true,

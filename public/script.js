@@ -22,10 +22,10 @@
     var allelements = $('*')
 
     var heights = allelements.map(function () {
-        return $(this).outerHeight(true);
+        return $(this).outerHeight(true)
     }).get()
 
     var maxHeight = Math.max.apply(null, heights)
 
-    $('video').outerHeight(maxHeight)
+    $('video').height(maxHeight)
 })()

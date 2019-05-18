@@ -118,10 +118,14 @@ app.get(Routes.SIGNED, (req, res, next) => {
         db.getNameAndSignature(req.session[Cookies.ID]),
         db.signersCount()
     ]).then((results) => {
-        const name = results[0].rows[0].first
-        const signature = results[0].rows[0].signature
-        const signersCount = results[1].rows[0].count
-        renderPage(res, new Pages.SignedPage(name, signature, signersCount))
+        if (results[0].rows[0] < 1) {
+            res.redirect(Routes.PETITION)
+        } else {
+            const name = results[0].rows[0].first
+            const signature = results[0].rows[0].signature
+            const signersCount = results[1].rows[0].count
+            renderPage(res, new Pages.SignedPage(name, signature, signersCount))
+        }
     }).catch((e) => {
         console.log(e)
     })
@@ -172,6 +176,7 @@ app.post(Routes.REGISTER, (req, res) => {
 app.post(Routes.PROFILE, (req, res) => {
     console.log(req.session)
     const userId = req.session[Cookies.ID]
+
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
         req.session[Cookies.LOGGEDIN] = true

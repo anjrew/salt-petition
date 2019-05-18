@@ -237,6 +237,18 @@ module.exports.getUserProfileById = function (id) {
     )
 }
 
+module.exports.getUserProfileById = function (id) {
+    return db.query(`
+    INSERT INTO user_profiles (name, age, oscars)
+    VALUES ('Penélope Cruz', 43, 1)
+    ON CONFLICT (name)
+    DO UPDATE SET age = 43, oscars = 1;
+    `,
+    [id]
+    )
+}
+
+
 // module.exports.getSignersByCity
 
 // module.exports.getUsersByCity = function (city){

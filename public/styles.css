@@ -48,7 +48,6 @@ body{
     align-items: center;
     padding: 10px;
     margin: 10px;
-    max-height: 100vh;
     overflow: hidden;
     align-self: center;
 }

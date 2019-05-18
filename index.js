@@ -242,7 +242,7 @@ app.post(Routes.LOGIN, (req, res) => {
                 req.session[Cookies.SIGNATURE] = sig
             }
             res.redirect(Routes.PETITION)
-        }).catch((_e) => { renderPage(res, new Pages.LoginPage('Credentials don\'t match')) })
+        }).catch((_e) => { renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`)) })
     } else {
         renderPage(res, new Pages.LoginPage('PLease fill in both fields'))
     }
@@ -253,7 +253,7 @@ app.post(Routes.PETITION, (req, res) => {
         renderPage(res, new Pages.SignPetitonPage(`You did not fill in the signature`))
     } else {
         db.addSignature(req.session[Cookies.ID], req.body.signature).then((result) => {
-            req.session[Cookies.SIGNATUREID] = result.rows[0].id
+            req.session[Cookies.SIGNATURE] = result.rows[0].id
             res.redirect(Routes.SIGNED)
         }).catch((e) => {
             res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })

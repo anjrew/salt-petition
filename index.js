@@ -87,12 +87,18 @@ app.get(Routes.LOGIN, (req, res, next) => {
 })
 
 app.get(Routes.REGISTER, (req, res, next) => {
-    const userId = req.session[Cookies.ID]
-    req.session[Cookies.LOGGEDIN] = null
-    if (userId) {
-        res.redirect(Routes.LOGIN)
+    if (req.session[Cookies.ID] || req.session[Cookies.LOGGEDIN]) {
+        req.session[Cookies.ID] = null
+        req.session[Cookies.LOGGEDIN] = null
+        res.redirect(Routes.REGISTER)
     } else {
-        renderPage(res, new Pages.SignUpPage())
+        const userId = req.session[Cookies.ID]
+        req.session[Cookies.LOGGEDIN] = null
+        if (userId) {
+            res.redirect(Routes.LOGIN)
+        } else {
+            renderPage(res, new Pages.SignUpPage())
+        }
     }
 })
 
@@ -127,9 +133,9 @@ app.get(Routes.EDITPROFILE, (req, res, next) => {
             firstname: result.rows[0].first,
             lastname: result.rows[0].last,
             email: result.rows[0].email,
-            age: result.rows[0].age,
-            city: result.rows[0].city,
-            url: result.rows[0].url
+            age: req.session[Cookies.AGE],
+            city: req.session[Cookies.CITY],
+            url: req.session[Cookies.URL]
         }
         let pageData = new Pages.EditProfilePage(detailsObj)
         renderPage(res, pageData)
@@ -182,29 +188,31 @@ app.post(Routes.PROFILE, (req, res) => {
 app.post(Routes.LOGIN, (req, res) => {
     const email = req.body.email
     const password = req.body.password
-    db.getHashedPWord(email).then((result) => {
-        return encryption.checkPassword(password, result.rows[0].password)
-    }).then((doesMatch) => {
-        if (doesMatch) {
-            db.getUserProfile(email).then((userProfile) => {
-                req.session[Cookies.ID] = userProfile.rows[0].id
-                req.session[Cookies.AGE] = userProfile.rows[0].age
-                req.session[Cookies.CITY] = userProfile.rows[0].city
-                req.session[Cookies.EMAIL] = userProfile.rows[0].email
-                req.session[Cookies.FIRSTNAME] = userProfile.rows[0].first
-                req.session[Cookies.LASTNAME] = userProfile.rows[0].last
-                req.session[Cookies.SIGNATURE] = userProfile.rows[0].sigId
-                req.session[Cookies.URL] = userProfile.rows[0].url
-                req.session[Cookies.LOGGEDIN] = true
-                console.log(req.session)
-                res.redirect(Routes.PETITION)
-            }).catch((e) => { renderPage(res, new Pages.LoginPage(e)) })
-        } else {
-            renderPage(res, new Pages.LoginPage(`Credentials did not match`))
-        }
-    }).catch((e) => {
-        renderPage(res, new Pages.LoginPage(`Credentials did not match`))
-    })
+    if (password && email) {
+        db.getHashedPWord(email).then((result) => {
+            return encryption.checkPassword(password, result.rows[0].password)
+        }).then((doesMatch) => {
+            if (doesMatch) { return db.getUserProfile(email) }
+        }).then((userProfile) => {
+            req.session[Cookies.ID] = userProfile.rows[0].id
+            req.session[Cookies.AGE] = userProfile.rows[0].age
+            req.session[Cookies.CITY] = userProfile.rows[0].city
+            req.session[Cookies.EMAIL] = userProfile.rows[0].email
+            req.session[Cookies.FIRSTNAME] = userProfile.rows[0].first
+            req.session[Cookies.LASTNAME] = userProfile.rows[0].last
+            req.session[Cookies.SIGNATURE] = userProfile.rows[0].sigId
+            req.session[Cookies.URL] = userProfile.rows[0].url
+            req.session[Cookies.LOGGEDIN] = true
+
+            return db.getSigId(req.session[Cookies.ID])
+        }).then((result) => {
+            let sig = result.rows[0].id
+            req.session[Cookies.SIGNATURE] = sig
+            res.redirect(Routes.PETITION)
+        }).catch((e) => { renderPage(res, new Pages.LoginPage(e)) })
+    } else {
+        renderPage(res, new Pages.LoginPage('PLease fill in both fields'))
+    }
 })
 
 app.post(Routes.PETITION, (req, res) => {

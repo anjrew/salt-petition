@@ -1,6 +1,6 @@
 (function () {
     var signature = document.getElementById('signature')
-    var context; 
+    var context
     if (signature) {
         context = signature.getContext('2d')
         context.strokeStyle = 'white'
@@ -19,5 +19,14 @@
         })
     }).on('mouseup mouseleave', function (event) { $(signature).off('mousemove mouseleave') })
 
-})()
+    var allelements = $('*')
+    console.log(allelements)
 
+    var heights = allelements.map(function () {
+        return $(this).height()
+    }).get()
+
+    var maxHeight = Math.max.apply(null, heights)
+
+    var videoHeight = $('video').outerHeight(maxHeight)
+})()

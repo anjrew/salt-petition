@@ -133,7 +133,8 @@ class EditProfilePage extends Page {
                 new Textfield('City', 'text', 'city', '', detailsObj.city),
                 new Textfield('Homepage', 'text', 'url', '', detailsObj.url)
             ]),
-            buttonName: 'Continue'
+            buttonName: 'Continue',
+            editProfile: true
         })
     }
 }

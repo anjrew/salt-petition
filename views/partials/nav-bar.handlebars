@@ -1,4 +1,4 @@
   <nav>
     {{>log-out}}
-    {{>edit-profile-button}}
+    {{#unless editProfile}} {{>edit-profile-button}} {{/unless}}
   </nav>  

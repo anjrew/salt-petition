@@ -68,12 +68,14 @@ module.exports.getSigners = function (userId) {
     )
 }
 
-module.exports.listSigners = function listSigners () {
+module.exports.listSigners = function listSigners (userId) {
     return db.query(
         `SELECT first,last,age,city,url FROM signatures
         JOIN users ON signatures.user_id=users.id
-        LEFT JOIN user_profiles ON users.id=user_profiles.user_id;
-        `
+        LEFT JOIN user_profiles ON users.id=user_profiles.user_id
+        WHERE user_profiles.user_id != $1;
+        `,
+        [ userId ]
     )
 }
 
@@ -89,8 +91,12 @@ module.exports.listSigners = function listSigners () {
 // JOIN songs
 // ON singers.id = songs.singer_id;
 
-module.exports.signersCount = function getAmountOfSigners () {
-    return db.query('SELECT COUNT(id) FROM signatures;')
+module.exports.signersCount = function getAmountOfSigners (userid) {
+    return db.query(
+        `SELECT COUNT(id)
+         FROM signatures
+         WHERE user_id != $1;`
+        , [userid])
 }
 
 // USER QUERIES

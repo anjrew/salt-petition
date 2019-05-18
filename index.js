@@ -43,7 +43,8 @@ app.use((req, res, next) => {
 // GET REQUESTS
 
 app.get(Routes.SIGNERS, (req, res, next) => {
-    db.listSigners().then((signers) => {
+    const userID = req.session[Cookies.ID]
+    db.listSigners(userID).then((signers) => {
         renderPage(res, new Pages.SignersPage(signers.rows))
     }).catch((e) => {
         console.log(e)
@@ -111,12 +112,12 @@ app.get(Routes.PROFILE, (req, res) => {
     }
 })
 
-app.get(Routes.SIGNERS, (req, res) => { renderPage(res, new Pages.SignersPage()) })
 
 app.get(Routes.SIGNED, (req, res, next) => {
     let sigId = req.session[Cookies.SIGNATURE]
+    let userID = req.session[Cookies.ID]
     db.getSignatureWithId(sigId).then((sigResult) => {
-        db.signersCount().then((results) => {
+        db.signersCount(userID).then((results) => {
             if (results.rows[0] < 1) {
                 res.redirect(Routes.PETITION)
             } else {

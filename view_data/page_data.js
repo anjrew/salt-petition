@@ -162,7 +162,7 @@ class SignedPage extends Page {
 
         if (signers === '1' || signers === 1) {
             linksIn.unshift(new Link('See the other signer', Routes.SIGNERS))
-        } else if (signers > 1) {
+        } else if (signers > 0) {
             linksIn.unshift(new Link(`See the other ${signers} singers`, Routes.SIGNERS))
         }
 

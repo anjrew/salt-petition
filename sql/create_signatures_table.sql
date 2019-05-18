@@ -7,4 +7,3 @@ CREATE TABLE signatures(
     user_id INT NOT NULL UNIQUE
 );
 
-

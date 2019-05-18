@@ -152,17 +152,17 @@ module.exports.addUserProfile = function (age, city, url, userId) {
     })
 }
 
-module.exports.getSigId = function (userId) {
+module.exports.getSigUserId = function (userId) {
     return db.query(`SELECT id FROM signatures WHERE user_id =$1`, [userId])
 }
 
-module.exports.getSignatureWithId = function (userId) {
+module.exports.getSignatureWithSigId = function (sigId) {
     return db.query(`
         SELECT signature
         FROM signatures 
-        WHERE user_Id = $1; 
+        WHERE id = $1; 
         `,
-    [userId]
+    [sigId]
     )
 }
 

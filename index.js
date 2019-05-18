@@ -120,7 +120,7 @@ app.get(Routes.PROFILE, (req, res) => {
 app.get(Routes.SIGNED, (req, res, next) => {
     let sigId = req.session[Cookies.SIGNATURE]
     let userID = req.session[Cookies.ID]
-    db.getSignatureWithId(sigId).then((sigResult) => {
+    db.getSignatureWithSigId(sigId).then((sigResult) => {
         const signature = sigResult.rows[0]
         if (!signature) {
             req.session[Cookies.SIGNATURE] = null
@@ -247,14 +247,16 @@ app.post(Routes.LOGIN, (req, res) => {
             req.session[Cookies.SIGNATURE] = userProfile.rows[0].sigId
             req.session[Cookies.URL] = userProfile.rows[0].url
             req.session[Cookies.LOGGEDIN] = true
-            return db.getSigId(req.session[Cookies.ID])
+            return db.getSigUserId(req.session[Cookies.ID])
         }).then((result) => {
             if (result.rows[0]) {
                 let sig = result.rows[0].id
                 req.session[Cookies.SIGNATURE] = sig
             }
             res.redirect(Routes.PETITION)
-        }).catch((_e) => { renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`)) })
+        }).catch((_e) => { 
+            renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`)) 
+        })
     } else {
         renderPage(res, new Pages.LoginPage('PLease fill in both fields'))
     }

@@ -202,6 +202,10 @@ app.post(Routes.REGISTER, (req, res) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.email, hashedP)
     }).then((result) => {
         req.session[Cookies.ID] = result.rows[0].id
+        req.session[Cookies.AGE] = null
+        req.session[Cookies.CITY] = null
+        req.session[Cookies.URL] = null
+        req.session[Cookies.SIGNATURE] = null
         res.redirect(Routes.PROFILE)
     }).catch((e) => {
         if (e.code === `23505`) {

@@ -138,6 +138,16 @@ module.exports.getSigId = function (userId) {
     return db.query(`SELECT id FROM signatures WHERE user_id =$1`, [userId])
 }
 
+module.exports.getSignatureWithId = function (userId) {
+    return db.query(`
+        SELECT signature
+        FROM signatures 
+        WHERE user_Id = $1; 
+        `,
+    [userId]
+    )
+}
+
 module.exports.getNameAndSignature = function (userId) {
     return db.query(`
         SELECT users.first, signatures.signature

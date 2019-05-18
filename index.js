@@ -114,15 +114,18 @@ app.get(Routes.PROFILE, (req, res) => {
 app.get(Routes.SIGNERS, (req, res) => { renderPage(res, new Pages.SignersPage()) })
 
 app.get(Routes.SIGNED, (req, res, next) => {
-    db.signersCount().then((results) => {
-        if (results.rows[0] < 1) {
-            res.redirect(Routes.PETITION)
-        } else {
-            const name = req.session[Cookies.FIRSTNAME]
-            const signature = req.session[Cookies.SIGNATURE]
-            const signersCount = results.rows[0].count
-            renderPage(res, new Pages.SignedPage(name, signature, signersCount))
-        }
+    let sigId = req.session[Cookies.SIGNATURE]
+    db.getSignatureWithId(sigId).then((sigResult) => {
+        db.signersCount().then((results) => {
+            if (results.rows[0] < 1) {
+                res.redirect(Routes.PETITION)
+            } else {
+                const name = req.session[Cookies.FIRSTNAME]
+                const signature = sigResult.rows[0].signature
+                const signersCount = results.rows[0].count
+                renderPage(res, new Pages.SignedPage(name, signature, signersCount))
+            }
+        })
     }).catch((e) => {
         console.log(e)
     })
@@ -239,7 +242,6 @@ app.post(Routes.LOGIN, (req, res) => {
                 req.session[Cookies.SIGNATURE] = sig
             }
             res.redirect(Routes.PETITION)
-            
         }).catch((_e) => { renderPage(res, new Pages.LoginPage('Credentials don\'t match')) })
     } else {
         renderPage(res, new Pages.LoginPage('PLease fill in both fields'))

@@ -19,6 +19,9 @@
          <div class="balance"></div>
     {{/if}}
     
+    {{#if editProfile}}
+        {{>delete-profile}}
+    {{/if}}
     {{!-- Main render --}}
 
     <div id="main">{{{ body }}}</div>

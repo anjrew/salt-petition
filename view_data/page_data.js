@@ -157,8 +157,8 @@ class SignedPage extends Page {
         }
 
         var linksIn = [
-            new Link('Edit your profile', Routes.EDITPROFILE),
-            new Link('Delete your signature', Routes.DELETESIG, true)
+            new Link('Edit your profile', Routes.EDITPROFILE)
+            // new Link('Delete your signature', Routes.DELETESIG, true)
         ]
 
         if (signers === '1' || signers === 1) {

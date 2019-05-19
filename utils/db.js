@@ -33,6 +33,15 @@ module.exports.addSignature = function (userId, signatureUrl) {
     )
 }
 
+module.exports.deleteSignature = function deleteSignature (sigId) {
+    return db.query(`
+        DELETE FROM signatures
+        WHERE id = $1;
+        `,
+    [ sigId ]
+    )
+}
+
 module.exports.getSignedInfo = function (userId) {
     return db.query(`
         INSERT INTO signatures(user_id, signature) 
@@ -130,7 +139,7 @@ module.exports.addUser = function (first, last, email, password) {
             RETURNING id;
             `,
             [first, last, email, password]
-            ) 
+            )
         } else {
             throw new Error('Somebody already signed up with that email! It mustbe unique.')
         }

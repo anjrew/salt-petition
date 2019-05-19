@@ -4,7 +4,8 @@
     margin: 0px;
     padding: 0px;
     color: white;
-    align-self: center
+    align-self: center;
+    text-align: center
 }
 *:focus {
     outline: none;
@@ -59,7 +60,7 @@ nav {
     justify-content: start;
 }
 
-nav > a > button {
+nav > a > button, nav > button {
     color: white;
     border-color: transparent;
     border-style: none;
@@ -68,6 +69,7 @@ nav > a > button {
     font-size: 20px;
     box-shadow: none;
 }
+
 
 section{
     display: flex;

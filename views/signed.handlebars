@@ -10,5 +10,10 @@
     {{/links}}
 {{/if}}
 
+<form method="post" id="link-post-form">
+<input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <button type="submit" form="link-post-form" class="link-post" formmethod="post" value="delete">Delete your signature</button>    
+</form>
+
 
 </section>

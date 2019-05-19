@@ -167,6 +167,14 @@ app.get(Routes.LOGOUT, (req, res) => {
 })
 
 // POST REQUESTS
+
+app.post(Routes.SIGNED, (req, res) => {
+    db.deleteSignature(req.session[Cookies.SIGNATURE]).then(() => {
+        req.cookies[Cookies.SIGNATURE] = null
+        res.redirect(Routes.PETITION)
+    })
+})
+
 app.post(Routes.EDITPROFILE, (req, res, next) => {
     const userId = req.session[Cookies.ID]
     const age = req.session[Cookies.AGE] = req.body.age
@@ -223,7 +231,6 @@ app.post(Routes.PROFILE, (req, res) => {
 
     db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
-        req.session[Cookies.ID] = result.rows[0].id
         req.session[Cookies.AGE] = result.rows[0].age
         req.session[Cookies.CITY] = result.rows[0].city
         req.session[Cookies.URL] = result.rows[0].url

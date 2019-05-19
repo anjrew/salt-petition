@@ -43,7 +43,7 @@ module.exports.getSignedInfo = function (userId) {
     )
 }
 
-// TODO
+// TODO WHy not working?@?@?
 module.exports.getSigners1 = function (userId) {
     return db.query(
         `
@@ -94,7 +94,7 @@ module.exports.listSignersByCity = function listSignersByCity (city) {
 // module.exports.signersCount = function signersCount () {
 //     return db.query(`SELECT COUNT(*) FROM signatures;`)
 // }
-
+// TODO CONCAT NOT WORKGIN
 // CONCAT(user_profiles.first, ' ', user_profiles.last) AS name
 // user_profiles.age AS age,
 // user_profiles.city AS city,
@@ -115,12 +115,26 @@ module.exports.signersCount = function getAmountOfSigners (userid) {
 
 module.exports.addUser = function (first, last, email, password) {
     return db.query(`
-        INSERT INTO users(first, last, email, password) 
-        VALUES ($1, $2, $3, $4)
-        RETURNING id;
+        SELECT email 
+        FROM users
+        WHERE email = $1
         `,
-    [first, last, email, password]
-    )
+    [email]
+    ).then((result) => {
+        let rowLength = result.rows.length
+        let hasValue = rowLength <= 1
+        if (hasValue) {
+            return db.query(`
+            INSERT INTO users(first, last, email, password) 
+            VALUES ($1, $2, $3, $4)
+            RETURNING id;
+            `,
+            [first, last, email, password]
+            ) 
+        } else {
+            throw new Error('Somebody already signed up with that email! It mustbe unique.')
+        }
+    })
 }
 
 module.exports.getHashedPWord = function (email) {
@@ -166,7 +180,7 @@ module.exports.getSignatureWithSigId = function (sigId) {
     )
 }
 
-module.exports.UpdateUsers = function (first, last, password, email, userId) {
+module.exports.updateUser = function (first, last, password, email, userId) {
     return db.query(`
         UPDATE users
         SET first = $1, last = $2, password = $3, email = $4
@@ -266,8 +280,8 @@ module.exports.findUser = function findUser (email) {
         WHERE email=$1;
         `,
         [email]
-    );
-};
+    )
+}
 
 module.exports.getUserProfileById = function (id) {
     return db.query(`

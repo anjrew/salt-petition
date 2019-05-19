@@ -124,7 +124,7 @@ class EditProfilePage extends Page {
         super(PageType.FORM, {
             loggedIn: true,
             error: err,
-            title: 'Tell the world a little more about yourself...',
+            title: 'Edit your profile below.',
             fieldset: new FormField([
                 new Textfield('First name', 'text', 'firstname', '', detailsObj.firstname),
                 new Textfield('Last name', 'text', 'lastname', '', detailsObj.lastname),
@@ -207,36 +207,6 @@ exports.Routes = Routes
 exports.SignersPage = SignersPage
 exports.EditProfilePage = EditProfilePage
 exports.LAYOUT = LAYOUT
-
-// class SignUp {
-//     constructor () {
-//         this.layout = 'main'
-//     }
-// }
-
-// class EditProfile {
-//     constructor () {
-//         this.layout = 'main'
-//     }
-// }
-
-// class MoreDetails {
-//     constructor () {
-//         this.layout = 'main'
-//     }
-// }
-
-// class Signers {
-//     constructor () {
-//         this.layout = 'main'
-//     }
-// }
-
-// class Sign {
-//     constructor () {
-//         this.layout = 'main'
-//     }
-// }
 
 // class PageAttributes {
 //     constructor () {

@@ -1,6 +1,6 @@
-<form method="post">
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+<form method="post" id="link-post-form">
     <div class="link-post">
-    <input type="submit" value="{{label}}" >
+    <button type="submit" form="link-post-form" value="delete">{{label}}</button>    
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </div>
 </form>

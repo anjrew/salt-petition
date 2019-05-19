@@ -1,4 +1,8 @@
   <nav>
     {{>log-out}}
-    {{#unless editProfile}} {{>edit-profile-button}} {{/unless}}
+    {{#unless editProfile}} 
+      {{>edit-profile-button}}
+    {{else}}
+        <a href="/petition/signed"><button>Back</button></a> 
+    {{/unless}}
   </nav>  

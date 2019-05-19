@@ -30,6 +30,7 @@ setupApp()
 
 // SECURTIY
 app.use((req, res, next) => {
+    console.log(`Token is : ${req.csrfToken()}`)
     res.locals.csrfToken = req.csrfToken()
     res.setHeader('X-FRAME-OPTIONS', 'DENY')
     next()
@@ -116,7 +117,6 @@ app.get(Routes.PROFILE, (req, res) => {
     }
 })
 
-
 app.get(Routes.SIGNED, (req, res, next) => {
     let sigId = req.session[Cookies.SIGNATURE]
     let userID = req.session[Cookies.ID]
@@ -180,7 +180,7 @@ app.post(Routes.EDITPROFILE, (req, res, next) => {
     Promise.all([
         db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }),
         encryption.hashPassword(password).then((hashedP) => {
-            return db.addUser(first, last, email, hashedP)
+            return db.updateUser(first, last, hashedP, email, userId)
         })
     ]).then((result) => {
         req.session[Cookies.LOGGEDIN] = true
@@ -201,7 +201,8 @@ app.post(Routes.REGISTER, (req, res) => {
     encryption.hashPassword(req.body.password).then((hashedP) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.email, hashedP)
     }).then((result) => {
-        req.session[Cookies.ID] = result.rows[0].id
+        let id = result.rows[0].id
+        req.session[Cookies.ID] = id
         req.session[Cookies.AGE] = null
         req.session[Cookies.CITY] = null
         req.session[Cookies.URL] = null
@@ -262,8 +263,8 @@ app.post(Routes.LOGIN, (req, res) => {
                 req.session[Cookies.SIGNATURE] = sig
             }
             res.redirect(Routes.PETITION)
-        }).catch((_e) => { 
-            renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`)) 
+        }).catch((_e) => {
+            renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`))
         })
     } else {
         renderPage(res, new Pages.LoginPage('PLease fill in both fields'))

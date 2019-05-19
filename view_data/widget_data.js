@@ -20,13 +20,14 @@ class Textfield extends Widget {
     * @param {string} placeholder - placeholder text.
     * @param {string} value - An optional value that fills the textfield
     */
-    constructor (label, inputType, databaseId, placeholder, value) {
+    constructor (label, inputType, databaseId, placeholder, value, required) {
         super()
         this.label = label
         this.inputType = inputType
         this.databaseId = databaseId
         this.placeholder = placeholder
         this.value = value
+        this.required = required
         if (!(label && inputType && databaseId)) {
             throw new Error('Not all neccessary fields complete in Textfield init.')
         }

@@ -11,7 +11,7 @@ const Routes = Object.freeze({
     LOGIN: '/login',
     LOGOUT: '/logout',
     PROFILE: '/profile',
-    CITY: '/city',
+    CITY: '/petition/signers/:city',
     EDITPROFILE: '/edit-profile',
     DELETESIG: '/delete-sig'
 })
@@ -36,14 +36,13 @@ class SignUpPage extends Page {
     constructor (err) {
         super(PageType.FORM,
             {
-                title: 'Make LAVA LAMPS exempt from VAT!',
                 subtitle: 'Sign up below to make a change...',
                 buttonName: 'Sign up',
                 fieldset: new FormField([
-                    new Textfield('First name', 'text', 'firstname', ''),
-                    new Textfield('Last name', 'text', 'lastname', ''),
-                    new Textfield('Email address', 'email', 'email', ''),
-                    new Textfield('Password', 'password', 'password', '')
+                    new Textfield('First name', 'text', 'firstname', '', null, true),
+                    new Textfield('Last name', 'text', 'lastname', '', null, true),
+                    new Textfield('Email address', 'email', 'email', '', null, true),
+                    new Textfield('Password', 'password', 'password', '', null, true)
                 ]),
                 footer: new Footer(
                     'If you are already a member, please ',
@@ -63,8 +62,8 @@ class LoginPage extends Page {
         super(PageType.FORM, {
             title: 'Let\'s Login',
             fieldset: new FormField([
-                new Textfield('Email address', 'email', 'email', ''),
-                new Textfield('Password', 'password', 'password', '')
+                new Textfield('Email address', 'email', 'email', '', null, true),
+                new Textfield('Password', 'password', 'password', '', null, true)
             ]),
             footer: new Footer(
                 `If you don't have an account yet please `,
@@ -84,7 +83,8 @@ class SignPetitonPage extends Page {
                 error: err,
                 signature: true,
                 firstname: firstnameIn,
-                loggedIn: true
+                loggedIn: true,
+                signaturePad: true
             })
     };
 }
@@ -158,10 +158,7 @@ class SignedPage extends Page {
             throw Error('Signers is not a number')
         }
 
-        var linksIn = [
-            new Link('Edit your profile', Routes.EDITPROFILE)
-            // new Link('Delete your signature', Routes.DELETESIG, true)
-        ]
+        var linksIn = []
 
         if (signers === '1' || signers === 1) {
             linksIn.unshift(new Link('See the other signer', Routes.SIGNERS))
@@ -173,6 +170,7 @@ class SignedPage extends Page {
             loggedIn: true,
             name: userName,
             signature: signedName,
+            signaturePad: true,
             signersCount: signers,
             links: linksIn
         })

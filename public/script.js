@@ -2,8 +2,9 @@
 
 (function () {
     var signature = document.getElementById('signature')
+    var pad = document.getElementsByClassName('pad')
     var context
-    if (signature) {
+    if (signature && pad.length === 0) {
         context = signature.getContext('2d')
         context.strokeStyle = 'white'
         context.lineWidth = 2

@@ -46,18 +46,40 @@ app.use((req, res, next) => {
 app.get(Routes.SIGNERS, (req, res, next) => {
     const userID = req.session[Cookies.ID]
     db.listSigners(userID).then((signers) => {
-        renderPage(res, new Pages.SignersPage(signers.rows))
+        var tolist = signers.rows.map((signer) => {
+            console.log(signer.city.charAt(0).toUpperCase() + signer.city.slice(1))
+            return {
+                first: signer.first,
+                last: signer.last,
+                age: signer.age,
+                city: signer.city.charAt(0).toUpperCase() + signer.city.slice(1),
+                url: signer.url
+            }
+        })
+        renderPage(res, new Pages.SignersPage(tolist))
     }).catch((e) => {
         console.log(e)
         next()
     })
 })
 
-app.get(`${Routes.SIGNERS}/:city`, (req, res, next) => {
+app.get(Routes.CITY, (req, res, next) => {
     const city = req.params.city
     if (city) {
         db.listSignersByCity(city).then((signers) => {
-            renderPage(res, new Pages.SignersPage(signers.rows))
+            var tolist = signers.rows.map((signer) => {
+                console.log(signer.city.charAt(0).toUpperCase() + signer.city.slice(1))
+                return {
+                    first: signer.first,
+                    last: signer.last,
+                    age: signer.age,
+                    city: signer.city.charAt(0).toUpperCase() + signer.city.slice(1),
+                    url: signer.url
+                }
+            }
+
+            )
+            renderPage(res, new Pages.SignersPage(tolist))
         }).catch((e) => {
             console.log(e)
             next()
@@ -200,12 +222,12 @@ app.post(Routes.EDITPROFILE, (req, res, next) => {
         db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }).then((result) => {
             if (password) {
                 encryption.hashPassword(password).then((hashedP) => {
-                    db.updateUser(first, last, hashedP, email, userId).catch((e) =>{
+                    db.updateUser(first, last, hashedP, email, userId).catch((e) => {
                         renderPage(res, new Pages.ProfilePage({}, `${e}`))
                     })
                 })
             } else {
-                db.updateUser(first, last, null, email, userId).catch((e) =>{
+                db.updateUser(first, last, null, email, userId).catch((e) => {
                     renderPage(res, new Pages.ProfilePage({}, `${e}`))
                 })
             }
@@ -222,7 +244,7 @@ app.post(Routes.EDITPROFILE, (req, res, next) => {
 })
 
 app.post(Routes.REGISTER, (req, res) => {
-    if (!req.body.firstname && !req.body.lastname && !req.body.email && !req.body.password) {
+    if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password) {
         return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
     }
     encryption.hashPassword(req.body.password).then((hashedP) => {

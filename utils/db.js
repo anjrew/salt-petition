@@ -184,6 +184,7 @@ module.exports.getHashedPWord = function (email) {
 }
 
 module.exports.addUserProfile = function (age, city, url, userId) {
+    city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
         if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.') && !url === '') {
             reject(new Error('Not a valid Url. Leave blank if you like :)'))
@@ -338,6 +339,7 @@ module.exports.getUserProfileById = function (id) {
 }
 
 module.exports.updateProfile = function (userId, age, city, url) {
+    city = city.charAt(0).toUpperCase() + city.slice(1)
     return db.query(`
     INSERT INTO user_profiles(user_id, age, city, url) 
     VALUES ($1, $2, $3, $4)

@@ -32,19 +32,17 @@ ul{
     transform: translateX(-25%)
 }
 
+#slogan{
+    width: 80%;
+    font-size: 60px;
+    font-family: 'Permanent Marker', cursive;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
 
 
 .page{
     position: relative;
     width: 100vw;
-}
-
-.page #delete-popup{
-
-}
-
-.page #main{
-
 }
 
 
@@ -247,6 +245,23 @@ a:active{
 }
 
 .link-post > input{
+    background:none;
+    color:inherit;
+    border:none; 
+    padding:0;
+    font: inherit;
+    border-bottom:1px white; 
+    text-decoration: underline; 
+    cursor: pointer;
+}
+.link-post{
+    transform: scale(1.05);
+}
+.link-post{
+    transform: translateY(-3px);
+}
+
+.link-post{
     background:none;
     color:inherit;
     border:none; 

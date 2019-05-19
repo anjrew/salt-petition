@@ -2,7 +2,7 @@
     {{#if url}}
         {{>signers-link}}
         {{else}}
-        <h3>{{name}}</h3>
+        <h3>{{first}} {{last}}</h3>
     {{/if}}
     <h3> </h3>
     {{#if age}}
@@ -10,7 +10,7 @@
     {{/if}}
     <h3> </h3>
     {{#if city}}
-        <a href='/signers/{{city}}'>{{city}}</a>
+        <a href='petition/signers/{{city}}'>{{city}}</a>
     {{/if}}
     
     

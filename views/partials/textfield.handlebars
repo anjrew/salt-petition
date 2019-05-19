@@ -1,4 +1,10 @@
 <div class="text-field">
     <h3>{{label}}</h3>
-    <input type={{inputType}} name={{databaseId}} placeholder="{{placeholder}}"" {{#if value}}value="{{value}}"{{/if}}>
+    <input
+        type={{inputType}}
+        name={{databaseId}}
+        {{#if placeholder}}placeholder="{{placeholder}}" {{/if}} 
+        {{#if value}}value="{{value}}" {{/if}} 
+        autocomplete="on" 
+        {{#if required}} "required" {{/if}}/>
 </div>

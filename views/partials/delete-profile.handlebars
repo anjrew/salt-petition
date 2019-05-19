@@ -1,12 +1,15 @@
-<div class="form-popup" id="myForm">
-  <form method action="/action_page.php" class="form-container">
+<div class="form-popup module" id="myForm">
     <h1>Delete Account</h1>
 
     <h2>Are you sure you would like to delete this account?</h2>
-    <divclass="row">
-         <button type="submit" class="btn">Yes</button>
-    <button type="submit" class="btn">No</button>
+
+    <div class="row">
+        <form method="post">
+            <button id="yesdel" type="submit" value="delete">Yes</button>
+            <input type="hidden" name="delete" value="delete">
+            <input id="deletecsrf" type="hidden" name="_csrf" value="{{csrfToken}}">
+        </form>
+        <button id="no" class="btn">No</button>
     </div>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}">
-  </form>
+    
 </div>

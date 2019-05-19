@@ -190,13 +190,24 @@ module.exports.getSignatureWithSigId = function (sigId) {
 }
 
 module.exports.updateUser = function (first, last, password, email, userId) {
-    return db.query(`
+    if (!password) {
+        return db.query(`
+        UPDATE users
+        SET first = $1, last = $2, email = $3
+        WHERE id = $4;
+        `,
+        [first, last, email, userId]
+        )
+
+    } else {
+        return db.query(`
         UPDATE users
         SET first = $1, last = $2, password = $3, email = $4
         WHERE id = $5;
         `,
-    [first, last, password, email, userId]
-    )
+        [first, last, password, email, userId]
+        )
+    }
 }
 
 // UPDATE users

@@ -1,3 +1,5 @@
+// eslint-disable-next-line quotes
+
 (function () {
     var signature = document.getElementById('signature')
     var context
@@ -19,13 +21,40 @@
         })
     }).on('mouseup mouseleave', function (event) { $(signature).off('mousemove mouseleave') })
 
-    var allelements = $('*')
+    $(window).on('resize', function () {
+        resizeImage()
+    })
 
-    var heights = allelements.map(function () {
-        return $(this).outerHeight(true)
-    }).get()
+    $('#yesdel').click(function (e) {
+    })
 
-    var maxHeight = Math.max.apply(null, heights)
+    $('#delete-nav').on('click', function (event) {
+        $('#pages').css({
+            'transform': 'translateX(25%)'
+        })
+        $('#delete-nav').css({
+            'transform': 'scale(0.0)'
+        })
+    })
 
-    $('video').height(maxHeight)
+    $('#no').click(function (e) {
+        $('#pages').css({
+            'transform': 'translateX(-25%)'
+        })
+        $('#delete-nav').css({
+            'transform': 'scale(1.0)'
+        })
+    })
+
+    function resizeImage () {
+        var allelements = $('*')
+
+        var heights = allelements.map(function () {
+            return $(this).outerHeight(true)
+        }).get()
+
+        var maxHeight = Math.max.apply(null, heights)
+
+        $('video').height(maxHeight)
+    }
 })()

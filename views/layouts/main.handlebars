@@ -18,13 +18,19 @@
     {{else}}
          <div class="balance"></div>
     {{/if}}
-    
-    {{#if editProfile}}
-        {{>delete-profile}}
-    {{/if}}
-    {{!-- Main render --}}
+    <div class="row" id="pages">
+        {{!-- Model popup    --}}
 
-    <div id="main">{{{ body }}}</div>
+        <section class="page" id="delete-popup">
+            {{>delete-profile}}
+        </section>
+
+        {{!-- Main render --}}
+        <section class="page" id="main">
+            <div class="module">{{{ body }}}</div>
+        </section>
+
+    </div>
     
     {{#unless error}}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>

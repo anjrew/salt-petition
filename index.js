@@ -176,30 +176,38 @@ app.post(Routes.SIGNED, (req, res) => {
 })
 
 app.post(Routes.EDITPROFILE, (req, res, next) => {
-    const userId = req.session[Cookies.ID]
-    const age = req.session[Cookies.AGE] = req.body.age
-    const city = req.session[Cookies.CITY] = req.body.city
-    const url = req.session[Cookies.URL] = req.body.url
-    const first = req.session[Cookies.FIRSTNAME] = req.body.firstname
-    const last = req.session[Cookies.LASTNAME] = req.body.lastname
-    const email = req.session[Cookies.EMAIL] = req.body.email
-    const password = req.body.password
-    // to update Profile
-    Promise.all([
-        db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }),
-        encryption.hashPassword(password).then((hashedP) => {
-            return db.updateUser(first, last, hashedP, email, userId)
+    if (req.body.delete) {
+        db.deleteUser(req.session[Cookies.id]).then(() => {
+            res.redirect()
+        }).catch((e) => {
+            renderPage(res, new Pages.EditProfilePage({}, e))
         })
-    ]).then((result) => {
-        req.session[Cookies.LOGGEDIN] = true
-        res.redirect(Routes.PETITION)
-    }).catch((e) => {
-        if (e.code === '22P02') {
-            renderPage(res, new Pages.ProfilePage(`Please enter a number for your age`))
-        } else {
-            renderPage(res, new Pages.ProfilePage(`${e}`))
-        }
-    })
+    } else {
+        const userId = req.session[Cookies.ID]
+        const age = req.session[Cookies.AGE] = req.body.age
+        const city = req.session[Cookies.CITY] = req.body.city
+        const url = req.session[Cookies.URL] = req.body.url
+        const first = req.session[Cookies.FIRSTNAME] = req.body.firstname
+        const last = req.session[Cookies.LASTNAME] = req.body.lastname
+        const email = req.session[Cookies.EMAIL] = req.body.email
+        const password = req.body.password
+        // to update Profile
+        Promise.all([
+            db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }),
+            encryption.hashPassword(password).then((hashedP) => {
+                return db.updateUser(first, last, hashedP, email, userId)
+            })
+        ]).then((result) => {
+            req.session[Cookies.LOGGEDIN] = true
+            res.redirect(Routes.PETITION)
+        }).catch((e) => {
+            if (e.code === '22P02') {
+                renderPage(res, new Pages.ProfilePage(`Please enter a number for your age`))
+            } else {
+                renderPage(res, new Pages.ProfilePage(`${e}`))
+            }
+        })
+    }
 })
 
 app.post(Routes.REGISTER, (req, res) => {

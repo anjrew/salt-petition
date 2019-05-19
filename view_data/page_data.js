@@ -38,6 +38,7 @@ class SignUpPage extends Page {
             {
                 title: 'Make LAVA LAMPS exempt from VAT!',
                 subtitle: 'Sign up below to make a change...',
+                buttonName: 'Sign up',
                 fieldset: new FormField([
                     new Textfield('First name', 'text', 'firstname', ''),
                     new Textfield('Last name', 'text', 'lastname', ''),
@@ -70,6 +71,7 @@ class LoginPage extends Page {
                 Routes.REGISTER,
                 'Register'),
             loginPage: true,
+            buttonName: 'Log in',
             error: err
         })
     };

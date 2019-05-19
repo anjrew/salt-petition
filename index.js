@@ -162,7 +162,7 @@ app.get(Routes.EDITPROFILE, (req, res, next) => {
 })
 
 app.get(Routes.LOGOUT, (req, res) => {
-    req.session[Cookies.LOGGEDIN] = false
+    req.session = null
     res.redirect(Routes.LOGIN)
 })
 
@@ -180,7 +180,7 @@ app.post(Routes.SIGNED, (req, res, next) => {
 
 app.post(Routes.EDITPROFILE, (req, res, next) => {
     if (req.body.delete) {
-        db.deleteAccount(req.session[Cookies.id]).then(() => {
+        db.deleteAccount(req.session[Cookies.ID]).then(() => {
             delete req.session
             res.redirect(Routes.REGISTER)
         }).catch((e) => {

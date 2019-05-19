@@ -164,12 +164,14 @@ module.exports.deleteUser = function deleteUser (userId) {
 }
 
 module.exports.deleteAccount = function deleteAccount (userId) {
-    return this.deleteSignature(userId).then((userId) => {
-        return this.deleteProfile(userId)
-    }).then((userId) => {
-        return this.deleteUser(userId)
-    }).then((result) => {
-        return result
+    return new Promise((resolve, reject) => {
+        this.deleteSignature(userId).then((res) => {
+            this.deleteProfile(userId).then((resu) => {
+                this.deleteUser(userId).then((result) => {
+                    resolve(result)
+                })
+            })
+        })
     })
 }
 
@@ -302,7 +304,7 @@ module.exports.getLoginData = function (email) {
 // NOT WORKING
 module.exports.getUserProfile = function (email) {
     return db.query(`
-    SELECT users.id, first,last,email,password, signatures.id AS "sigId", age, city, url
+    SELECT users.id AS "id", first,last,email,password, signatures.id AS "sigId", age, city, url
     FROM users
     LEFT JOIN user_profiles
     ON users.id = user_profiles.user_id

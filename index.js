@@ -168,17 +168,21 @@ app.get(Routes.LOGOUT, (req, res) => {
 
 // POST REQUESTS
 
-app.post(Routes.SIGNED, (req, res) => {
+app.post(Routes.SIGNED, (req, res, next) => {
     db.deleteSignature(req.session[Cookies.SIGNATURE]).then(() => {
         req.cookies[Cookies.SIGNATURE] = null
         res.redirect(Routes.PETITION)
+    }).catch((e) => {
+        console.log(e)
+        next()
     })
 })
 
 app.post(Routes.EDITPROFILE, (req, res, next) => {
     if (req.body.delete) {
-        db.deleteUser(req.session[Cookies.id]).then(() => {
-            res.redirect()
+        db.deleteAccount(req.session[Cookies.id]).then(() => {
+            delete req.session
+            res.redirect(Routes.REGISTER)
         }).catch((e) => {
             renderPage(res, new Pages.EditProfilePage({}, e))
         })
@@ -191,20 +195,27 @@ app.post(Routes.EDITPROFILE, (req, res, next) => {
         const last = req.session[Cookies.LASTNAME] = req.body.lastname
         const email = req.session[Cookies.EMAIL] = req.body.email
         const password = req.body.password
+
         // to update Profile
-        Promise.all([
-            db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }),
-            encryption.hashPassword(password).then((hashedP) => {
-                return db.updateUser(first, last, hashedP, email, userId)
-            })
-        ]).then((result) => {
+        db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }).then((result) => {
+            if (password) {
+                encryption.hashPassword(password).then((hashedP) => {
+                    db.updateUser(first, last, hashedP, email, userId).catch((e) =>{
+                        renderPage(res, new Pages.ProfilePage({}, `${e}`))
+                    })
+                })
+            } else {
+                db.updateUser(first, last, null, email, userId).catch((e) =>{
+                    renderPage(res, new Pages.ProfilePage({}, `${e}`))
+                })
+            }
             req.session[Cookies.LOGGEDIN] = true
             res.redirect(Routes.PETITION)
         }).catch((e) => {
             if (e.code === '22P02') {
-                renderPage(res, new Pages.ProfilePage(`Please enter a number for your age`))
+                renderPage(res, new Pages.EditProfilePage({}, `Please enter a number for your age`))
             } else {
-                renderPage(res, new Pages.ProfilePage(`${e}`))
+                renderPage(res, new Pages.ProfilePage({}, `${e}`))
             }
         })
     }
@@ -282,7 +293,7 @@ app.post(Routes.LOGIN, (req, res) => {
             renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`))
         })
     } else {
-        renderPage(res, new Pages.LoginPage('PLease fill in both fields'))
+        renderPage(res, new Pages.LoginPage('Please fill in both fields'))
     }
 })
 

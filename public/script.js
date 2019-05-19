@@ -9,6 +9,8 @@
         context.lineWidth = 2
     }
 
+    resizeImage()
+
     $(signature).mousedown(function (event) {
         context.beginPath()
         context.moveTo(event.offsetX, event.offsetY)
@@ -23,9 +25,6 @@
 
     $(window).on('resize', function () {
         resizeImage()
-    })
-
-    $('#yesdel').click(function (e) {
     })
 
     $('#delete-nav').on('click', function (event) {
@@ -46,6 +45,11 @@
         })
     })
 
+    $('*').on('mouseover', function () {
+        resizeImage()
+    });
+
+
     function resizeImage () {
         var allelements = $('*')
 
@@ -57,4 +61,5 @@
 
         $('video').height(maxHeight)
     }
+    
 })()

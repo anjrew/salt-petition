@@ -146,6 +146,33 @@ module.exports.addUser = function (first, last, email, password) {
     })
 }
 
+module.exports.deleteProfile = function deleteProfile (userId) {
+    return db.query(`
+        DELETE FROM user_profiles
+        WHERE user_id = $1;
+    `
+    ,
+    [userId])
+}
+
+module.exports.deleteUser = function deleteUser (userId) {
+    return db.query(`
+        DELETE FROM users
+        WHERE id = $1;
+    `,
+    [userId])
+}
+
+module.exports.deleteAccount = function deleteAccount (userId) {
+    return this.deleteSignature(userId).then((userId) => {
+        return this.deleteProfile(userId)
+    }).then((userId) => {
+        return this.deleteUser(userId)
+    }).then((result) => {
+        return result
+    })
+}
+
 module.exports.getHashedPWord = function (email) {
     return db.query(`
         SELECT password FROM users WHERE $1 = email; 
@@ -198,7 +225,6 @@ module.exports.updateUser = function (first, last, password, email, userId) {
         `,
         [first, last, email, userId]
         )
-
     } else {
         return db.query(`
         UPDATE users
@@ -209,10 +235,6 @@ module.exports.updateUser = function (first, last, password, email, userId) {
         )
     }
 }
-
-// UPDATE users
-// SET first = 'PLEASE', last = 'FUCKING', password = 'WORK', email = 'io@SpeechGrammarList.com'
-// WHERE id = 1;
 
 module.exports.getNameAndSignature = function (userId) {
     return db.query(`

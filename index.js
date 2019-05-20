@@ -19,6 +19,7 @@ const ROUTES = require('./routers/routes')
 const profileRouter = require('./routers/profile')
 const loginRouter = require('./routers/login')
 const pertitionRouter = require('./routers/petition')
+const registerRouter = require('./routers/register')
 
 // VARIABLES
 const COOKIES = Object.freeze({
@@ -48,7 +49,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(pertitionRouter, profileRouter, loginRouter)
+app.use(pertitionRouter, profileRouter, loginRouter, registerRouter)
 
 // GET REQUESTS
 
@@ -97,21 +98,7 @@ app.get(ROUTES.CITY, (req, res, next) => {
     }
 })
 
-app.get(ROUTES.REGISTER, (req, res, next) => {
-    if (req.session[COOKIES.ID] || req.session[COOKIES.LOGGEDIN]) {
-        req.session[COOKIES.ID] = null
-        req.session[COOKIES.LOGGEDIN] = null
-        res.redirect(ROUTES.REGISTER)
-    } else {
-        const userId = req.session[COOKIES.ID]
-        req.session[COOKIES.LOGGEDIN] = null
-        if (userId) {
-            res.redirect(ROUTES.LOGIN)
-        } else {
-            this.renderPage(res, new PAGES.RegisterPage())
-        }
-    }
-})
+
 
 app.get(ROUTES.SIGNED, (req, res, next) => {
     let sigId = req.session[COOKIES.SIGNATURE]
@@ -156,28 +143,7 @@ app.post(ROUTES.SIGNED, (req, res, next) => {
     })
 })
 
-app.post(ROUTES.REGISTER, (req, res) => {
-    if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password) {
-        return this.renderPage(res, new PAGES.RegisterPage(`You did not fill in all the fields`))
-    }
-    encryption.hashPassword(req.body.password).then((hashedP) => {
-        return db.addUser(req.body.firstname, req.body.lastname, req.body.email, hashedP)
-    }).then((result) => {
-        let id = result.rows[0].id
-        req.session[COOKIES.ID] = id
-        req.session[COOKIES.AGE] = null
-        req.session[COOKIES.CITY] = null
-        req.session[COOKIES.URL] = null
-        req.session[COOKIES.SIGNATURE] = null
-        res.redirect(ROUTES.PROFILE)
-    }).catch((e) => {
-        if (e.code === `23505`) {
-            this.renderPage(res, new PAGES.RegisterPage(`We already have a user registed to that email`))
-        } else {
-            this.renderPage(res, new PAGES.RegisterPage(`Database ${e}`))
-        }
-    })
-})
+
 
 app.get('/error', (req, res) => {
     res.render('error', {

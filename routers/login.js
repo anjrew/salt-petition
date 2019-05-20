@@ -7,12 +7,9 @@ const PAGES = require('../view_data/page_data')
 const index = require('../index')
 const db = require('../utils/db')
 const encryption = require('../utils/encryption')
-const userLoggedIn = require('../middleware').userLoggedIn
-const chalk = require('chalk')
-
 
 router.route(ROUTES.LOGIN)
-    .get(userLoggedIn, (req, res) => {
+    .get((req, res) => {
         const userId = req.session[COOKIES.LOGGEDIN]
         if (userId) {
             res.redirect(ROUTES.PETITION)

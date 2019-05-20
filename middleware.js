@@ -7,7 +7,8 @@ const ROUTES = require('./routers/routes')
 const chalk = require('chalk')
 
 function requireNoSignature (req, res, next) {
-    if (req.session[COOKIES.SIGNATURE]) {
+    const isSigned = req.session[COOKIES.SIGNATURE]
+    if (isSigned) {
         // if signatureId exists, this if block will run!
         // this is my signed route
         res.redirect(ROUTES.SIGNED)
@@ -21,8 +22,7 @@ function userLoggedIn (req, res, next) {
     if (!userId) {
         // if signatureId exists, this if block will run!
         // this is my signed route
-        console.log(chalk.green('going to signed in midddleware'))
-        
+        console.log(chalk.green('going to signed in midddleware'))     
         res.redirect(ROUTES.SIGNED)
     } else {
         next()

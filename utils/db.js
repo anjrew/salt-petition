@@ -42,16 +42,6 @@ module.exports.deleteSignature = function deleteSignature (sigId) {
     )
 }
 
-module.exports.getSignedInfo = function (userId) {
-    return db.query(`
-        INSERT INTO signatures(user_id, signature) 
-        VALUES ($1, $2)
-        RETURNING id;
-        `,
-    [userId]
-    )
-}
-
 // TODO WHy not working?@?@?
 module.exports.getSigners1 = function (userId) {
     return db.query(
@@ -66,16 +56,6 @@ module.exports.getSigners1 = function (userId) {
     )
 }
 
-module.exports.getSigners = function (userId) {
-    return db.query(
-        `SELECT first,last,age,city,url FROM signatures
-        CONCAT (first, " ", last) AS name
-        FROM signatures
-        JOIN users ON signatures.user_id=users.id
-        LEFT JOIN user_profiles ON users.id=user_profiles.user_id;`,
-        [userId]
-    )
-}
 
 module.exports.listSigners = function listSigners (userId) {
     return db.query(
@@ -99,18 +79,6 @@ module.exports.listSignersByCity = function listSignersByCity (city) {
         [ city ]
     )
 }
-
-// module.exports.signersCount = function signersCount () {
-//     return db.query(`SELECT COUNT(*) FROM signatures;`)
-// }
-// TODO CONCAT NOT WORKGIN
-// CONCAT(user_profiles.first, ' ', user_profiles.last) AS name
-// user_profiles.age AS age,
-// user_profiles.city AS city,
-// user_profiles.url AS url
-// FROM user_profiles
-// JOIN songs
-// ON singers.id = songs.singer_id;
 
 module.exports.signersCount = function getAmountOfSigners (userid) {
     return db.query(
@@ -316,18 +284,6 @@ module.exports.getUserProfile = function (email) {
     )
 }
 
-module.exports.findUser = function findUser (email) {
-    return db.query(
-        `SELECT users.id, first,last,email,password,  age, city, url
-        FROM users
-        LEFT JOIN user_profiles
-        ON users.id = user_profiles.userid
-        WHERE email=$1;
-        `,
-        [email]
-    )
-}
-
 module.exports.getUserProfileById = function (id) {
     return db.query(`
     SELECT first,last,email, user_profiles.age, user_profiles.city
@@ -349,14 +305,3 @@ module.exports.updateProfile = function (userId, age, city, url) {
     [ userId, age, city, url ]
     )
 }
-
-// module.exports.getSignersByCity
-
-// module.exports.getUsersByCity = function (city){
-//      // return db.query(`
-//     //     SELECT password FROM users WHERE $1 = email;
-//     //     `,
-//     // [email]
-//     // )
-//     // WHERE LOWER(city) = LOWER($1)
-// }

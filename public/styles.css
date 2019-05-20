@@ -37,8 +37,8 @@ ul{
 }
 
 #slogan{
-    font-family: LavaLamp;
     max-width: 600px;
+    color: rgba(255,255,255,0.99);
     width: 80%;
     font-size: 60px;
     font-family: 'Permanent Marker', cursive;
@@ -121,7 +121,7 @@ section{
 }
 
 video{
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -130,7 +130,8 @@ video{
     justify-content: center;
     object-fit: cover;
     z-index: -99;
-    background-color: black
+    background-color: black;
+    background-attachment: fixed
 }
 
 button{
@@ -376,7 +377,7 @@ li{
     transition-delay: 1;
     vertical-align: 0;
     position: absolute;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-content: center;
@@ -417,6 +418,7 @@ li{
 }
 
 #popup.on{
+    display: flex;
     visibility: unset;
     opacity: 1;
 }

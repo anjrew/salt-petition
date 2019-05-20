@@ -24,6 +24,8 @@
         <p>This site uses cookies and if you're using it we have to assume that you are ok with that.</p>
     </div>
 
+    
+
     {{#if loggedIn}}
         {{>nav-bar}}
     {{else}}
@@ -43,6 +45,9 @@
             <div class="module">{{{ body }}}</div>
         </section>
 
+        <section class="page" id="about">
+            {{>about}}
+        </section>
     </div>
     
     {{#unless error}}

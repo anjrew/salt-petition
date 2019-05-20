@@ -1,3 +1,5 @@
+/* global test */
+/* global expect */
 const pages = require('../view_data/page_data')
 
 test('Test SignedPage constructor', () => {
@@ -10,7 +12,7 @@ test('Test SignedPage constructor throw', () => {
 })
 
 test('Test SignersPage constructor for correct type of Array', () => {
-    expect( new pages.SignersPage(['Name', 'bill']).attributes.signers[1]).toBe('bill')
+    expect(new pages.SignersPage(['Name', 'bill']).attributes.signers[1]).toBe('bill')
 })
 
 test('Test SignersPage constructor throw', () => {
@@ -24,9 +26,9 @@ test('Test SignedPage constructor throw on singers not being a number', () => {
 })
 
 test('Test SignedPage : if signers 0 then links length should be 2', () => {
-    expect(new pages.SignedPage('userName', 'signedName', 0).attributes.links.length).toBe(2)
+    expect(new pages.SignedPage('userName', 'signedName', 0).attributes.links.length).toBe(0)
 })
 
 test('Test SignedPage : if signers greater than 0 then links should be 3', () => {
-    expect(new pages.SignedPage('userName', 'signedName', 1).attributes.links.length).toBe(3)
+    expect(new pages.SignedPage('userName', 'signedName', 1).attributes.links.length).toBe(1)
 })

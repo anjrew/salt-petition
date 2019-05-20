@@ -9,6 +9,9 @@ const cookieSession = require('cookie-session')
 const csurf = require('csurf')
 const chalk = require('chalk')
 
+// EXPORTS
+module.exports.app = app
+
 // MODULES
 const db = require(`./utils/db.js`)
 const PAGES = require('./view_data/page_data.js')
@@ -39,14 +42,12 @@ app.use((req, res, next) => {
     next()
 })
 
-
 app.use((req, res, next) => {
     console.log(chalk.blue(`Recieve ${req.method} to ${req.url}`))
     next()
 })
 
 app.use(profileRouter)
-
 
 // GET REQUESTS
 
@@ -309,9 +310,12 @@ function setupApp () {
     app.use(csurf())
 }
 
-app.listen(process.env.PORT || 8080, () => {
-    console.log(process.env.PORT ? `Online` : `Listening on port 8080`)
-})
+// Stops server starting during tests
+if (require.main == module) {   
+    app.listen(process.env.PORT || 8080, () => {
+        console.log(process.env.PORT ? `Online` : `Listening on port 8080`)
+    })
+}
 
 // Parameters may be declared in a variety of syntactic forms
 /**

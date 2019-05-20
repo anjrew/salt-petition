@@ -1,4 +1,5 @@
 // eslint-disable-next-line quotes
+/* global $ */
 
 (function () {
     var cookiesAccepted = localStorage.getItem('cookiesAccepted')

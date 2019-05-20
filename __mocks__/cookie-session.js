@@ -1,11 +1,15 @@
-let tempSession, session = {};
+/* eslint-disable no-return-assign */
+let tempSession; let session = {}
 
+// Acting as the cookies session middleware
 module.exports = () => (req, res, next) => {
-    req.session = tempSession || session;
-    tempSession = null;
-    next();
-};
+    req.session = tempSession || session
+    tempSession = null
+    next()
+}
 
-module.exports.mockSession = sess => session = sess;
+// For multiple tests
+module.exports.mockSession = sess => session = sess
 
-module.exports.mockSessionOnce = sess => tempSession = sess;
+// Can only be used once
+module.exports.mockSessionOnce = sess => tempSession = sess

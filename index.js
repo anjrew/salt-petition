@@ -17,6 +17,7 @@ const db = require(`./utils/db.js`)
 const PAGES = require('./view_data/page_data.js')
 const ROUTES = require('./routers/routes')
 const profileRouter = require('./routers/profile')
+const loginRouter = require('./routers/login')
 const middleware = require('./middleware')
 
 // VARIABLES
@@ -47,7 +48,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(profileRouter)
+app.use(profileRouter, loginRouter)
 
 // GET REQUESTS
 
@@ -154,24 +155,6 @@ app.get(ROUTES.SIGNED, (req, res, next) => {
     })
 })
 
-app.get(ROUTES.EDITPROFILE, (req, res, next) => {
-    db.getUserProfileById(req.session[COOKIES.ID]).then((result) => {
-        let detailsObj = {
-            firstname: result.rows[0].first,
-            lastname: result.rows[0].last,
-            email: result.rows[0].email,
-            age: req.session[COOKIES.AGE],
-            city: req.session[COOKIES.CITY],
-            url: req.session[COOKIES.URL]
-        }
-        let pageData = new PAGES.EditProfilePage(detailsObj)
-        this.renderPage(res, pageData)
-    }).catch((e) => {
-        console.log(e)
-        next()
-    })
-})
-
 app.get(ROUTES.LOGOUT, (req, res) => {
     req.session = null
     res.redirect(ROUTES.LOGIN)
@@ -189,47 +172,7 @@ app.post(ROUTES.SIGNED, (req, res, next) => {
     })
 })
 
-app.post(ROUTES.EDITPROFILE, (req, res, next) => {
-    if (req.body.delete) {
-        db.deleteAccount(req.session[COOKIES.ID]).then(() => {
-            delete req.session
-            res.redirect(ROUTES.REGISTER)
-        }).catch((e) => {
-            this.renderPage(res, new PAGES.EditProfilePage({}, e))
-        })
-    } else {
-        const userId = req.session[COOKIES.ID]
-        let age = req.session[COOKIES.AGE] = req.body.age
-        const city = req.session[COOKIES.CITY] = req.body.city
-        const url = req.session[COOKIES.URL] = req.body.url
-        const first = req.session[COOKIES.FIRSTNAME] = req.body.firstname
-        const last = req.session[COOKIES.LASTNAME] = req.body.lastname
-        const email = req.session[COOKIES.EMAIL] = req.body.email
-        const password = req.body.password
-        // to update Profile
-        db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }).then((result) => {
-            if (password) {
-                encryption.hashPassword(password).then((hashedP) => {
-                    db.updateUser(first, last, hashedP, email, userId).catch((e) => {
-                        this.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
-                    })
-                })
-            } else {
-                db.updateUser(first, last, null, email, userId).catch((e) => {
-                    this.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
-                })
-            }
-            req.session[COOKIES.LOGGEDIN] = true
-            res.redirect(ROUTES.PETITION)
-        }).catch((e) => {
-            if (e.code === '22P02') {
-                this.renderPage(res, new PAGES.EditProfilePage({}, `Please enter a number for your age`))
-            } else {
-                this.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
-            }
-        })
-    }
-})
+
 
 app.post(ROUTES.REGISTER, (req, res) => {
     if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password) {

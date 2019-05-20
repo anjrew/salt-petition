@@ -1,2 +1,3 @@
-test
+
+npm test
 nodemon --inspect index.js

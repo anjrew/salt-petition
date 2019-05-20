@@ -7,14 +7,15 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 const csurf = require('csurf')
+const chalk = require('chalk')
 
 // MODULES
 const db = require(`./utils/db.js`)
-const Pages = require('./view_data/page_data.js')
-const Routes = require('./view_data/page_data').Routes
+const PAGES = require('./view_data/page_data.js')
+const ROUTES = require('./view_data/page_data').ROUTES
 
 // VARIABLES
-const Cookies = Object.freeze({
+const COOKIES = Object.freeze({
     LOGGEDIN: 'loggedIn',
     ID: 'userId',
     SIGNATURE: 'signature',
@@ -30,21 +31,25 @@ setupApp()
 
 // SECURTIY
 app.use((req, res, next) => {
-    console.log(`Token is : ${req.csrfToken()}`)
+    console.log(chalk.green(`Token is : ${req.csrfToken()}`))
     res.locals.csrfToken = req.csrfToken()
     res.setHeader('X-FRAME-OPTIONS', 'DENY')
     next()
 })
 
+const profileRouter = require('./routers/profile')
+console.log(profileRouter);
+app.use(profileRouter)
+
 app.use((req, res, next) => {
-    console.log(`Recieve ${req.method} to ${req.url}`)
+    console.log(chalk.blue(`Recieve ${req.method} to ${req.url}`))
     next()
 })
 
 // GET REQUESTS
 
-app.get(Routes.SIGNERS, (req, res, next) => {
-    const userID = req.session[Cookies.ID]
+app.get(ROUTES.SIGNERS, (req, res, next) => {
+    const userID = req.session[COOKIES.ID]
     db.listSigners(userID).then((signers) => {
         var tolist = signers.rows.map((signer) => {
             console.log(signer.city.charAt(0).toUpperCase() + signer.city.slice(1))
@@ -56,14 +61,14 @@ app.get(Routes.SIGNERS, (req, res, next) => {
                 url: signer.url
             }
         })
-        renderPage(res, new Pages.SignersPage(tolist))
+        renderPage(res, new PAGES.SignersPage(tolist))
     }).catch((e) => {
         console.log(e)
         next()
     })
 })
 
-app.get(Routes.CITY, (req, res, next) => {
+app.get(ROUTES.CITY, (req, res, next) => {
     const city = req.params.city
     if (city) {
         db.listSignersByCity(city).then((signers) => {
@@ -78,7 +83,7 @@ app.get(Routes.CITY, (req, res, next) => {
             }
 
             )
-            renderPage(res, new Pages.SignersPage(tolist))
+            renderPage(res, new PAGES.SignersPage(tolist))
         }).catch((e) => {
             console.log(e)
             next()
@@ -88,15 +93,15 @@ app.get(Routes.CITY, (req, res, next) => {
     }
 })
 
-app.get(Routes.PETITION, (req, res, next) => {
-    const userId = req.session[Cookies.ID]
-    const signatureId = req.session[Cookies.SIGNATURE]
+app.get(ROUTES.PETITION, (req, res, next) => {
+    const userId = req.session[COOKIES.ID]
+    const signatureId = req.session[COOKIES.SIGNATURE]
     if (userId && signatureId) {
-        res.redirect(Routes.SIGNED)
+        res.redirect(ROUTES.SIGNED)
     } else {
         db.getName(userId).then((result) => {
             const firstname = result.rows[0].first
-            renderPage(res, new Pages.SignPetitonPage(firstname))
+            renderPage(res, new PAGES.PetitonPage(firstname))
         }).catch((e) => {
             console.log(e)
             next()
@@ -104,57 +109,57 @@ app.get(Routes.PETITION, (req, res, next) => {
     }
 })
 
-app.get(Routes.LOGIN, (req, res, next) => {
-    const userId = req.session[Cookies.LOGGEDIN]
+app.get(ROUTES.LOGIN, (req, res, next) => {
+    const userId = req.session[COOKIES.LOGGEDIN]
     if (userId) {
-        res.redirect(Routes.PETITION)
+        res.redirect(ROUTES.PETITION)
     } else {
-        renderPage(res, new Pages.LoginPage())
+        renderPage(res, new PAGES.LoginPage())
     }
 })
 
-app.get(Routes.REGISTER, (req, res, next) => {
-    if (req.session[Cookies.ID] || req.session[Cookies.LOGGEDIN]) {
-        req.session[Cookies.ID] = null
-        req.session[Cookies.LOGGEDIN] = null
-        res.redirect(Routes.REGISTER)
+app.get(ROUTES.REGISTER, (req, res, next) => {
+    if (req.session[COOKIES.ID] || req.session[COOKIES.LOGGEDIN]) {
+        req.session[COOKIES.ID] = null
+        req.session[COOKIES.LOGGEDIN] = null
+        res.redirect(ROUTES.REGISTER)
     } else {
-        const userId = req.session[Cookies.ID]
-        req.session[Cookies.LOGGEDIN] = null
+        const userId = req.session[COOKIES.ID]
+        req.session[COOKIES.LOGGEDIN] = null
         if (userId) {
-            res.redirect(Routes.LOGIN)
+            res.redirect(ROUTES.LOGIN)
         } else {
-            renderPage(res, new Pages.SignUpPage())
+            renderPage(res, new PAGES.RegisterPage())
         }
     }
 })
 
-app.get(Routes.PROFILE, (req, res) => {
-    const userId = req.session[Cookies.ID]
+app.get(ROUTES.PROFILE, (req, res) => {
+    const userId = req.session[COOKIES.ID]
     if (userId) {
-        renderPage(res, new Pages.ProfilePage())
+        renderPage(res, new PAGES.ProfilePage())
     } else {
-        res.redirect(Routes.REGISTER)
+        res.redirect(ROUTES.REGISTER)
     }
 })
 
-app.get(Routes.SIGNED, (req, res, next) => {
-    let sigId = req.session[Cookies.SIGNATURE]
-    let userID = req.session[Cookies.ID]
+app.get(ROUTES.SIGNED, (req, res, next) => {
+    let sigId = req.session[COOKIES.SIGNATURE]
+    let userID = req.session[COOKIES.ID]
     db.getSignatureWithSigId(sigId).then((sigResult) => {
         const signature = sigResult.rows[0]
         if (!signature) {
-            req.session[Cookies.SIGNATURE] = null
-            res.redirect(Routes.PETITION)
+            req.session[COOKIES.SIGNATURE] = null
+            res.redirect(ROUTES.PETITION)
         } else {
             db.signersCount(userID).then((results) => {
                 if (results.rows[0] < 1) {
-                    res.redirect(Routes.PETITION)
+                    res.redirect(ROUTES.PETITION)
                 } else {
-                    const name = req.session[Cookies.FIRSTNAME]
+                    const name = req.session[COOKIES.FIRSTNAME]
                     const signature = sigResult.rows[0].signature
                     const signersCount = results.rows[0].count
-                    renderPage(res, new Pages.SignedPage(name, signature, signersCount))
+                    renderPage(res, new PAGES.SignedPage(name, signature, signersCount))
                 }
             })
         }
@@ -164,17 +169,17 @@ app.get(Routes.SIGNED, (req, res, next) => {
     })
 })
 
-app.get(Routes.EDITPROFILE, (req, res, next) => {
-    db.getUserProfileById(req.session[Cookies.ID]).then((result) => {
+app.get(ROUTES.EDITPROFILE, (req, res, next) => {
+    db.getUserProfileById(req.session[COOKIES.ID]).then((result) => {
         let detailsObj = {
             firstname: result.rows[0].first,
             lastname: result.rows[0].last,
             email: result.rows[0].email,
-            age: req.session[Cookies.AGE],
-            city: req.session[Cookies.CITY],
-            url: req.session[Cookies.URL]
+            age: req.session[COOKIES.AGE],
+            city: req.session[COOKIES.CITY],
+            url: req.session[COOKIES.URL]
         }
-        let pageData = new Pages.EditProfilePage(detailsObj)
+        let pageData = new PAGES.EditProfilePage(detailsObj)
         renderPage(res, pageData)
     }).catch((e) => {
         console.log(e)
@@ -182,110 +187,110 @@ app.get(Routes.EDITPROFILE, (req, res, next) => {
     })
 })
 
-app.get(Routes.LOGOUT, (req, res) => {
+app.get(ROUTES.LOGOUT, (req, res) => {
     req.session = null
-    res.redirect(Routes.LOGIN)
+    res.redirect(ROUTES.LOGIN)
 })
 
 // POST REQUESTS
 
-app.post(Routes.SIGNED, (req, res, next) => {
-    db.deleteSignature(req.session[Cookies.SIGNATURE]).then(() => {
-        req.cookies[Cookies.SIGNATURE] = null
-        res.redirect(Routes.PETITION)
+app.post(ROUTES.SIGNED, (req, res, next) => {
+    db.deleteSignature(req.session[COOKIES.SIGNATURE]).then(() => {
+        req.cookies[COOKIES.SIGNATURE] = null
+        res.redirect(ROUTES.PETITION)
     }).catch((e) => {
         console.log(e)
         next()
     })
 })
 
-app.post(Routes.EDITPROFILE, (req, res, next) => {
+app.post(ROUTES.EDITPROFILE, (req, res, next) => {
     if (req.body.delete) {
-        db.deleteAccount(req.session[Cookies.ID]).then(() => {
+        db.deleteAccount(req.session[COOKIES.ID]).then(() => {
             delete req.session
-            res.redirect(Routes.REGISTER)
+            res.redirect(ROUTES.REGISTER)
         }).catch((e) => {
-            renderPage(res, new Pages.EditProfilePage({}, e))
+            renderPage(res, new PAGES.EditProfilePage({}, e))
         })
     } else {
-        const userId = req.session[Cookies.ID]
-        let age = req.session[Cookies.AGE] = req.body.age
-        const city = req.session[Cookies.CITY] = req.body.city
-        const url = req.session[Cookies.URL] = req.body.url
-        const first = req.session[Cookies.FIRSTNAME] = req.body.firstname
-        const last = req.session[Cookies.LASTNAME] = req.body.lastname
-        const email = req.session[Cookies.EMAIL] = req.body.email
+        const userId = req.session[COOKIES.ID]
+        let age = req.session[COOKIES.AGE] = req.body.age
+        const city = req.session[COOKIES.CITY] = req.body.city
+        const url = req.session[COOKIES.URL] = req.body.url
+        const first = req.session[COOKIES.FIRSTNAME] = req.body.firstname
+        const last = req.session[COOKIES.LASTNAME] = req.body.lastname
+        const email = req.session[COOKIES.EMAIL] = req.body.email
         const password = req.body.password
         // to update Profile
         db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }).then((result) => {
             if (password) {
                 encryption.hashPassword(password).then((hashedP) => {
                     db.updateUser(first, last, hashedP, email, userId).catch((e) => {
-                        renderPage(res, new Pages.ProfilePage({}, `${e}`))
+                        renderPage(res, new PAGES.ProfilePage({}, `${e}`))
                     })
                 })
             } else {
                 db.updateUser(first, last, null, email, userId).catch((e) => {
-                    renderPage(res, new Pages.ProfilePage({}, `${e}`))
+                    renderPage(res, new PAGES.ProfilePage({}, `${e}`))
                 })
             }
-            req.session[Cookies.LOGGEDIN] = true
-            res.redirect(Routes.PETITION)
+            req.session[COOKIES.LOGGEDIN] = true
+            res.redirect(ROUTES.PETITION)
         }).catch((e) => {
             if (e.code === '22P02') {
-                renderPage(res, new Pages.EditProfilePage({}, `Please enter a number for your age`))
+                renderPage(res, new PAGES.EditProfilePage({}, `Please enter a number for your age`))
             } else {
-                renderPage(res, new Pages.ProfilePage({}, `${e}`))
+                renderPage(res, new PAGES.ProfilePage({}, `${e}`))
             }
         })
     }
 })
 
-app.post(Routes.REGISTER, (req, res) => {
+app.post(ROUTES.REGISTER, (req, res) => {
     if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password) {
-        return renderPage(res, new Pages.SignUpPage(`You did not fill in all the fields`))
+        return renderPage(res, new PAGES.RegisterPage(`You did not fill in all the fields`))
     }
     encryption.hashPassword(req.body.password).then((hashedP) => {
         return db.addUser(req.body.firstname, req.body.lastname, req.body.email, hashedP)
     }).then((result) => {
         let id = result.rows[0].id
-        req.session[Cookies.ID] = id
-        req.session[Cookies.AGE] = null
-        req.session[Cookies.CITY] = null
-        req.session[Cookies.URL] = null
-        req.session[Cookies.SIGNATURE] = null
-        res.redirect(Routes.PROFILE)
+        req.session[COOKIES.ID] = id
+        req.session[COOKIES.AGE] = null
+        req.session[COOKIES.CITY] = null
+        req.session[COOKIES.URL] = null
+        req.session[COOKIES.SIGNATURE] = null
+        res.redirect(ROUTES.PROFILE)
     }).catch((e) => {
         if (e.code === `23505`) {
-            renderPage(res, new Pages.SignUpPage(`We already have a user registed to that email`))
+            renderPage(res, new PAGES.RegisterPage(`We already have a user registed to that email`))
         } else {
-            renderPage(res, new Pages.SignUpPage(`Database ${e}`))
+            renderPage(res, new PAGES.RegisterPage(`Database ${e}`))
         }
     })
 })
 
-app.post(Routes.PROFILE, (req, res) => {
+app.post(ROUTES.PROFILE, (req, res) => {
     console.log(req.session)
-    const userId = req.session[Cookies.ID]
+    const userId = req.session[COOKIES.ID]
     const age = req.body.age === '' ? null : req.body.age
 
     db.addUserProfile(age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
-        req.session[Cookies.AGE] = result.rows[0].age
-        req.session[Cookies.CITY] = result.rows[0].city
-        req.session[Cookies.URL] = result.rows[0].url
-        req.session[Cookies.LOGGEDIN] = true
-        res.redirect(Routes.PETITION)
+        req.session[COOKIES.AGE] = result.rows[0].age
+        req.session[COOKIES.CITY] = result.rows[0].city
+        req.session[COOKIES.URL] = result.rows[0].url
+        req.session[COOKIES.LOGGEDIN] = true
+        res.redirect(ROUTES.PETITION)
     }).catch((e) => {
         if (e.code === '22P02') {
-            renderPage(res, new Pages.ProfilePage(`Please enter a number for your age`))
+            renderPage(res, new PAGES.ProfilePage(`Please enter a number for your age`))
         } else {
-            renderPage(res, new Pages.ProfilePage(`${e}`))
+            renderPage(res, new PAGES.ProfilePage(`${e}`))
         }
     })
 })
 
-app.post(Routes.LOGIN, (req, res) => {
+app.post(ROUTES.LOGIN, (req, res) => {
     const email = req.body.email
     const password = req.body.password
     if (password && email) {
@@ -294,37 +299,37 @@ app.post(Routes.LOGIN, (req, res) => {
         }).then((doesMatch) => {
             if (doesMatch) { return db.getUserProfile(email) }
         }).then((userProfile) => {
-            req.session[Cookies.ID] = userProfile.rows[0].id
-            req.session[Cookies.AGE] = userProfile.rows[0].age
-            req.session[Cookies.CITY] = userProfile.rows[0].city
-            req.session[Cookies.EMAIL] = userProfile.rows[0].email
-            req.session[Cookies.FIRSTNAME] = userProfile.rows[0].first
-            req.session[Cookies.LASTNAME] = userProfile.rows[0].last
-            req.session[Cookies.SIGNATURE] = userProfile.rows[0].sigId
-            req.session[Cookies.URL] = userProfile.rows[0].url
-            req.session[Cookies.LOGGEDIN] = true
-            return db.getSigUserId(req.session[Cookies.ID])
+            req.session[COOKIES.ID] = userProfile.rows[0].id
+            req.session[COOKIES.AGE] = userProfile.rows[0].age
+            req.session[COOKIES.CITY] = userProfile.rows[0].city
+            req.session[COOKIES.EMAIL] = userProfile.rows[0].email
+            req.session[COOKIES.FIRSTNAME] = userProfile.rows[0].first
+            req.session[COOKIES.LASTNAME] = userProfile.rows[0].last
+            req.session[COOKIES.SIGNATURE] = userProfile.rows[0].sigId
+            req.session[COOKIES.URL] = userProfile.rows[0].url
+            req.session[COOKIES.LOGGEDIN] = true
+            return db.getSigUserId(req.session[COOKIES.ID])
         }).then((result) => {
             if (result.rows[0]) {
                 let sig = result.rows[0].id
-                req.session[Cookies.SIGNATURE] = sig
+                req.session[COOKIES.SIGNATURE] = sig
             }
-            res.redirect(Routes.PETITION)
+            res.redirect(ROUTES.PETITION)
         }).catch((_e) => {
-            renderPage(res, new Pages.LoginPage(`SOZ! We did not find a user with these credentails :/`))
+            renderPage(res, new PAGES.LoginPage(`SOZ! We did not find a user with these credentails :/`))
         })
     } else {
-        renderPage(res, new Pages.LoginPage('Please fill in both fields'))
+        renderPage(res, new PAGES.LoginPage('Please fill in both fields'))
     }
 })
 
-app.post(Routes.PETITION, (req, res) => {
+app.post(ROUTES.PETITION, (req, res) => {
     if (!req.body.signature) {
-        renderPage(res, new Pages.SignPetitonPage(`You did not fill in the signature`))
+        renderPage(res, new PAGES.PetitonPage(`You did not fill in the signature`))
     } else {
-        db.addSignature(req.session[Cookies.ID], req.body.signature).then((result) => {
-            req.session[Cookies.SIGNATURE] = result.rows[0].id
-            res.redirect(Routes.SIGNED)
+        db.addSignature(req.session[COOKIES.ID], req.body.signature).then((result) => {
+            req.session[COOKIES.SIGNATURE] = result.rows[0].id
+            res.redirect(ROUTES.SIGNED)
         }).catch((e) => {
             res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
             res.cookie('error_type', 'data_base_error', { maxAge: 1000, httpOnly: true })
@@ -380,12 +385,12 @@ app.listen(process.env.PORT || 8080, () => {
 
 // Parameters may be declared in a variety of syntactic forms
 /**
- * @param {Object}  req - The http request object.
+ * @param {Object} req - The http request object.
  * @param {Object} res - The http response object.
  * @param {Page} page - A instance of a Page class or child.
  */
 function renderPage (res, page) {
-    if (!(page instanceof Pages.Page)) {
+    if (!(page instanceof PAGES.Page)) {
         throw new Error(`Page argument is not of type "Page"`)
     } else {
         res.render(page.type, page.attributes)

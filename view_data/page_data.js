@@ -3,7 +3,7 @@ const { Textfield, Button, FormField, Form, Footer, Link } = require('./widget_d
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
 const LAYOUT = 'layout'
 const { TableId } = require(`../utils/db`)
-const Routes = Object.freeze({
+const ROUTES = Object.freeze({
     SIGNED: '/petition/signed',
     PETITION: '/petition',
     REGISTER: '/register',
@@ -22,7 +22,7 @@ class Page {
     * @param {PageAttributes} data - The widget data for the page.
     * @property {Object} attributes - An attributes object which has details that are passed to the handlebars script.
     */
-    constructor (type, attributes) {
+    constructor(type, attributes) {
         this.type = type
         this.attributes = attributes
         this.attributes.layout = 'main'
@@ -32,8 +32,8 @@ class Page {
     }
 }
 
-class SignUpPage extends Page {
-    constructor (err) {
+class RegisterPage extends Page {
+    constructor(err) {
         super(PageType.FORM,
             {
                 subtitle: 'Sign up below to make a change...',
@@ -46,7 +46,7 @@ class SignUpPage extends Page {
                 ]),
                 footer: new Footer(
                     'If you are already a member, please ',
-                    Routes.LOGIN,
+                    ROUTES.LOGIN,
                     'Log in!'),
                 error: err
             })
@@ -58,7 +58,7 @@ class LoginPage extends Page {
     * @constructor
     * @param {any} err - An Error to show the user.
     */
-    constructor (err) {
+    constructor(err) {
         super(PageType.FORM, {
             title: 'Let\'s Login',
             fieldset: new FormField([
@@ -67,7 +67,7 @@ class LoginPage extends Page {
             ]),
             footer: new Footer(
                 `If you don't have an account yet please `,
-                Routes.REGISTER,
+                ROUTES.REGISTER,
                 'Register'),
             loginPage: true,
             buttonName: 'Log in',
@@ -76,8 +76,8 @@ class LoginPage extends Page {
     };
 }
 
-class SignPetitonPage extends Page {
-    constructor (firstnameIn, err) {
+class PetitonPage extends Page {
+    constructor(firstnameIn, err) {
         super(PageType.PETITION,
             {
                 error: err,
@@ -94,7 +94,7 @@ class ProfilePage extends Page {
     * @constructor
     * @param {string} err - The error to render to screen in case of an Error.
     */
-    constructor (err) {
+    constructor(err) {
         super(PageType.FORM, {
             loggedIn: true,
             error: err,
@@ -122,7 +122,7 @@ class EditProfilePage extends Page {
     *        - city
     *        - url
     */
-    constructor (detailsObj, err) {
+    constructor(detailsObj, err) {
         super(PageType.FORM, {
             loggedIn: true,
             error: err,
@@ -150,7 +150,7 @@ class SignedPage extends Page {
     * @param {number} signers - The total number of signers
     * @property {Array<Link>} links - An array of links to display below the signature pad
     */
-    constructor (userName, signedName, signers) {
+    constructor(userName, signedName, signers) {
         if (!userName && !signedName && !signers) {
             throw Error('Arguments are missing for Thankyou page')
         }
@@ -161,9 +161,9 @@ class SignedPage extends Page {
         var linksIn = []
 
         if (signers === '1' || signers === 1) {
-            linksIn.unshift(new Link('See the other signer', Routes.SIGNERS))
+            linksIn.unshift(new Link('See the other signer', ROUTES.SIGNERS))
         } else if (signers > 0) {
-            linksIn.unshift(new Link(`See the other ${signers} singers`, Routes.SIGNERS))
+            linksIn.unshift(new Link(`See the other ${signers} singers`, ROUTES.SIGNERS))
         }
 
         super(PageType.SIGNED, {
@@ -182,7 +182,7 @@ class SignersPage extends Page {
     * @constructor
     * @param {Array[signers]} - And array of signer data
     */
-    constructor (signersArr, err) {
+    constructor(signersArr, err) {
         if (!signersArr) {
             throw Error('Signers Argument is missing')
         }
@@ -197,13 +197,13 @@ class SignersPage extends Page {
     }
 }
 
-exports.SignPetitonPage = SignPetitonPage
+exports.PetitonPage = PetitonPage
 exports.Page = Page
-exports.SignUpPage = SignUpPage
+exports.RegisterPage = RegisterPage
 exports.LoginPage = LoginPage
 exports.ProfilePage = ProfilePage
 exports.SignedPage = SignedPage
-exports.Routes = Routes
+exports.ROUTES = ROUTES
 exports.SignersPage = SignersPage
 exports.EditProfilePage = EditProfilePage
 exports.LAYOUT = LAYOUT

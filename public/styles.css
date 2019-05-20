@@ -111,6 +111,7 @@ nav > a > button, nav > button {
     box-shadow: none;
     font-size: 20px;
     box-shadow: none;
+    transform: scale(1.0)
 }
 
 

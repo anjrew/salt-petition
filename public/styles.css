@@ -1,3 +1,7 @@
+@font-face { font-family: Caleu; src: url('/public/fonts/Caleu___.ttf'); } 
+@font-face { font-family: LavaLamp; src: url('/public/fonts/KR\ Lava\ Lamp.ttf'); } 
+@font-face { font-family: Mont; src: url('/public/fonts/MONTR___.TTF'); } 
+
 *{
     font-family: 'Montserrat', sans-serif;
     font-weight: 100;
@@ -33,6 +37,8 @@ ul{
 }
 
 #slogan{
+    font-family: LavaLamp;
+    max-width: 600px;
     width: 80%;
     font-size: 60px;
     font-family: 'Permanent Marker', cursive;

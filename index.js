@@ -68,7 +68,6 @@ app.get(Routes.CITY, (req, res, next) => {
     if (city) {
         db.listSignersByCity(city).then((signers) => {
             var tolist = signers.rows.map((signer) => {
-                console.log(signer.city.charAt(0).toUpperCase() + signer.city.slice(1))
                 return {
                     first: signer.first,
                     last: signer.last,
@@ -210,14 +209,13 @@ app.post(Routes.EDITPROFILE, (req, res, next) => {
         })
     } else {
         const userId = req.session[Cookies.ID]
-        const age = req.session[Cookies.AGE] = req.body.age
+        let age = req.session[Cookies.AGE] = req.body.age
         const city = req.session[Cookies.CITY] = req.body.city
         const url = req.session[Cookies.URL] = req.body.url
         const first = req.session[Cookies.FIRSTNAME] = req.body.firstname
         const last = req.session[Cookies.LASTNAME] = req.body.lastname
         const email = req.session[Cookies.EMAIL] = req.body.email
         const password = req.body.password
-
         // to update Profile
         db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }).then((result) => {
             if (password) {
@@ -269,8 +267,9 @@ app.post(Routes.REGISTER, (req, res) => {
 app.post(Routes.PROFILE, (req, res) => {
     console.log(req.session)
     const userId = req.session[Cookies.ID]
+    const age = req.body.age === '' ? null : req.body.age
 
-    db.addUserProfile(req.body.age, req.body.city, req.body.url, userId).then((result) => {
+    db.addUserProfile(age, req.body.city, req.body.url, userId).then((result) => {
         console.log(result)
         req.session[Cookies.AGE] = result.rows[0].age
         req.session[Cookies.CITY] = result.rows[0].city

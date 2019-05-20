@@ -1,32 +1,30 @@
 // eslint-disable-next-line quotes
 
 (function () {
-    var signature = document.getElementById('signature')
+    var canvas = document.getElementById('signature')
     var pad = document.getElementsByClassName('pad')
     var context
-    if (signature && pad.length === 0) {
-        context = signature.getContext('2d')
+    if (canvas && pad.length === 0) {
+        context = canvas.getContext('2d')
         context.strokeStyle = 'white'
         context.lineWidth = 2
     }
 
     resizeImage()
 
-    $(signature).mousedown(function (event) {
+    $(canvas).mousedown(function (event) {
         context.beginPath()
         context.moveTo(event.offsetX, event.offsetY)
 
-        $(signature).mousemove(function (event) {
+        $(canvas).mousemove(function (event) {
             context.lineTo(event.offsetX, event.offsetY)
             context.stroke()
             var data = this.toDataURL()
             $('#data').val(data)
         })
-    }).on('mouseup mouseleave', function (event) { $(signature).off('mousemove mouseleave') })
+    }).on('mouseup mouseleave', function (event) { $(canvas).off('mousemove mouseleave') })
 
-    $(window).on('resize', function () {
-        resizeImage()
-    })
+    // Buttons
 
     $('#delete-nav').on('click', function (event) {
         $('#pages').css({
@@ -46,10 +44,20 @@
         })
     })
 
+    $('#clear').click(function (e) {
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        context.restore()
+    })
+
     $('*').on('mouseover', function () {
         resizeImage()
-    });
+    })
 
+    // To Resize image
+
+    $(window).on('resize', function () {
+        resizeImage()
+    })
 
     function resizeImage () {
         var allelements = $('*')
@@ -62,5 +70,4 @@
 
         $('video').height(maxHeight)
     }
-    
 })()

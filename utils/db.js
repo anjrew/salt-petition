@@ -131,7 +131,7 @@ module.exports.addUser = function (first, last, email, password) {
     [email]
     ).then((result) => {
         let rowLength = result.rows.length
-        let hasValue = rowLength <= 1
+        let hasValue = rowLength < 1
         if (hasValue) {
             return db.query(`
             INSERT INTO users(first, last, email, password) 

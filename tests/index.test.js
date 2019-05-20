@@ -3,6 +3,7 @@
 /* global jest */
 /* global expect */
 const ROUTES = require('../routers/routes')
+const COOKIES = require('../utils/cookies')
 const pages = require('../view_data/page_data.js')
 const app = require('../index.js')
 const supertest = require('supertest')
@@ -12,20 +13,37 @@ const chalk = require('chalk')
 // this is becasue jest looks in the __mocks folder
 
 /// Mock the cookie session
-const cookieSession = require('cookie-Session')
+const cookieSession = require('cookie-session')
 
-test.only('Takes a page as an argument and does not throw error', () => {
-    console.log(app.renderPage);
+test('Takes a page as an argument and does not throw error', () => {
+    console.log(app.renderPage)
     function renderTest () {
         return app.renderPage({}, {}, new pages.Page())
     }
     expect(renderTest).toThrow()
 })
 
+test('Users who are logged out are redirected to the registration page when they attempt to go to the petition page', () => {
+    // Express app wothin the index html
+    return supertest(app.app)
+        .get(ROUTES.PETITION)
+        .expect('location', ROUTES.REGISTER)
+})
 
-// Change to supertest
-test('Takes a page as an argument and does not throw error', () => {
-    expect(supertest(app).renderTest).toThrow()
+test.only('Users who are logged in are redirected to the petition page when they attempt to go to the registration', () => {
+    cookieSession.mockSessionOnce({
+        userId: 'funky'
+    })
+    /* req.session.chicken will be 'funky' in the following request */
+    return supertest(app).get(ROUTES.REGISTER).expect(ROUTES.PETITION)
+})
+
+test('Users who are logged in are redirected to the petition page when they attempt to go to the Login', () => {
+    cookieSession.mockSessionOnce({
+        'userId': 'funky'
+    })
+    /* req.session.chicken will be 'funky' in the following request */
+    return supertest(app).get(ROUTES.LOGIN).expect('location', ROUTES.PETITION)
 })
 
 // A super test

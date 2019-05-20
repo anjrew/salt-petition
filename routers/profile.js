@@ -6,12 +6,11 @@ const COOKIES = require('../utils/cookies')
 const PAGES = require('../view_data/page_data')
 const index = require('../index')
 const db = require('../utils/db')
-const chalk = require('chalk')
 const requireNoSignature = require('../middleware').requireNoSignature
+const userLoggedIn = require('../middleware').userLoggedIn
 
 router.route(ROUTES.PROFILE)
     .get(requireNoSignature, (req, res) => {
-        console.log(chalk.yellow('in here'));
         const userId = req.session[COOKIES.ID]
         if (userId) {
             index.renderPage(res, new PAGES.ProfilePage())
@@ -19,7 +18,7 @@ router.route(ROUTES.PROFILE)
             res.redirect(ROUTES.REGISTER)
         }
     })
-    .post((req, res, middleware) => {
+    .post(userLoggedIn, (req, res, middleware) => {
         console.log(req.session)
         const userId = req.session[COOKIES.ID]
         const age = req.body.age === '' ? null : req.body.age

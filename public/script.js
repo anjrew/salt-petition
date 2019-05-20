@@ -36,6 +36,11 @@
     // Buttons
 
     $('#delete-nav').on('click', function (event) {
+
+        $('#delete-nav').css({
+            'transform': 'scale(1.0)'
+        })
+
         $('#pages').css({
             'transform': 'translateX(33%)'
         })

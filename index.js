@@ -24,6 +24,7 @@ const signedRouter = require('./routers/signed')
 const signersRouter = require('./routers/signers')
 const cityRouter = require('./routers/city')
 const logoutRouter = require('./routers/logout')
+const editProfileRouter = require('./routers/edit_profile')
 
 // VARIABLES
 const COOKIES = Object.freeze({
@@ -53,7 +54,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(pertitionRouter, profileRouter, loginRouter, registerRouter, signedRouter, signersRouter, cityRouter, logoutRouter)
+app.use(pertitionRouter, profileRouter, loginRouter, registerRouter, signedRouter, signersRouter, cityRouter, logoutRouter, editProfileRouter)
 
 app.get('/error', (req, res) => {
     res.render('error', {

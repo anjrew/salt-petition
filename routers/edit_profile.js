@@ -8,7 +8,7 @@ const db = require('../utils/db')
 const userLoggedIn = require('../middleware').userLoggedIn
 const encryption = require('../utils/encryption')
 
-router.route(ROUTES.PROFILE)
+router.route(ROUTES.EDITPROFILE)
 
     .get(userLoggedIn, (req, res, next) => {
         db.getUserProfileById(req.session[COOKIES.ID]).then((result) => {
@@ -28,7 +28,7 @@ router.route(ROUTES.PROFILE)
         })
     })
 
-    .post(userLoggedIn, ROUTES.EDITPROFILE, (req, res, next) => {
+    .post(userLoggedIn, (req, res, next) => {
         if (req.body.delete) {
             db.deleteAccount(req.session[COOKIES.ID]).then(() => {
                 delete req.session

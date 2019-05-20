@@ -1,7 +1,11 @@
 // eslint-disable-next-line quotes
 
 (function () {
+    var cookiesAccepted = localStorage.getItem('cookiesAccepted')
+    var popup = $('#popup')
+    var closePopUpButton = $('#close-popup')
     var canvas = document.getElementById('signature')
+    var overlay = document.getElementById('overlay')
     var pad = document.getElementsByClassName('pad')
     var context
     if (canvas && pad.length === 0) {
@@ -11,6 +15,10 @@
     }
 
     resizeImage()
+
+    if (!cookiesAccepted) {
+        welcomePopup()
+    }
 
     $(canvas).mousedown(function (event) {
         context.beginPath()
@@ -70,4 +78,34 @@
 
         $('video').height(maxHeight)
     }
+
+    function welcomePopup () {
+        overlay.classList.add('on')
+        popup.addClass('on')
+    }
+
+    // Executed after the modal popup has fully dismissed
+    overlay.addEventListener('transitionend', function (event) {
+        popup.removeClass('unsetting')
+        overlay.classList.remove('unsetting')
+        event.stopPropagation()
+    })
+
+    // Executed when the user presses the close button
+    closePopUpButton.click(function (event) {
+        overlay.classList.add('unsetting')
+        popup.addClass('unsetting')
+        overlay.classList.remove('on')
+        popup.removeClass('on')
+        event.stopPropagation()
+    })
+
+    closePopUpButton.click(function (event) {
+        localStorage.setItem('cookiesAccepted', true)
+        overlay.classList.add('unsetting')
+        popup.addClass('unsetting')
+        overlay.classList.remove('on')
+        popup.removeClass('on')
+        event.stopPropagation()
+    })
 })()

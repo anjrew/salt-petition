@@ -13,6 +13,16 @@
 </video>
 <body>
      
+    <div id="overlay"></div>
+
+    <div id="popup" class="popup">
+        <form method="post" id="popup-right">
+            <button type="submit" value="cookiesAccepted" id="close-popup">X</button>
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        </form>
+        <h3>Welcome to LAVA LAMPS UNITED!</h3>
+        <p>This site uses cookies and if you're using it we have to assume that you are ok with that.</p>
+    </div>
 
     {{#if loggedIn}}
         {{>nav-bar}}

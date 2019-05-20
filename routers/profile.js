@@ -6,10 +6,13 @@ const COOKIES = require('../utils/cookies')
 const PAGES = require('../view_data/page_data')
 const index = require('../index')
 const db = require('../utils/db')
+const chalk = require('chalk')
+
 const requireNoSignature = require('../middleware').requireNoSignature
 
 router.route(ROUTES.PROFILE)
     .get(requireNoSignature, (req, res) => {
+        console.log(chalk.yellow('in here'));
         const userId = req.session[COOKIES.ID]
         if (userId) {
             index.renderPage(res, new PAGES.ProfilePage())

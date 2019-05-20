@@ -18,7 +18,7 @@ const PAGES = require('./view_data/page_data.js')
 const ROUTES = require('./routers/routes')
 const profileRouter = require('./routers/profile')
 const loginRouter = require('./routers/login')
-const middleware = require('./middleware')
+const pertitionRouter = require('./routers/petition')
 
 // VARIABLES
 const COOKIES = Object.freeze({
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(profileRouter, loginRouter)
+app.use(pertitionRouter, profileRouter, loginRouter)
 
 // GET REQUESTS
 
@@ -94,22 +94,6 @@ app.get(ROUTES.CITY, (req, res, next) => {
         })
     } else {
         next()
-    }
-})
-
-app.get(ROUTES.PETITION, (req, res, next) => {
-    const userId = req.session[COOKIES.ID]
-    const signatureId = req.session[COOKIES.SIGNATURE]
-    if (userId && signatureId) {
-        res.redirect(ROUTES.SIGNED)
-    } else {
-        db.getName(userId).then((result) => {
-            const firstname = result.rows[0].first
-            this.renderPage(res, new PAGES.PetitonPage(firstname))
-        }).catch((e) => {
-            console.log(e)
-            next()
-        })
     }
 })
 
@@ -172,8 +156,6 @@ app.post(ROUTES.SIGNED, (req, res, next) => {
     })
 })
 
-
-
 app.post(ROUTES.REGISTER, (req, res) => {
     if (!req.body.firstname || !req.body.lastname || !req.body.email || !req.body.password) {
         return this.renderPage(res, new PAGES.RegisterPage(`You did not fill in all the fields`))
@@ -195,22 +177,6 @@ app.post(ROUTES.REGISTER, (req, res) => {
             this.renderPage(res, new PAGES.RegisterPage(`Database ${e}`))
         }
     })
-})
-
-app.post(ROUTES.PETITION, (req, res) => {
-    if (!req.body.signature) {
-        this.renderPage(res, new PAGES.PetitonPage(`You did not fill in the signature`))
-    } else {
-        db.addSignature(req.session[COOKIES.ID], req.body.signature).then((result) => {
-            req.session[COOKIES.SIGNATURE] = result.rows[0].id
-            res.redirect(ROUTES.SIGNED)
-        }).catch((e) => {
-            res.cookie('error_title', 'Error', { maxAge: 1000, httpOnly: true })
-            res.cookie('error_type', 'data_base_error', { maxAge: 1000, httpOnly: true })
-            res.cookie(`error_message`, ` 'Database error: ${e}`, { maxAge: 1000, httpOnly: true })
-            res.redirect('/error')
-        })
-    }
 })
 
 app.get('/error', (req, res) => {
@@ -254,7 +220,7 @@ function setupApp () {
 }
 
 // Stops server starting during tests
-if (require.main == module) {   
+if (require.main === module) {
     app.listen(process.env.PORT || 8080, () => {
         console.log(process.env.PORT ? `Online` : `Listening on port 8080`)
     })

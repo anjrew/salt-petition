@@ -69,3 +69,5 @@ router.route(ROUTES.PROFILE)
             })
         }
     })
+
+module.exports.route

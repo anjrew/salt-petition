@@ -8,6 +8,8 @@ const index = require('../index')
 const db = require('../utils/db')
 const encryption = require('../utils/encryption')
 const userLoggedIn = require('../middleware').userLoggedIn
+const chalk = require('chalk')
+
 
 router.route(ROUTES.LOGIN)
     .get(userLoggedIn, (req, res) => {

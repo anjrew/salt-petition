@@ -36,19 +36,52 @@
 
     $('#delete-nav').on('click', function (event) {
         $('#pages').css({
-            'transform': 'translateX(25%)'
+            'transform': 'translateX(33%)'
         })
         $('#delete-nav').css({
             'transform': 'scale(0.0)'
-        })
+        }).off('transitionend')
     })
 
     $('#no').click(function (e) {
         $('#pages').css({
-            'transform': 'translateX(-25%)'
+            'transform': 'translateX(0%)'
         })
         $('#delete-nav').css({
             'transform': 'scale(1.0)'
+        }).off('transitionend')
+    })
+
+    $('#about-nav').click(function (e) {
+        $('#pages').css({
+            'transform': 'translateX(-33%)'
+        })
+        $('#about-nav').css({
+            'transform': 'scale(0.0)'
+
+        }).on('transitionend', function (event) {
+            $('#about-nav').css({ 'display': 'none' })
+            $('#petition-nav').css({
+                'display': 'inline-block',
+                'transform': 'scale(1.0)'
+            }).off('transitionend')
+        })
+    })
+
+    $('#petition-nav').click(function (e) {
+        $('#pages').css({
+            'transform': 'translateX(0%)'
+        })
+        $('#petition-nav').css({
+            'transform': 'scale(1.0)'
+        }).on('transitionend', function (event) {
+            $('#petition-nav').css({
+                'display': 'none'
+            })
+            $('#about-nav').show().css({
+                'disply': 'inline-block',
+                'transform': 'scale(1.0)'
+            }).off('transitionend')
         })
     })
 

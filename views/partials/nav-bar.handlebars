@@ -1,5 +1,6 @@
   <nav>
     {{>log-out}}
+     <button id="about-nav">About</button>
     {{#unless editProfile}} 
       {{>edit-profile-button}}
         
@@ -7,4 +8,6 @@
         <a href="/petition/signed"><button>Back</button></a>
         <button id="delete-nav">Delete Profile</button> 
     {{/unless}}
+   
+    <button id="petition-nav">Pertition</button>  
   </nav>  

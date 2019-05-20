@@ -32,8 +32,8 @@ ul{
     overflow: hidden;
     justify-content: space-evenly;
     align-items: flex-end;
-    width: 200vw;
-    transform: translateX(-25%)
+    width: 300vw;
+    transform: translateX(0%)
 }
 
 #slogan{
@@ -101,6 +101,8 @@ nav {
     justify-content: start;
 }
 
+
+
 nav > a > button, nav > button {
     color: white;
     border-color: transparent;
@@ -109,6 +111,11 @@ nav > a > button, nav > button {
     box-shadow: none;
     font-size: 20px;
     box-shadow: none;
+}
+
+
+#petition-nav{
+    transform: scale(0.0)
 }
 
 

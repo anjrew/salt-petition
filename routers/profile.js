@@ -1,20 +1,17 @@
 // Router directory in a file called profile.js
 const express = require('express')
 const router = express.Router()
-const ROUTES = require('../view_data/page_data').ROUTES
+const ROUTES = require('../routers/routes')
 const COOKIES = require('../utils/cookies')
 const PAGES = require('../view_data/page_data')
 const index = require('../index')
 const db = require('../utils/db')
+const requireNoSignature = require('../middleware').requireNoSignature
 
 router.route(ROUTES.PROFILE)
-    .get((req, res) => {
-        console.log(COOKIES);
-        console.log(COOKIES.ID);
+    .get(requireNoSignature, (req, res) => {
         const userId = req.session[COOKIES.ID]
         if (userId) {
-            console.log(index);
-            
             index.renderPage(res, new PAGES.ProfilePage())
         } else {
             res.redirect(ROUTES.REGISTER)
@@ -34,9 +31,9 @@ router.route(ROUTES.PROFILE)
             res.redirect(ROUTES.PETITION)
         }).catch((e) => {
             if (e.code === '22P02') {
-                renderPage(res, new PAGES.ProfilePage(`Please enter a number for your age`))
+                index.renderPage(res, new PAGES.ProfilePage(`Please enter a number for your age`))
             } else {
-                renderPage(res, new PAGES.ProfilePage(`${e}`))
+                index.renderPage(res, new PAGES.ProfilePage(`${e}`))
             }
         })
     })

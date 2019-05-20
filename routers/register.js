@@ -9,7 +9,6 @@ const db = require('../utils/db')
 const encryption = require('../utils/encryption')
 
 router.route(ROUTES.REGISTER)
-
     .get((req, res, next) => {
         if (req.session[COOKIES.ID] || req.session[COOKIES.LOGGEDIN]) {
             req.session[COOKIES.ID] = null

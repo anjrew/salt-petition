@@ -70,4 +70,4 @@ router.route(ROUTES.PROFILE)
         }
     })
 
-module.exports.route
+module.exports = router

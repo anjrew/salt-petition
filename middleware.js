@@ -23,7 +23,7 @@ function userLoggedIn (req, res, next) {
         // if signatureId exists, this if block will run!
         // this is my signed route
         console.log(chalk.green('going to signed in midddleware'))     
-        res.redirect(ROUTES.SIGNED)
+        res.redirect(ROUTES.LOGIN)
     } else {
         next()
     }

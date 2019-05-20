@@ -20,6 +20,10 @@ const profileRouter = require('./routers/profile')
 const loginRouter = require('./routers/login')
 const pertitionRouter = require('./routers/petition')
 const registerRouter = require('./routers/register')
+const signedRouter = require('./routers/signed')
+const signersRouter = require('./routers/signers')
+const cityRouter = require('./routers/city')
+const logoutRouter = require('./routers/logout')
 
 // VARIABLES
 const COOKIES = Object.freeze({
@@ -49,101 +53,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(pertitionRouter, profileRouter, loginRouter, registerRouter)
-
-// GET REQUESTS
-
-app.get(ROUTES.SIGNERS, (req, res, next) => {
-    const userID = req.session[COOKIES.ID]
-    db.listSigners(userID).then((signers) => {
-        var tolist = signers.rows.map((signer) => {
-            console.log(signer.city.charAt(0).toUpperCase() + signer.city.slice(1))
-            return {
-                first: signer.first,
-                last: signer.last,
-                age: signer.age,
-                city: signer.city.charAt(0).toUpperCase() + signer.city.slice(1),
-                url: signer.url
-            }
-        })
-        this.renderPage(res, new PAGES.SignersPage(tolist))
-    }).catch((e) => {
-        console.log(e)
-        next()
-    })
-})
-
-app.get(ROUTES.CITY, (req, res, next) => {
-    const city = req.params.city
-    if (city) {
-        db.listSignersByCity(city).then((signers) => {
-            var tolist = signers.rows.map((signer) => {
-                return {
-                    first: signer.first,
-                    last: signer.last,
-                    age: signer.age,
-                    city: signer.city.charAt(0).toUpperCase() + signer.city.slice(1),
-                    url: signer.url
-                }
-            }
-
-            )
-            this.renderPage(res, new PAGES.SignersPage(tolist))
-        }).catch((e) => {
-            console.log(e)
-            next()
-        })
-    } else {
-        next()
-    }
-})
-
-
-
-app.get(ROUTES.SIGNED, (req, res, next) => {
-    let sigId = req.session[COOKIES.SIGNATURE]
-    let userID = req.session[COOKIES.ID]
-    db.getSignatureWithSigId(sigId).then((sigResult) => {
-        const signature = sigResult.rows[0]
-        if (!signature) {
-            req.session[COOKIES.SIGNATURE] = null
-            res.redirect(ROUTES.PETITION)
-        } else {
-            db.signersCount(userID).then((results) => {
-                if (results.rows[0] < 1) {
-                    res.redirect(ROUTES.PETITION)
-                } else {
-                    const name = req.session[COOKIES.FIRSTNAME]
-                    const signature = sigResult.rows[0].signature
-                    const signersCount = results.rows[0].count
-                    this.renderPage(res, new PAGES.SignedPage(name, signature, signersCount))
-                }
-            })
-        }
-    }).catch((e) => {
-        console.log(e)
-        next()
-    })
-})
-
-app.get(ROUTES.LOGOUT, (req, res) => {
-    req.session = null
-    res.redirect(ROUTES.LOGIN)
-})
-
-// POST REQUESTS
-
-app.post(ROUTES.SIGNED, (req, res, next) => {
-    db.deleteSignature(req.session[COOKIES.SIGNATURE]).then(() => {
-        req.cookies[COOKIES.SIGNATURE] = null
-        res.redirect(ROUTES.PETITION)
-    }).catch((e) => {
-        console.log(e)
-        next()
-    })
-})
-
-
+app.use(pertitionRouter, profileRouter, loginRouter, registerRouter, signedRouter, signersRouter, cityRouter, logoutRouter)
 
 app.get('/error', (req, res) => {
     res.render('error', {

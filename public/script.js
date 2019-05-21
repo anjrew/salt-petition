@@ -53,11 +53,11 @@
             if (canvas !== document.elementFromPoint(touch.pageX, touch.pageY)) {
                 touchleave()
             }
-        }).on('touchend mouseleave', function (event) { $(canvas).off('mousemove mouseleave') })
+        }).on('touchend', function (event) { $(canvas).off('touchmove touchstart') })
     })
 
     function touchleave () {
-        console.log("You're not touching the element anymore")
+        $(canvas).off('touchmove touchstart')
     }
 
     // Buttons

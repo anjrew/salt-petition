@@ -66,11 +66,9 @@
         $('#delete-nav').css({
             'transform': 'scale(1.0)'
         })
-        $('#delete-popup').css({
-            'transform': 'translateX(200%)'
-        })
-        $('#main').css({
-            'transform': 'translateX(-100%)'
+
+        $('#pages').css({
+            'transform': 'translateX(33%)'
         })
         $('#delete-nav').css({
             'transform': 'scale(0.0)'
@@ -78,11 +76,8 @@
     })
 
     $('#no').click(function (e) {
-        $('#main').css({
+        $('#pages').css({
             'transform': 'translateX(0%)'
-        })
-        $('#delete-popup').css({
-            'transform': 'translateX(100%)'
         })
         $('#delete-nav').css({
             'transform': 'scale(1.0)'
@@ -90,11 +85,12 @@
     })
 
     $('#about-nav').click(function (e) {
-        $('#about').css({
-            'transform': 'translateX(-100%)'
+        $('#pages').css({
+            'transform': 'translateX(-33%)'
         })
         $('#about-nav').css({
             'transform': 'scale(0.0)'
+
         }).on('transitionend', function (event) {
             $('#about-nav').css({ 'display': 'none' })
             $('#petition-nav').css({

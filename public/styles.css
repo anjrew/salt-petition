@@ -435,7 +435,3 @@ li{
     visibility: unset;
     opacity: 0.0;
 }
-
-#about{
-    transform: translateX(100%)
-}

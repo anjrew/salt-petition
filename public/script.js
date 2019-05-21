@@ -131,15 +131,7 @@
     // To Resize image
 
     $(window).on('resize', function () {
-        resizeImage()
-        var pages = $('.page')
-        var width = window.innerWidth
-        console.log(pages)
-        for (let index = 0; index < pages.length; index++) {
-            const page = pages[index]
-            console.log(page)
-            page.style.width = '"' + width + '"'
-        }
+        resizeImage()  
     })
 
     function resizeImage () {
@@ -152,6 +144,15 @@
         var maxHeight = Math.max.apply(null, heights)
 
         $('video').height(maxHeight)
+
+        var pages = $('.page')
+        var width = window.innerWidth
+        console.log(pages)
+        for (let index = 0; index < pages.length; index++) {
+            const page = pages[index]
+            console.log(page)
+            page.style.width = '"' + width + '"'
+        }
     }
 
     function welcomePopup () {

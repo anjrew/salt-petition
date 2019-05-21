@@ -1,9 +1,7 @@
 
 /* global test */
-/* global jest */
 /* global expect */
 const ROUTES = require('../routers/routes')
-const COOKIES = require('../utils/cookies.js')
 const pages = require('../view_data/page_data.js')
 const index = require('../index.js')
 const supertest = require('supertest')
@@ -89,17 +87,9 @@ to the petition page when they attempt to go to either the SIGNED page or the si
 })
 
 test(`5: User Types in a Url that does not exist`, () => {
-
     return supertest(index.app)
         .get('/cheese')
         .then(res => {
             expect(res.statusCode).toBe(404)
         })
 })
-
-// The main propertires of the response we are interested in are:
-// 1 - Text: gives us the BODY of the response!
-
-// 2 - Headers: gives us meta data
-
-// 3 Status Code

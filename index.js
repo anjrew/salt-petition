@@ -14,6 +14,7 @@ module.exports.app = app
 // MODULES
 const PAGES = require('./view_data/page_data.js')
 const routers = [
+    require('./routers/home'),
     require('./routers/profile'),
     require('./routers/login'),
     require('./routers/petition'),

@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 const csurf = require('csurf')
 const chalk = require('chalk')
+const COOKIES = require('./utils/cookies');
 
 // EXPORTS
 module.exports.app = app
@@ -16,28 +17,17 @@ module.exports.app = app
 const db = require(`./utils/db.js`)
 const PAGES = require('./view_data/page_data.js')
 const ROUTES = require('./routers/routes')
-const profileRouter = require('./routers/profile')
-const loginRouter = require('./routers/login')
-const pertitionRouter = require('./routers/petition')
-const registerRouter = require('./routers/register')
-const signedRouter = require('./routers/signed')
-const signersRouter = require('./routers/signers')
-const cityRouter = require('./routers/city')
-const logoutRouter = require('./routers/logout')
-const editProfileRouter = require('./routers/edit_profile')
-
-// VARIABLES
-const COOKIES = Object.freeze({
-    LOGGEDIN: 'loggedIn',
-    ID: 'userId',
-    SIGNATURE: 'signature',
-    EMAIL: 'email',
-    FIRSTNAME: 'first',
-    LASTNAME: 'last',
-    CITY: 'city',
-    AGE: 'age',
-    URL: 'url'
-})
+const routers = [
+    require('./routers/profile'),
+    require('./routers/login'),
+    require('./routers/petition'),
+    require('./routers/register'),
+    require('./routers/signed'),
+    require('./routers/signers'),
+    require('./routers/city'),
+    require('./routers/logout'),
+    require('./routers/edit_profile'),
+]
 
 setupApp()
 
@@ -54,7 +44,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use(pertitionRouter, profileRouter, loginRouter, registerRouter, signedRouter, signersRouter, cityRouter, logoutRouter, editProfileRouter)
+app.use(...routers)
 
 app.get('/error', (req, res) => {
     res.render('error', {

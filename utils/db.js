@@ -3,16 +3,18 @@ const spicedPg = require('spiced-pg')
 // process.env.NODE_ENV === "production" ? secrets = process.env : secrets = require('./secrets');
 const dbUrl = process.env.DATABASE_URL || `postgres:postgres:postgres@localhost:5432/salt-petition`
 const db = spicedPg(dbUrl)
-const TableId = Object.freeze({
-    USERID: 'user_id',
-    SIGNATURE: 'signature',
-    EMAIL: 'email',
-    FIRSTNAME: 'first',
-    LASTNAME: 'last',
-    CITY: 'city',
-    AGE: 'age',
-    URL: 'url'
-})
+
+// DB ids
+module.exports.USERID = 'user_id'
+module.exports.SIGNATURE = 'signature'
+module.exports.EMAIL = 'email'
+module.exports.FIRSTNAME = 'first'
+module.exports.LASTNAME = 'last'
+module.exports.CITY = 'city'
+module.exports.AGE = 'age'
+module.exports.URL = 'url'
+module.exports.SIGNERS = 'signers'
+
 const RelationId = Object.freeze({
     SIGNATURES: 'signatures',
     USERS: 'users',

@@ -182,7 +182,7 @@ class SignersPage extends Page {
     * @constructor
     * @param {Array[signers]} - And array of signer data
     */
-    constructor(signersArr, err) {
+    constructor (signersArr, err) {
         if (!signersArr) {
             throw Error('Signers Argument is missing')
         }

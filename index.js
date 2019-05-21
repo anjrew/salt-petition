@@ -45,7 +45,6 @@ app.use(...routers)
 
 /// Redis demo ////////////////////
 
-const redis = require('./redis')
 
 // This won't work because redis does not accept objects
 // app.get('/redis-fun', function (req, res) {

@@ -1,6 +1,7 @@
 module.exports = {
     requireNoSignature,
-    userLoggedIn
+    userLoggedIn,
+    userLoggedInAtEntry
 }
 const COOKIES = require('./utils/cookies')
 const ROUTES = require('./routers/routes')
@@ -22,9 +23,20 @@ function userLoggedIn (req, res, next) {
     if (!userId) {
         // if signatureId exists, this if block will run!
         // this is my signed route
-        console.log(chalk.green('going to signed in midddleware'))     
+        console.log(chalk.green('going to signed in midddleware'))
         res.redirect(ROUTES.REGISTER)
     } else {
         next()
+    }
+}
+
+function userLoggedInAtEntry (req, res, next) {
+    const userId = req.session[COOKIES.ID]
+    if (!userId) {
+        // if signatureId exists, this if block will run!
+        // this is my signed route
+        next()
+    } else {
+        res.redirect(ROUTES.PETITION)
     }
 }

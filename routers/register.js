@@ -7,9 +7,10 @@ const PAGES = require('../view_data/page_data')
 const index = require('../index')
 const db = require('../utils/db')
 const encryption = require('../utils/encryption')
+const userLoggedInAtEntry = require('../middleware').userLoggedInAtEntry
 
 router.route(ROUTES.REGISTER)
-    .get((req, res, next) => {
+    .get(userLoggedInAtEntry, (req, res, next) => {
         if (req.session[COOKIES.ID] || req.session[COOKIES.LOGGEDIN]) {
             req.session[COOKIES.ID] = null
             req.session[COOKIES.LOGGEDIN] = null

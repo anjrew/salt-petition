@@ -7,6 +7,8 @@ const index = require('../index')
 const db = require('../utils/db')
 const userLoggedIn = require('../middleware').userLoggedIn
 
+// Implement redis
+
 router.route(ROUTES.SIGNERS)
     .get(userLoggedIn, (req, res, next) => {
         const userID = req.session[COOKIES.ID]

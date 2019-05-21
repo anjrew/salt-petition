@@ -37,12 +37,16 @@
     // Touch
     $(canvas).on('touchstart', function (event) {
         context.beginPath()
-        context.moveTo(event.offsetX, event.offsetY)
+        context.moveTo(
+            $(event)[0].originalEvent.touches[0].pageX - $(canvas).offset().left, event.offsetY,
+            $(event)[0].originalEvent.touches[0].pageY - $(canvas).offset().top)
 
         $(canvas).on('touchmove', function (event) {
+            var x = $(event)[0].originalEvent.touches[0].pageX - $(canvas).offset().left
+            var y = $(event)[0].originalEvent.touches[0].pageY - $(canvas).offset().top
             var touch = event.touches[0]
             event.preventDefault()
-            context.lineTo(event.offsetX, event.offsetY)
+            context.lineTo(x, y)
             context.stroke()
             var data = this.toDataURL()
             $('#data').val(data)

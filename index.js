@@ -42,6 +42,66 @@ app.use((req, res, next) => {
 
 app.use(...routers)
 
+/// Redis demo ////////////////////
+
+const redis = require('./redis')
+
+// This won't work because redis does not accept objects
+// app.get('/redis-fun', function (req, res) {
+//     redis.setex('cute-puppies', 120,
+//         {
+//             name: 'layla',
+//             age: 9,
+//             cutenessScore: 10000000
+//         }
+//     ).then(() => {
+//         res.send('Cock')
+//         // the code to be run after the property has been sset by redis
+//     }).catch((e) => {
+//         console.log(`Error in SETEX:`, e)
+//     })
+// })
+
+// This works becasue we stringigy the object
+app.get('/redis-fun', function (req, res) {
+    redis.setex('cute-puppies', 12000,
+        JSON.stringify({
+            name: 'layla',
+            age: 9,
+            cutenessScore: 10000000
+        })
+    ).then(() => {
+        res.send('Cock')
+        // the code to be run after the property has been sset by redis
+    }).catch((e) => {
+        console.log(`Error in SETEX:`, e)
+    })
+})
+
+// To GET from redis
+app.get('/get-cute-puppies', function (req, res) {
+    redis.get('cute-puppies').then((value) => {
+        console.log(value)
+        console.log(JSON.parse(value))
+        // the code to be run after the property has been sset by redis
+    }).catch((e) => {
+        console.log(`Error in GET:`, e)
+    })
+})
+
+
+
+// To Delete from redis
+app.get('/delete-cute-puppies', function (req, res) {
+    redis.del('get-cute-puppies').then((response) => {
+        // will run after redis has completed the deletation
+    }).catch((e) => {
+        console.log(e)
+    })
+})
+
+/// //////////////////////////////////
+
 app.get('/error', (req, res) => {
     res.render('error', {
         layout: 'main',
@@ -84,7 +144,7 @@ function setupApp () {
 }
 
 // Stops server starting during tests
-if (require.main == module) {
+if (require.main === module) {
     app.listen(process.env.PORT || 8080, () => {
         console.log(process.env.PORT ? `Online` : `Listening on port 8080`)
     })
@@ -93,7 +153,6 @@ if (require.main == module) {
 // Parameters may be declared in a variety of syntactic forms
 /**
  * @param {Object} req - The http request object.
- * @param {Object} res - The http response object.
  * @param {Page} page - A instance of a Page class or child.
  */
 module.exports.renderPage = function renderPage (res, page) {

@@ -20,7 +20,7 @@ test('Test SignersPage constructor throw', () => {
     expect(renderTest).toThrow()
 })
 
-test('Test SignedPage constructor throw on singers not being a number', () => {
+test('Test SignedPage constructor throw on signers not being a number', () => {
     function renderTest () { return new pages.SignedPage('userName', 'signedName', 'Singers') }
     expect(renderTest).toThrow()
 })

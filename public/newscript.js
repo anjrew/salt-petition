@@ -1,4 +1,4 @@
-// eslint-disable-next-line quotes
+new// eslint-disable-next-line quotes
 /* global $ */
 
 (function () {

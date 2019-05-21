@@ -78,7 +78,7 @@ function setupApp () {
         secret: `I'm always angry.`,
         maxAge: 1000 * 60 * 60 * 24 * 14
     }))
-    app.use(express.static(`${__dirname}/public`))
+    app.use(express.static(`./public`))
 
     app.use(csurf())
 }

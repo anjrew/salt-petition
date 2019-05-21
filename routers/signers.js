@@ -19,7 +19,7 @@ router.route(ROUTES.SIGNERS)
         redis.get(db.SIGNERS).then((result) => {
             if (result) {
                 var data = JSON.parse(result).rows
-                console.log(chalk.blue(`Took ${performance.now() - start} milliseconds`))
+                console.log(chalk.blue(`Took ${performance.now() - start} milliseconds to get from Redis`))
                 index.renderPage(res, new PAGES.SignersPage(data))
             } else {
                 db.listSigners(userID).then((signers) => {
@@ -32,11 +32,12 @@ router.route(ROUTES.SIGNERS)
                             url: signer.url
                         }
                     })
-                    redis.setex(db.SIGNERS, redis.SAVETIME, JSON.stringify(signers)).then(() => {
+                    redis.setex(db.SIGNERS, 500, JSON.stringify(signers)).then(() => {
                         console.log(chalk.green('Signers saved to redis: ', signers))
                     }).catch((e) => {
                         console.log(chalk.red('Unable to save to Redis:', e))
                     })
+                    console.log(chalk.blue(`Took ${performance.now() - start} milliseconds to get from Postgres`))
                     index.renderPage(res, new PAGES.SignersPage(tolist))
                 }).catch((e) => {
                     console.log(e)

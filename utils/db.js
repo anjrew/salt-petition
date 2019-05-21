@@ -1,10 +1,21 @@
 const spicedPg = require('spiced-pg')
+const redis = require('../utils/redis')
+const chalk = require('chalk')
 
 // process.env.NODE_ENV === "production" ? secrets = process.env : secrets = require('./secrets');
 const dbUrl = process.env.DATABASE_URL || `postgres:postgres:postgres@localhost:5432/salt-petition`
 const db = spicedPg(dbUrl)
 
 // DB ids
+const USERID = 'user_id'
+const SIGNATURE = 'signature'
+const EMAIL = 'email'
+const FIRSTNAME = 'first'
+const LASTNAME = 'last'
+const CITY = 'city'
+const AGE = 'age'
+const URL = 'url'
+const SIGNERS = 'signers'
 module.exports.USERID = 'user_id'
 module.exports.SIGNATURE = 'signature'
 module.exports.EMAIL = 'email'
@@ -26,6 +37,9 @@ module.exports.test = function () {
 }
 
 module.exports.addSignature = function (userId, signatureUrl) {
+    redis.del(SIGNERS).catch((e) =>{
+        console.log(chalk.red(`Redis failed to delete: `, e));
+    })
     return db.query(`
         INSERT INTO signatures(user_id, signature) 
         VALUES ($1, $2)
@@ -41,20 +55,6 @@ module.exports.deleteSignature = function deleteSignature (sigId) {
         WHERE id = $1;
         `,
     [ sigId ]
-    )
-}
-
-// TODO WHy not working?@?@?
-module.exports.getSigners1 = function (userId) {
-    return db.query(
-        `
-        SELECT CONCAT(users.first, ' ', users.last) AS name,city,age,url
-        FROM signatures
-        JOIN users ON signatures.user_id=users.id
-        LEFT JOIN user_profiles ON users.id=user_profiles.user_id 
-        WHERE users.id != $1;
-        `,
-        [userId]
     )
 }
 
@@ -89,6 +89,9 @@ module.exports.signersCount = function getAmountOfSigners (userid) {
 // USER QUERIES
 
 module.exports.addUser = function (first, last, email, password) {
+    redis.del(SIGNERS).catch((e) => {
+        console.log(chalk.red(`Redis failed to delete: `, e));
+    })
     return db.query(`
         SELECT email 
         FROM users
@@ -150,6 +153,9 @@ module.exports.getHashedPWord = function (email) {
 }
 
 module.exports.addUserProfile = function (age, city, url, userId) {
+    redis.del(SIGNERS).catch((e) => {
+        console.log(chalk.red(`Redis failed to delete: `, e));
+    })
     age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
@@ -187,6 +193,9 @@ module.exports.getSignatureWithSigId = function (sigId) {
 }
 
 module.exports.updateUser = function (first, last, password, email, userId) {
+    redis.del(SIGNERS).catch((e) => {
+        console.log(chalk.red(`Redis failed to delete: `, e))
+    })
     if (!password) {
         return db.query(`
         UPDATE users
@@ -228,60 +237,6 @@ module.exports.getName = function (userId) {
     )
 }
 
-// Not working
-module.exports.getProfileData = function (email) {
-    return db.query(`
-    SELECT * 
-    FROM users 
-    LEFT JOIN user_profiles
-    ON users.id = user_profiles.user_id
-    LEFT JOIN signatures
-    ON user_profiles.user_id = signatures.user_id;
-    WHERE users.email =$1;
-        `,
-    [email]
-    )
-}
-// Not working
-module.exports.getProfileDataById = function (id) {
-    return db.query(`
-    SELECT * 
-    FROM users 
-    LEFT JOIN user_profiles
-    ON users.id = user_profiles.user_id
-    LEFT JOIN signatures
-    ON user_profiles.user_id = signatures.user_id;
-    WHERE users.id =$1;
-        `,
-    [id]
-    )
-}
-
-// TODO why not working
-module.exports.getLoginData = function (email) {
-    return db.query(`
-    SELECT email,users.id, signature.id AS "sigId"
-    FROM users
-    LEFT JOIN signatures ON users.id=signatures.user_id
-    WHERE email =$1;
-    `,
-    [email]
-    )
-}
-
-// NOT WORKING
-module.exports.getUserProfile = function (email) {
-    return db.query(`
-    SELECT users.id AS "id", first,last,email,password, signatures.id AS "sigId", age, city, url
-    FROM users
-    LEFT JOIN user_profiles
-    ON users.id = user_profiles.user_id
-    LEFT JOIN signatures 
-    ON user_profiles.user_id=signatures.user_id
-    WHERE email =$1;`,
-    [email]
-    )
-}
 
 module.exports.getUserProfileById = function (id) {
     return db.query(`
@@ -294,6 +249,9 @@ module.exports.getUserProfileById = function (id) {
 }
 
 module.exports.updateProfile = function (userId, age, city, url) {
+    redis.del(SIGNERS).catch((e) => {
+        console.log(chalk.red(`Redis failed to delete: `, e))
+    })
     age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
@@ -314,4 +272,17 @@ module.exports.updateProfile = function (userId, age, city, url) {
             )
         }
     })
+}
+
+module.exports.getUserProfile = function (email) {
+    return db.query(`
+    SELECT users.id AS "id", first,last,email,password, signatures.id AS "sigId", age, city, url
+    FROM users
+    LEFT JOIN user_profiles
+    ON users.id = user_profiles.user_id
+    LEFT JOIN signatures 
+    ON user_profiles.user_id=signatures.user_id
+    WHERE email =$1;`,
+    [email]
+    )
 }

@@ -21,6 +21,7 @@
         welcomePopup()
     }
 
+    // Mouse
     $(canvas).mousedown(function (event) {
         context.beginPath()
         context.moveTo(event.offsetX, event.offsetY)
@@ -33,10 +34,31 @@
         })
     }).on('mouseup mouseleave', function (event) { $(canvas).off('mousemove mouseleave') })
 
+    // Touch
+    $(canvas).on('touchstart', function (event) {
+        context.beginPath()
+        context.moveTo(event.offsetX, event.offsetY)
+
+        $(canvas).on('touchmove', function (event) {
+            var touch = event.touches[0]
+            event.preventDefault()
+            context.lineTo(event.offsetX, event.offsetY)
+            context.stroke()
+            var data = this.toDataURL()
+            $('#data').val(data)
+            if (canvas !== document.elementFromPoint(touch.pageX, touch.pageY)) {
+                touchleave()
+            }
+        }).on('touchend mouseleave', function (event) { $(canvas).off('mousemove mouseleave') })
+    })
+
+    function touchleave () {
+        console.log("You're not touching the element anymore")
+    }
+
     // Buttons
 
     $('#delete-nav').on('click', function (event) {
-
         $('#delete-nav').css({
             'transform': 'scale(1.0)'
         })
@@ -99,6 +121,8 @@
     $('*').on('mouseover', function () {
         resizeImage()
     })
+
+    // Touch Events
 
     // To Resize image
 

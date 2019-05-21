@@ -16,12 +16,17 @@ router.route(ROUTES.PETITION)
         const signatureId = req.session[COOKIES.SIGNATURE]
         if (userId && signatureId) {
             console.log('Redirecting to signed');
-
             res.redirect(ROUTES.SIGNED)
         } else {
             db.getName(userId).then((result) => {
-                const firstname = result.rows[0].first
-                index.renderPage(res, new PAGES.PetitonPage(firstname))
+                const hasResult = result.rows[0]
+                if (hasResult) {
+                    const firstname = result.rows[0].first
+                    index.renderPage(res, new PAGES.PetitonPage(firstname))
+                } else {
+                    req.session = null
+                    res.redirect(ROUTES.REGISTER)
+                }
             }).catch((e) => {
                 console.log(e)
                 next()

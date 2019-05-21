@@ -56,7 +56,6 @@ module.exports.getSigners1 = function (userId) {
     )
 }
 
-
 module.exports.listSigners = function listSigners (userId) {
     return db.query(
         `SELECT first,last,age,city,url FROM signatures
@@ -149,6 +148,7 @@ module.exports.getHashedPWord = function (email) {
 }
 
 module.exports.addUserProfile = function (age, city, url, userId) {
+    age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
         if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.') && !url === '') {
@@ -292,13 +292,24 @@ module.exports.getUserProfileById = function (id) {
 }
 
 module.exports.updateProfile = function (userId, age, city, url) {
+    age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
-    return db.query(`
-    INSERT INTO user_profiles(user_id, age, city, url) 
-    VALUES ($1, $2, $3, $4)
-    ON CONFLICT (user_id)
-    DO UPDATE SET age=$2, city=$3, url=$4;
-    `,
-    [ userId, age, city, url ]
-    )
+    return new Promise((resolve, reject) => {
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.') && !url === '') {
+            reject(new Error('Not a valid Url. Leave blank if you like :)'))
+        } else {
+            if (url.startsWith('www.')) {
+                url = 'https://'.concat(url)
+            }
+            resolve(db.query(`
+                INSERT INTO user_profiles(user_id, age, city, url) 
+                VALUES ($1, $2, $3, $4)
+                ON CONFLICT (user_id)
+                DO UPDATE SET age=$2, city=$3, url=$4;
+                `,
+            [ userId, age, city, url ]
+            )
+            )
+        }
+    })
 }

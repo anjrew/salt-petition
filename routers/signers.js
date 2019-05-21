@@ -12,12 +12,11 @@ router.route(ROUTES.SIGNERS)
         const userID = req.session[COOKIES.ID]
         db.listSigners(userID).then((signers) => {
             var tolist = signers.rows.map((signer) => {
-                console.log(signer.city.charAt(0).toUpperCase() + signer.city.slice(1))
                 return {
                     first: signer.first,
                     last: signer.last,
                     age: signer.age,
-                    city: signer.city.charAt(0).toUpperCase() + signer.city.slice(1),
+                    city: signer.city ? signer.city.charAt(0).toUpperCase() + signer.city.slice(1) : null,
                     url: signer.url
                 }
             })

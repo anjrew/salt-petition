@@ -1,22 +1,18 @@
 // IMPORTS
 const express = require('express')
 const app = express()
-const encryption = require('./utils/encryption')
 const hb = require('express-handlebars')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session')
 const csurf = require('csurf')
 const chalk = require('chalk')
-const COOKIES = require('./utils/cookies');
 
 // EXPORTS
 module.exports.app = app
 
 // MODULES
-const db = require(`./utils/db.js`)
 const PAGES = require('./view_data/page_data.js')
-const ROUTES = require('./routers/routes')
 const routers = [
     require('./routers/profile'),
     require('./routers/login'),

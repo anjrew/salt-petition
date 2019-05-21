@@ -62,10 +62,7 @@ module.exports.listSigners = function listSigners (userId) {
         `SELECT first,last,age,city,url FROM signatures
         JOIN users ON signatures.user_id=users.id
         LEFT JOIN user_profiles ON users.id=user_profiles.user_id
-        WHERE user_profiles.user_id != $1;
-        `,
-        [ userId ]
-    )
+        `)
 }
 
 module.exports.listSignersByCity = function listSignersByCity (city) {

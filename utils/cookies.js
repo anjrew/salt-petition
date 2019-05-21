@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 module.exports.LOGGEDIN = 'loggedIn'
 module.exports.ID = 'userId'
 module.exports.SIGNATURE = 'signature'

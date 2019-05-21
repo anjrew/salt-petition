@@ -22,7 +22,7 @@ const routers = [
     require('./routers/signers'),
     require('./routers/city'),
     require('./routers/logout'),
-    require('./routers/edit_profile'),
+    require('./routers/edit_profile')
 ]
 
 setupApp()
@@ -52,6 +52,7 @@ app.get('/error', (req, res) => {
 })
 
 app.get('*', (req, res) => {
+    res.status(404)
     res.render('error', {
         layout: 'main',
         error: 'ERROR: No page found',
@@ -83,7 +84,7 @@ function setupApp () {
 }
 
 // Stops server starting during tests
-if (require.main === module) {
+if (require.main == module) {
     app.listen(process.env.PORT || 8080, () => {
         console.log(process.env.PORT ? `Online` : `Listening on port 8080`)
     })

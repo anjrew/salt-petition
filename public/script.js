@@ -231,33 +231,33 @@
     }
 
     if ($('#email')) {
-        $('#email').keydown(function () {
+        $('#email').keyup(function () {
             localStorage.setItem('email', $('#email').val())
         })
     }
 
     if ($('#firstname')) {
-        $('#firstname').keydown(function () {
+        $('#firstname').keyup(function () {
             localStorage.setItem('firstname', $('#firstname').val())
         })
     }
     if ($('#lastname')) {
-        $('#lastname').keydown(function () {
+        $('#lastname').keyup(function () {
             localStorage.setItem('lastname', $('#lastname').val())
         })
     }
     if ($('#age')) {
-        $('#age').keydown(function () {
+        $('#age').keyup(function () {
             localStorage.setItem('age', $('#age').val())
         })
     }
     if ($('#city')) {
-        $('#city').keydown(function () {
+        $('#city').keyup(function () {
             localStorage.setItem('city', $('#city').val())
         })
     }
     if ($('#url')) {
-        $('#url').keydown(function () {
+        $('#url').keyup(function () {
             localStorage.setItem('url', $('#url').val())
         })
     }

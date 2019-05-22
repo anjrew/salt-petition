@@ -136,12 +136,7 @@ module.exports.addUserProfile = function (age, city, url, userId) {
     age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
-        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.') && !url === '') {
-            reject(new Error('Not a valid Url. Leave blank if you like :)'))
-        } else {
-            if (url.startsWith('www.')) {
-                url = 'https://'.concat(url)
-            }
+        if (url.startsWith('http://') || url.startsWith('https://') || url === '' || url === null) {
             resolve(
                 db.query(`
                 INSERT INTO user_profiles(age, city, url, user_id) 
@@ -151,6 +146,8 @@ module.exports.addUserProfile = function (age, city, url, userId) {
                 [age, city, url, userId]
                 )
             )
+        } else {
+            reject(new Error('Not a valid Url. Leave blank if you like :)'))
         }
     })
 }
@@ -213,9 +210,10 @@ module.exports.getName = function (userId) {
 
 module.exports.getUserProfileById = function (id) {
     return db.query(`
-    SELECT first,last,email, user_profiles.age, user_profiles.city
+    SELECT first,last,email, age, city, url
     FROM users
-    LEFT JOIN user_profiles ON users.id=user_profiles.user_id
+    LEFT JOIN user_profiles 
+    ON users.id=user_profiles.user_id
     WHERE users.id =$1;`,
     [id]
     )
@@ -225,21 +223,17 @@ module.exports.updateProfile = function (userId, age, city, url) {
     age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
-        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('www.') && !url === '') {
-            reject(new Error('Not a valid Url. Leave blank if you like :)'))
-        } else {
-            if (url.startsWith('www.')) {
-                url = 'https://'.concat(url)
-            }
+        if (url.startsWith('http://') || url.startsWith('https://') || url === '' || url === null) {
             resolve(db.query(`
-                INSERT INTO user_profiles(user_id, age, city, url) 
-                VALUES ($1, $2, $3, $4)
-                ON CONFLICT (user_id)
-                DO UPDATE SET age=$2, city=$3, url=$4;
-                `,
+            INSERT INTO user_profiles(user_id, age, city, url) 
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id)
+            DO UPDATE SET age=$2, city=$3, url=$4;
+            `,
             [ userId, age, city, url ]
-            )
-            )
+            ))
+        } else {
+            reject(new Error('Not a valid Url. Leave blank if you like :)'))
         }
     })
 }

@@ -22,6 +22,10 @@
         welcomePopup()
     }
 
+    $(document).ready(function () {
+        $('#video').play()
+    })
+
     // Mouse
     $(canvas).mousedown(function (event) {
         context.beginPath()
@@ -57,7 +61,7 @@
         }).on('touchend mouseleave', function (event) { $(canvas).off('mousemove mouseleave') })
     })
 
-    function touchleave() {
+    function touchleave () {
         console.log("You're not touching the element anymore")
     }
 
@@ -127,12 +131,10 @@
         resizeImage()
         if (vid.paused) {
             vid.play().catch((e) => {
-                console.log(e);
+                console.log(e)
             })
         }
     })
-
-    // Touch Events
 
     // To Resize image
 
@@ -140,7 +142,7 @@
         resizeImage()
     })
 
-    function resizeImage() {
+    function resizeImage () {
         var allelements = $('*')
 
         var heights = allelements.map(function () {
@@ -162,7 +164,7 @@
         }
     }
 
-    function welcomePopup() {
+    function welcomePopup () {
         overlay.classList.add('on')
         popup.addClass('on')
     }
@@ -191,6 +193,20 @@
         popup.removeClass('on')
         event.stopPropagation()
     })
+
+    // if (localStorage.getItem('firstname')){
+    //     $('#firstname')firstname}
+    // if (localStorage.getItem('lastname')){
+    //     $('#lastname')lastname}
+    // if (localStorage.getItem('password')){
+    //     $('#password')password}
+    // if (localStorage.getItem('age')){
+    //     $('#age')age}
+    // if (localStorage.getItem('city')){
+    //     $('#city')city}
+    // if (localStorage.getItem('url')){
+    //     $('#url')url}
+
     vid.play().catch((e) => {
         console.log(e)
     })

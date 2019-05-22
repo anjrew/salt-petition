@@ -16,9 +16,9 @@ router.route(ROUTES.EDITPROFILE)
                 firstname: result.rows[0].first,
                 lastname: result.rows[0].last,
                 email: result.rows[0].email,
-                age: req.session[COOKIES.AGE],
-                city: req.session[COOKIES.CITY],
-                url: req.session[COOKIES.URL]
+                age: result.rows[0].age,
+                city: result.rows[0].city,
+                url: result.rows[0].url
             }
             let pageData = new PAGES.EditProfilePage(detailsObj)
             index.renderPage(res, pageData)
@@ -38,33 +38,37 @@ router.route(ROUTES.EDITPROFILE)
             })
         } else {
             const userId = req.session[COOKIES.ID]
-            let age = req.session[COOKIES.AGE] = req.body.age
-            const city = req.session[COOKIES.CITY] = req.body.city
-            const url = req.session[COOKIES.URL] = req.body.url
-            const first = req.session[COOKIES.FIRSTNAME] = req.body.firstname
-            const last = req.session[COOKIES.LASTNAME] = req.body.lastname
-            const email = req.session[COOKIES.EMAIL] = req.body.email
+            let age = req.body.age
+            const city = req.body.city
+            const url = req.body.url
+            const first = req.body.firstname
+            const last = req.body.lastname
+            const email = req.body.email
             const password = req.body.password
             // to update Profile
-            db.updateProfile(userId, age, city, url).catch((e) => { console.log(e) }).then((result) => {
-                if (password) {
-                    encryption.hashPassword(password).then((hashedP) => {
-                        db.updateUser(first, last, hashedP, email, userId).catch((e) => {
+            db.updateProfile(userId, age, city, url).then((result) => {
+                if (result) {
+                    if (password) {
+                        encryption.hashPassword(password).then((hashedP) => {
+                            db.updateUser(first, last, hashedP, email, userId).catch((e) => {
+                                index.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
+                            })
+                        })
+                    } else {
+                        db.updateUser(first, last, null, email, userId).catch((e) => {
                             index.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
                         })
-                    })
+                    }
+                    req.session[COOKIES.LOGGEDIN] = true
+                    res.redirect(ROUTES.PETITION)
                 } else {
-                    db.updateUser(first, last, null, email, userId).catch((e) => {
-                        index.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
-                    })
+                    index.renderPage(res, new PAGES.EditProfilePage({}, `Please enter a valid url`))
                 }
-                req.session[COOKIES.LOGGEDIN] = true
-                res.redirect(ROUTES.PETITION)
             }).catch((e) => {
                 if (e.code === '22P02') {
                     index.renderPage(res, new PAGES.EditProfilePage({}, `Please enter a number for your age`))
                 } else {
-                    index.renderPage(res, new PAGES.ProfilePage({}, `${e}`))
+                    index.renderPage(res, new PAGES.EditProfilePage({}, `${e.message}`))
                 }
             })
         }

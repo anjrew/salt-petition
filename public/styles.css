@@ -16,6 +16,11 @@
     outline: none;
 }
 
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 ul{
     list-style-type: none;
     display: flex;

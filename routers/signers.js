@@ -6,10 +6,13 @@ const PAGES = require('../view_data/page_data')
 const index = require('../index')
 const db = require('../utils/db')
 const userLoggedIn = require('../middleware').userLoggedIn
+<<<<<<< HEAD
 const redis = require('../utils/redis')
 const chalk = require('chalk')
 const performance = require('perf_hooks').performance
 // Implement redis
+=======
+>>>>>>> parent of 52c023d... View is now sorted
 
 router.route(ROUTES.SIGNERS)
 

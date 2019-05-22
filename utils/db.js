@@ -1,21 +1,10 @@
 const spicedPg = require('spiced-pg')
-const redis = require('../utils/redis')
-const chalk = require('chalk')
 
 // process.env.NODE_ENV === "production" ? secrets = process.env : secrets = require('./secrets');
 const dbUrl = process.env.DATABASE_URL || `postgres:postgres:postgres@localhost:5432/salt-petition`
 const db = spicedPg(dbUrl)
 
 // DB ids
-const USERID = 'user_id'
-const SIGNATURE = 'signature'
-const EMAIL = 'email'
-const FIRSTNAME = 'first'
-const LASTNAME = 'last'
-const CITY = 'city'
-const AGE = 'age'
-const URL = 'url'
-const SIGNERS = 'signers'
 module.exports.USERID = 'user_id'
 module.exports.SIGNATURE = 'signature'
 module.exports.EMAIL = 'email'
@@ -25,21 +14,15 @@ module.exports.CITY = 'city'
 module.exports.AGE = 'age'
 module.exports.URL = 'url'
 module.exports.SIGNERS = 'signers'
-
-const RelationId = Object.freeze({
-    SIGNATURES: 'signatures',
-    USERS: 'users',
-    USERPROFILES: 'user_profiles'
-})
+module.exports.SIGNATURES = 'signatures'
+module.exports.USERS = 'users'
+module.exports.USERPROFILES = 'user_profiles'
 
 module.exports.test = function () {
     return true
 }
 
 module.exports.addSignature = function (userId, signatureUrl) {
-    redis.del(SIGNERS).catch((e) =>{
-        console.log(chalk.red(`Redis failed to delete: `, e));
-    })
     return db.query(`
         INSERT INTO signatures(user_id, signature) 
         VALUES ($1, $2)
@@ -89,9 +72,6 @@ module.exports.signersCount = function getAmountOfSigners (userid) {
 // USER QUERIES
 
 module.exports.addUser = function (first, last, email, password) {
-    redis.del(SIGNERS).catch((e) => {
-        console.log(chalk.red(`Redis failed to delete: `, e));
-    })
     return db.query(`
         SELECT email 
         FROM users
@@ -153,9 +133,6 @@ module.exports.getHashedPWord = function (email) {
 }
 
 module.exports.addUserProfile = function (age, city, url, userId) {
-    redis.del(SIGNERS).catch((e) => {
-        console.log(chalk.red(`Redis failed to delete: `, e));
-    })
     age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {
@@ -193,9 +170,6 @@ module.exports.getSignatureWithSigId = function (sigId) {
 }
 
 module.exports.updateUser = function (first, last, password, email, userId) {
-    redis.del(SIGNERS).catch((e) => {
-        console.log(chalk.red(`Redis failed to delete: `, e))
-    })
     if (!password) {
         return db.query(`
         UPDATE users
@@ -237,7 +211,6 @@ module.exports.getName = function (userId) {
     )
 }
 
-
 module.exports.getUserProfileById = function (id) {
     return db.query(`
     SELECT first,last,email, user_profiles.age, user_profiles.city
@@ -249,9 +222,6 @@ module.exports.getUserProfileById = function (id) {
 }
 
 module.exports.updateProfile = function (userId, age, city, url) {
-    redis.del(SIGNERS).catch((e) => {
-        console.log(chalk.red(`Redis failed to delete: `, e))
-    })
     age = age === '' ? null : age
     city = city.charAt(0).toUpperCase() + city.slice(1)
     return new Promise((resolve, reject) => {

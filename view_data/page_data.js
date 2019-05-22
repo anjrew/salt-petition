@@ -1,8 +1,7 @@
 'use strict'
-const { Textfield, Button, FormField, Form, Footer, Link } = require('./widget_data.js')
+const { Textfield, FormField, Footer, Link } = require('./widget_data.js')
 const PageType = Object.freeze({ ERROR: 'error', FORM: 'form', SIGNERS: 'signers', SIGNED: 'signed', PETITION: 'petition' })
 const LAYOUT = 'layout'
-const { TableId } = require(`../utils/db`)
 const ROUTES = Object.freeze({
     SIGNED: '/petition/signed',
     PETITION: '/petition',

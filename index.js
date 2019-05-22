@@ -43,65 +43,6 @@ app.use((req, res, next) => {
 
 app.use(...routers)
 
-/// Redis demo ////////////////////
-
-
-// This won't work because redis does not accept objects
-// app.get('/redis-fun', function (req, res) {
-//     redis.setex('cute-puppies', 120,
-//         {
-//             name: 'layla',
-//             age: 9,
-//             cutenessScore: 10000000
-//         }
-//     ).then(() => {
-//         res.send('Cock')
-//         // the code to be run after the property has been sset by redis
-//     }).catch((e) => {
-//         console.log(`Error in SETEX:`, e)
-//     })
-// })
-
-// This works becasue we stringigy the object
-app.get('/redis-fun', function (req, res) {
-    redis.setex('cute-puppies', 12000,
-        JSON.stringify({
-            name: 'layla',
-            age: 9,
-            cutenessScore: 10000000
-        })
-    ).then(() => {
-        res.send('Cock')
-        // the code to be run after the property has been sset by redis
-    }).catch((e) => {
-        console.log(`Error in SETEX:`, e)
-    })
-})
-
-// To GET from redis
-app.get('/get-cute-puppies', function (req, res) {
-    redis.get('cute-puppies').then((value) => {
-        console.log(value)
-        console.log(JSON.parse(value))
-        // the code to be run after the property has been sset by redis
-    }).catch((e) => {
-        console.log(`Error in GET:`, e)
-    })
-})
-
-
-
-// To Delete from redis
-app.get('/delete-cute-puppies', function (req, res) {
-    redis.del('get-cute-puppies').then((response) => {
-        // will run after redis has completed the deletation
-    }).catch((e) => {
-        console.log(e)
-    })
-})
-
-/// //////////////////////////////////
-
 app.get('/error', (req, res) => {
     res.render('error', {
         layout: 'main',

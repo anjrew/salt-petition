@@ -3,6 +3,7 @@
 
 (function () {
     var cookiesAccepted = localStorage.getItem('cookiesAccepted')
+    var vid = document.getElementById('video')
     var popup = $('#popup')
     var closePopUpButton = $('#close-popup')
     var canvas = document.getElementById('signature')
@@ -56,7 +57,7 @@
         }).on('touchend mouseleave', function (event) { $(canvas).off('mousemove mouseleave') })
     })
 
-    function touchleave () {
+    function touchleave() {
         console.log("You're not touching the element anymore")
     }
 
@@ -72,14 +73,14 @@
         })
         $('#delete-nav').css({
             'transform': 'scale(0.0)'
-        }).off('transitionend')
+        }).off('transitionend').hide()
     })
 
     $('#no').click(function (e) {
         $('#pages').css({
             'transform': 'translateX(0%)'
         })
-        $('#delete-nav').css({
+        $('#delete-nav').show().css({
             'transform': 'scale(1.0)'
         }).off('transitionend')
     })
@@ -124,6 +125,11 @@
 
     $('*').on('mouseover', function () {
         resizeImage()
+        if (vid.paused) {
+            vid.play().catch((e) => {
+                console.log(e);
+            })
+        }
     })
 
     // Touch Events
@@ -131,10 +137,10 @@
     // To Resize image
 
     $(window).on('resize', function () {
-        resizeImage()  
+        resizeImage()
     })
 
-    function resizeImage () {
+    function resizeImage() {
         var allelements = $('*')
 
         var heights = allelements.map(function () {
@@ -144,6 +150,7 @@
         var maxHeight = Math.max.apply(null, heights)
 
         $('video').height(maxHeight)
+        $('video').width($('body'))
 
         var pages = $('.page')
         var width = window.innerWidth
@@ -155,7 +162,7 @@
         }
     }
 
-    function welcomePopup () {
+    function welcomePopup() {
         overlay.classList.add('on')
         popup.addClass('on')
     }
@@ -183,5 +190,8 @@
         overlay.classList.remove('on')
         popup.removeClass('on')
         event.stopPropagation()
+    })
+    vid.play().catch((e) => {
+        console.log(e)
     })
 })()

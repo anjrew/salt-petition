@@ -194,18 +194,73 @@
         event.stopPropagation()
     })
 
-    // if (localStorage.getItem('firstname')){
-    //     $('#firstname')firstname}
-    // if (localStorage.getItem('lastname')){
-    //     $('#lastname')lastname}
-    // if (localStorage.getItem('password')){
-    //     $('#password')password}
-    // if (localStorage.getItem('age')){
-    //     $('#age')age}
-    // if (localStorage.getItem('city')){
-    //     $('#city')city}
-    // if (localStorage.getItem('url')){
-    //     $('#url')url}
+    if (localStorage.getItem('email')) {
+        if ($('#email')) {
+            $('#email').val(localStorage.getItem('email'))
+        }
+    }
+
+    if (localStorage.getItem('firstname')) {
+        if ($('#firstname')) {
+            $('#firstname').val(localStorage.getItem('firstname'))
+        }
+    }
+
+    if (localStorage.getItem('lastname')) {
+        if ($('#lastname')) {
+            $('#lastname').val(localStorage.getItem('lastname'))
+        }
+    }
+
+    if (localStorage.getItem('age')) {
+        if ($('#age')) {
+            $('#age').val(localStorage.getItem('age'))
+        }
+    }
+
+    if (localStorage.getItem('city')) {
+        if ($('#city')) {
+            $('#city').val(localStorage.getItem('city'))
+        }
+    }
+
+    if (localStorage.getItem('url')) {
+        if ($('#url')) {
+            $('#url').val(localStorage.getItem('url'))
+        }
+    }
+
+    if ($('#email')) {
+        $('#email').keydown(function () {
+            localStorage.setItem('email', $('#email').val())
+        })
+    }
+
+    if ($('#firstname')) {
+        $('#firstname').keydown(function () {
+            localStorage.setItem('firstname', $('#firstname').val())
+        })
+    }
+    if ($('#lastname')) {
+        $('#lastname').keydown(function () {
+            localStorage.setItem('lastname', $('#lastname').val())
+        })
+    }
+    if ($('#age')) {
+        $('#age').keydown(function () {
+            localStorage.setItem('age', $('#age').val())
+        })
+    }
+    if ($('#city')) {
+        $('#city').keydown(function () {
+            localStorage.setItem('city', $('#city').val())
+        })
+    }
+    if ($('#url')) {
+        $('#url').keydown(function () {
+            localStorage.setItem('url', $('#url').val())
+        })
+    }
 
     vid.play().catch((e) => {
         console.log(e)

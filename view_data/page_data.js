@@ -207,13 +207,3 @@ exports.SignersPage = SignersPage
 exports.EditProfilePage = EditProfilePage
 exports.LAYOUT = LAYOUT
 
-// class PageAttributes {
-//     constructor () {
-//         this.name = name
-//         this.data = data
-//         this.data.layout = 'main'
-//         if (!this.name && !this.data) {
-//             throw Error('Arguments are missing')
-//         }
-//     }
-// }

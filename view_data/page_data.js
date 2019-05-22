@@ -22,7 +22,7 @@ class Page {
     * @param {PageAttributes} data - The widget data for the page.
     * @property {Object} attributes - An attributes object which has details that are passed to the handlebars script.
     */
-    constructor(type, attributes) {
+    constructor (type, attributes) {
         this.type = type
         this.attributes = attributes
         this.attributes.layout = 'main'
@@ -33,7 +33,7 @@ class Page {
 }
 
 class RegisterPage extends Page {
-    constructor(err) {
+    constructor (err) {
         super(PageType.FORM,
             {
                 subtitle: 'Sign up below to make a change...',
@@ -58,7 +58,7 @@ class LoginPage extends Page {
     * @constructor
     * @param {any} err - An Error to show the user.
     */
-    constructor(err) {
+    constructor (err) {
         super(PageType.FORM, {
             title: 'Let\'s Login',
             fieldset: new FormField([
@@ -77,7 +77,7 @@ class LoginPage extends Page {
 }
 
 class PetitonPage extends Page {
-    constructor(firstnameIn, err) {
+    constructor (firstnameIn, err) {
         super(PageType.PETITION,
             {
                 error: err,
@@ -94,7 +94,7 @@ class ProfilePage extends Page {
     * @constructor
     * @param {string} err - The error to render to screen in case of an Error.
     */
-    constructor(err) {
+    constructor (err) {
         super(PageType.FORM, {
             loggedIn: true,
             error: err,
@@ -122,7 +122,7 @@ class EditProfilePage extends Page {
     *        - city
     *        - url
     */
-    constructor(detailsObj, err) {
+    constructor (detailsObj, err) {
         super(PageType.FORM, {
             loggedIn: true,
             error: err,
@@ -150,7 +150,7 @@ class SignedPage extends Page {
     * @param {number} signers - The total number of signers
     * @property {Array<Link>} links - An array of links to display below the signature pad
     */
-    constructor(userName, signedName, signers) {
+    constructor (userName, signedName, signers) {
         if (!userName && !signedName && !signers) {
             throw Error('Arguments are missing for Thankyou page')
         }
